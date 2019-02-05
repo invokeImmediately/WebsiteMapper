@@ -1,0 +1,19 @@
+{
+  "name": "websitemapper",
+  "version": "0.0.0",
+  "description": "Node.js-driven generator of graphical website maps",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/invokeImmediately/WebsiteMapper.git"
+  },
+  "author": "Daniel Rieck <danielcrieck@gmail.com> (https://github.com/invokeImmediately)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/invokeImmediately/WebsiteMapper/issues"
+  },
+  "homepage": "https://github.com/invokeImmediately/WebsiteMapper#readme"
+}
