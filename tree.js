@@ -1,6 +1,8 @@
 // Tree (root node)
 // ├─→ This is a child node.
 // │   ├─→ This is a child of a child node.
+// │   │   ├─→ This is yet another child of a child node.
+// │   │   ├─→ This is yet another child of a child node.
 // │   │   └─→ This is yet another child of a child node.
 // │   └─→ Testing 1 2 3.
 // │       └─→ Bleh.
@@ -42,13 +44,23 @@
  * @todo Add inline documentation.
  * @todo Finish writing class.
  */
-class Tree {
+
+var WebsiteMapper = WebsiteMapper || {};
+
+WebsiteMapper.Tree = class Tree {
 	/**
 	 * @todo Add inline documentation.
 	 */
 	constructor( rootValue ) {
-		this.root = new TreeNode( rootValue, 0, 0, undefined, this );
+		this.root = new WebsiteMapper.TreeNode(
+			rootValue,
+			0,
+			0,
+			undefined,
+			this
+		);
 		this.treeType = typeof rootValue;
+		this.lastAdded = this.root;
 	}
 
 	/**
@@ -63,8 +75,49 @@ class Tree {
 	 * @todo Finish writing function.
 	 */
 	getPrintStr() {
-		// ...
-		console.log( 'Tree.getPrintStr() -- Still under construction.' )
+		var curIdx = [0];
+		var curDepth = 0
+		var curNode = this.root.children[curIdx];
+		var outHdr = '';
+		var outStr = outHdr + this.root.value + '\n';
+		var counter = 0;
+
+		curIdx.push( 0 );
+		while ( curNode !== undefined && counter < 100 ) {
+			outHdr = outHdr.replace( '├─→', '│  ' );
+			outHdr = outHdr.replace( '└─→', '   ' );
+			if ( curNode.getSibNext() === undefined ) {
+				outHdr += '└─→ ';
+			} else {
+				outHdr += '├─→ ';				
+			}
+			outStr += outHdr + curNode.value + '\n';
+			if ( curNode.children.length ) {
+				curNode = curNode.children[0];
+			} else if ( curNode.getSibNext() !== undefined ) {
+				curNode = curNode.getSibNext();
+				outHdr = outHdr.slice(0, outHdr.length - 4 );
+			} else {
+				curNode = curNode.parent;
+				outHdr = outHdr.slice(0, outHdr.length - 4 );
+				while (
+					curNode !== undefined &&
+					curNode.getSibNext() === undefined &&
+					counter < 100
+				) {
+					curNode = curNode.parent;
+					outHdr = outHdr.slice(0, outHdr.length - 4 );
+					counter++;
+				}
+				if ( curNode !== undefined ) {
+					curNode = curNode.getSibNext();
+					outHdr = outHdr.slice(0, outHdr.length - 4 );
+				}
+			}
+			counter++;
+		}
+
+		return outStr;
 	}
 }
 
@@ -72,7 +125,7 @@ class Tree {
  * @todo Add inline documentation.
  * @todo Finish writing class.
  */
-class TreeNode {
+WebsiteMapper.TreeNode = class TreeNode {
 	/**
 	 * @todo Add inline documentation.
 	 */
@@ -86,12 +139,43 @@ class TreeNode {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Append a new node to this node's children.
+	 * 
+	 * @todo Finish inline documentation.
 	 */
 	addChild( value ) {
-		this.children.push( new TreeNode( value, this.children.length, this.depth + 1, this, this.tree ) );
+		var newNode = new TreeNode(
+			value,
+			this.children.length,
+			this.depth + 1,
+			this,
+			this.tree
+		);
+		this.children.push( newNode );
+		this.tree.lastAdded = newNode;
 
-		return this.children[ this.children.length - 1 ];
+		return newNode;
+	}
+
+	/**
+	 * @todo Append a new node to this node's siblings.
+	 */
+	addSib( value ) {
+		var newNode = undefined;
+
+		if ( this.parent !== undefined ) {
+			newNode = new TreeNode(
+				value,
+				this.parent.children.length,
+				this.depth,
+				this.parent,
+				this.tree
+			);
+			this.parent.children.push( newNode );
+			this.tree.lastAdded = newNode;
+		}
+
+		return newNode;
 	}
 
 	/**
@@ -133,7 +217,10 @@ class TreeNode {
 	getSibNext() {
 		var next;
 
-		if ( this.idx >= this.parent.children.length - 1 ) {
+		if (
+			this.parent === undefined ||
+			this.idx >= this.parent.children.length - 1
+		) {
 			next = undefined; 
 		} else {
 			next = this.parent.children[ this.idx + 1 ];
@@ -159,18 +246,23 @@ class TreeNode {
 }
 
 function testTrees() {
-	var tree = new Tree( 'Node 1' );
+	var tree = new WebsiteMapper.Tree( 'Node 1' );
 	var node;
+	var node2;
 	var foundNode;
 
 	tree.root.addChild( 'Node 2' );
 	node = tree.root.addChild( 'Node 3' );
 	node.addChild( 'Node 4' );
-	node.addChild( 'Node 5' );
+	node2 = node.addChild( 'Node 5' );
 	node.addChild( 'Node 6' );
+	node.addSib( 'Node 7' );
+	tree.root.addSib( 'Node 8' );
+	node2.addChild( 'Node 9' );
+	node2.addChild( 'Node 10' );
 
-	foundNode = tree.findFirst( 'Node 3' );
-	console.log( foundNode );
+	console.log( 'Contents of tree:\n-----------------\n' +
+		tree.getPrintStr() );
 }
 
 testTrees();
