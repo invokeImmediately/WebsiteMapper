@@ -3,6 +3,9 @@ const moment = require( 'moment-timezone' );
 const readline = require( 'readline' );
 const intf = readline.createInterface( process.stdin, process.stdout );
 
+/**
+ * @todo Add inline documentation.
+ */
 function advStkIfReady( success, stkIdx, promptStk, intf ) {
 	if ( success ) {
 		stkIdx++;
@@ -12,6 +15,9 @@ function advStkIfReady( success, stkIdx, promptStk, intf ) {
 	return stkIdx;
 }
 
+/**
+ * @todo Add inline documentation.
+ */
 function checkFnSlug( line ) {
 	var fnSlug = undefined;
 
@@ -22,6 +28,9 @@ function checkFnSlug( line ) {
 	return fnSlug;
 }
 
+/**
+ * @todo Add inline documentation.
+ */
 function checkMainElemId( line ) {
 	var mainElemId = undefined;
 
@@ -32,6 +41,9 @@ function checkMainElemId( line ) {
 	return mainElemId;
 }
 
+/**
+ * @todo Add inline documentation.
+ */
 function checkUrl( line ) {
 	var url = undefined;
 
@@ -42,11 +54,17 @@ function checkUrl( line ) {
 	return url;
 }
 
+/**
+ * @todo Add inline documentation.
+ */
 function closeWebsiteMapper() {
 	console.log( '\nThank you for using WebsiteMapper. Goodbye!\n' );
 	process.exit( 0 );
 }
 
+/**
+ * @todo Add inline documentation.
+ */
 async function generateScreenshot( url, elemId, fnSlug ) {
 	try {
 		console.log( 'Loading headless Chromium browser.' );
@@ -62,7 +80,8 @@ async function generateScreenshot( url, elemId, fnSlug ) {
 		} );
 		console.log( 'Navigating to the url (' + url + ').' );
 		await page.goto( url );
-		console.log( 'Measuring the dimensions of the page via element with ID ' + elemId + '.' );
+		console.log( 'Measuring the dimensions of the page via element with ID \
+' + elemId + '.' );
 		const dimensions = await page.evaluate( ( elemId ) => {
 			var mainElem = document.getElementById( elemId );
 
@@ -81,8 +100,8 @@ async function generateScreenshot( url, elemId, fnSlug ) {
 		await page.screenshot( {
 			path: fnPath
 		} );
-		console.log('Screenshot successfully captured and exported to ' + fnPath +  '. Dimensions:',
-			dimensions);
+		console.log('Screenshot successfully captured and exported to ' +
+			fnPath +  '. Dimensions:', dimensions);
 		console.log('Closing browser.');
 		await browser.close();
 		closeWebsiteMapper();
@@ -92,10 +111,16 @@ async function generateScreenshot( url, elemId, fnSlug ) {
 	}
 }
 
+/**
+ * @todo Add inline documentation.
+ */
 function getTimeStamp() {
 	return moment().format( 'YYYYMMDD-HHmmss' );
 }
 
+/**
+ * @todo Add inline documentation.
+ */
 function promptUserForInputs( intf ) {
 	var stkIdx = 0;
 	var promptStk = [
@@ -127,13 +152,16 @@ function promptUserForInputs( intf ) {
 			closed = true;
 			generateScreenshot( inputs.url, inputs.mainElemId, inputs.fnSlug );
 		} else if ( !closed ) {
-			console.log( 'Unable to take a screenshot due to a lack of required, valid information;\
- aborting operation.' );
+			console.log( 'Unable to take a screenshot due to a lack of required\
+, valid information; aborting operation.' );
 			closeWebsiteMapper();
 		}
 	} );
 }
 
+/**
+ * @todo Add inline documentation.
+ */
 function procPromptLine( intf, line, inputs, stkIdx, promptStk ) {
 	var success;
 
