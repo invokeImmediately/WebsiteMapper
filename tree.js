@@ -1,58 +1,69 @@
-// Tree (root node)
-// ├─→ This is a child node.
-// │   ├─→ This is a child of a child node.
-// │   │   ├─→ This is yet another child of a child node.
-// │   │   ├─→ This is yet another child of a child node.
-// │   │   └─→ This is yet another child of a child node.
-// │   └─→ Testing 1 2 3.
-// │       └─→ Bleh.
-// └─→ This is a sibling child node.
-// 
+/*!*************************************************************************************************
+ * WsMapper.tree.js
+ * -------------------------------------------------------------------------------------------------
+ * SUMMARY: Implementation of a tree ADT for use on the Website Mapper project.
+ *
+ * AUTHOR: Daniel Rieck [daniel.rieck@wsu.edu] (https://github.com/invokeImmediately)
+ *
+ * REPOSITORY: https://github.com/invokeImmediately/WSU-UE---JS
+ *
+ * LICENSE: ISC - Copyright (c) 2019 Daniel C. Rieck.
+ *
+ *   Permission to use, copy, modify, and/or distribute this software for any purpose with or
+ *   without fee is hereby granted, provided that the above copyright notice and this permission
+ *   notice appear in all copies.
+ *
+ *   THE SOFTWARE IS PROVIDED "AS IS" AND DANIEL RIECK DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+ *   SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL
+ *   DANIEL RIECK BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY
+ *   DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+ *   CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *   PERFORMANCE OF THIS SOFTWARE.
+ **************************************************************************************************/
 
-// ~Step     Indendation String      Value
-// -----     ------------------      -----
-// 1         ''                      Tree (root node)
-// 2         '├─→ '                  This is a child node.
-// 3a        '│   '                  This is a child of a child node.
-// 3b        '│   ├─→ '              This is a child of a child node.
-// 4a        '│   │   '              This is yet another child of a child node.
-// 4b        '│   │   └─→ '          This is yet another child of a child node.
-// 5a        '│   │   '              Testing 1 2 3.
-// 5b        '│   │   '              Testing 1 2 3.
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// TABLE OF CONTENTS
+// -----------------
+//   §1: Script dependencies..................................................................37
+//     §1.1: Node.js includes.................................................................40
+//     §1.2: Namespace declaration............................................................47
+//   §2: Class declarations...................................................................52
+//     §2.1: WsMapper.Tree....................................................................55
+//     §2.2: WsMapper.TreeNode...............................................................136
+//   §3: Class testing.......................................................................263
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Printing procedure (Work in Progress):
-// -------------------------------------
-// 1. Start at root, which should not be indented. Push an index onto the depth array, setting it to zero.
-// 2. If there is a node at the current depth, add the indentation string plus the value of current node plus a newline to the output. Otherwise go to 4.
-// 3a. If the current node does not have children left, goto 4. Otheriwse, goto 3b after processing the indentation string as follows:
-// 3a1. Replace all instances of '├─→ ' in the indentation string with '│   '.
-// 3a2. Replace all instances of '└─→ ' in the indentation string with '    '.
-// 3a3. If the child node has an additional sibling, then append the substring '├─→ ' to the indentation string.
-// 3a4. Otherwise, append the substring '└─→ ' to the indentation string.
-// 3b. Set the current node to the child.
-// 3c. Goto 2.
-// 4. If there is not a parent, goto 5. Otherwise, go back to the parent after trimming 4 characters off the end of the indentation string and doing the following:
-// 4a. Pop the depth array.
-// 4b. Iterate the index at the end of the depth array.
-// 5. End the operation, returning the final output.
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// §1: Script dependencies
 
-// Notes on printing procedure:
-// ---------------------------
-// Should maintain an array that stores the index of the active child at the current depth. 
+////////
+// §1.1: Node.js includes
+
+var tty = require('tty');
+var ttys = require('ttys');
+var stdout = ttys.stdout;
+
+////////
+// §1.2: Namespace declaration
+
+var WsMapper = WsMapper || {};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// §2: Class declarations
+
+////////
+// §2.1: WsMapper.Tree
 
 /**
  * @todo Add inline documentation.
  * @todo Finish writing class.
  */
-
-var WebsiteMapper = WebsiteMapper || {};
-
-WebsiteMapper.Tree = class Tree {
+WsMapper.Tree = class Tree {
 	/**
 	 * @todo Add inline documentation.
 	 */
 	constructor( rootValue ) {
-		this.root = new WebsiteMapper.TreeNode(
+		this.root = new WsMapper.TreeNode(
 			rootValue,
 			0,
 			0,
@@ -121,11 +132,14 @@ WebsiteMapper.Tree = class Tree {
 	}
 }
 
+////////
+// §2.2: WsMapper.TreeNode
+
 /**
  * @todo Add inline documentation.
  * @todo Finish writing class.
  */
-WebsiteMapper.TreeNode = class TreeNode {
+WsMapper.TreeNode = class TreeNode {
 	/**
 	 * @todo Add inline documentation.
 	 */
@@ -245,8 +259,11 @@ WebsiteMapper.TreeNode = class TreeNode {
 	}
 }
 
-function testTrees() {
-	var tree = new WebsiteMapper.Tree( 'Node 1' );
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// §3: Class testing
+
+WsMapper.testTrees = function () {
+	var tree = new WsMapper.Tree( 'Node 1' );
 	var node;
 	var node2;
 	var foundNode;
@@ -261,8 +278,7 @@ function testTrees() {
 	node2.addChild( 'Node 9' );
 	node2.addChild( 'Node 10' );
 
-	console.log( 'Contents of tree:\n-----------------\n' +
-		tree.getPrintStr() );
+	console.log( tree.getPrintStr() );
 }
 
-testTrees();
+WsMapper.testTrees();
