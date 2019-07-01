@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/invokeImmediately/WebsiteMapper/issues"
   },
-  "homepage": "https://github.com/invokeImmediately/WebsiteMapper#readme"
+  "homepage": "https://github.com/invokeImmediately/WebsiteMapper#readme",
+  "devDependencies": {
+    "moment-timezone": "^0.5.25",
+    "puppeteer-core": "^1.15.0",
+    "ttys": "0.0.3"
+  }
 }
