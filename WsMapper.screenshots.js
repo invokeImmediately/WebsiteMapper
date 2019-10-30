@@ -1,7 +1,8 @@
 /*!*************************************************************************************************
- * WsMapper.tree.js
+ * WsMapper.screenshot.js
  * -------------------------------------------------------------------------------------------------
- * SUMMARY: Implementation of a tree ADT for use on the Website Mapper project.
+ * SUMMARY: Headless-Chromium-based screenshot capture tool based on an application of the Node
+ *   library Puppeteer.
  *
  * AUTHOR: Daniel Rieck [daniel.rieck@wsu.edu] (https://github.com/invokeImmediately)
  *
@@ -24,13 +25,23 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // TABLE OF CONTENTS
 // -----------------
-//   §1: Script dependencies..................................................................37
-//     §1.1: Node.js includes.................................................................40
-//     §1.2: Namespace declaration............................................................47
-//   §2: Class declarations...................................................................52
-//     §2.1: WsMapper.Tree....................................................................55
-//     §2.2: WsMapper.TreeNode...............................................................136
-//   §3: Class testing.......................................................................263
+//   §1: Script dependencies..................................................................48
+//     §1.1: Node.js includes.................................................................51
+//     §1.2: Namespace declaration............................................................59
+//   §2: WsMapper modules.....................................................................69
+//     §2.1: WsMapper.Screenshotter class.....................................................72
+//   §3: User interface......................................................................256
+//     §3.1: advStkIfReady(…)................................................................259
+//     §3.2: checkCaptureWidth(…)............................................................274
+//     §3.3: checkFnSlug(…)..................................................................292
+//     §3.4: checkMainElemId(…)..............................................................308
+//     §3.5: checkUrl(…).....................................................................324
+//     §3.6: closeWebsiteMapper()............................................................340
+//     §3.7: generateScreenshot(…)...........................................................351
+//     §3.8: getTimeStamp()..................................................................404
+//     §3.9: promptUserForInputs(…)..........................................................414
+//     §3.10: procPromptLine(…)..............................................................470
+//   §4: Execution entry point...............................................................505
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +66,7 @@ const intf = readline.createInterface( process.stdin, process.stdout );
 var WsMapper = WsMapper || {};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// §2: Class declarations
+// §2: WsMapper modules
 
 ////////
 // §2.1: WsMapper.Screenshotter
@@ -80,10 +91,11 @@ WsMapper.Screenshotter = class Screenshotter {
 	 * @param {boolean} fnSlug - A flag indicating whether or not the operations of the object
 	 *     should be reported to the user interface.
 	 */
-	constructor( chromiumPath, url, elemId, fnSlug, rprtActivity ) {
+	constructor( chromiumPath, url, elemId, captW, fnSlug, rprtActivity ) {
 		this.chromiumPath = chromiumPath;
 		this.url = url;
 		this.elemId = elemId;
+		this.captW = captW;
 		this.fnSlug = fnSlug;
 		this.rprtActivity = rprtActivity;
 	}
@@ -172,7 +184,13 @@ WsMapper.Screenshotter = class Screenshotter {
 		this.narrate( 'Measuring the dimensions of the page via element with ID ' + this.elemId +
 			'.' );
 		const dimensions = await page.evaluate( ( elemId ) => {
-			let captElem = document.getElementById( elemId );
+			let captElem = undefined;
+			if ( elemId == "body" ) {
+				captElem = document.getElementsByTagName( elemId );
+				captElem = captElem[0];
+			} else {
+				captElem = document.getElementById( elemId );
+			}
 
 			return {
 				width: captElem.clientWidth,
@@ -190,8 +208,9 @@ WsMapper.Screenshotter = class Screenshotter {
 	async openNewPage( browser ) {
 		this.narrate( 'Opening a new page in Chromium.' );
 		const page = await browser.newPage();
+		this.narrate( 'Setting viewport width to ' + this.captW + 'px.');
 		page.setViewport( {
-			width: 1188,
+			width: this.captW,
 			height: 1080
 		} );
 
@@ -204,7 +223,7 @@ WsMapper.Screenshotter = class Screenshotter {
 	async resizePage( page, dimensions ) {
 		this.narrate( 'Resizing page in preparation for screen capture.' );
 		page.setViewport( {
-			width: 1188,
+			width: this.captW,
 			height: dimensions.height
 		} );
 
@@ -233,6 +252,11 @@ WsMapper.Screenshotter = class Screenshotter {
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// §3: User interface
+
+////////
+// §3.1: advStkIfReady(…)
 
 /**
  * @todo Add inline documentation.
@@ -245,6 +269,27 @@ function advStkIfReady( success, stkIdx, promptStk, intf ) {
 
 	return stkIdx;
 }
+
+////////
+// §3.2: checkCaptureWidth(…)
+
+/**
+ * @todo Add inline documentation.
+ */
+function checkCaptureWidth( line ) {
+	var captureWidth = undefined;
+
+	if ( typeof line === 'string' && !isNaN( Number( line ) ) && parseInt( line, 10 ) > 320 ) {
+		captureWidth = parseInt( line, 10 );
+	} else {
+		throw new Error( "Capture width must be set to a value >= 320." );
+	}
+
+	return captureWidth;
+}
+
+////////
+// §3.3: checkFnSlug(…)
 
 /**
  * @todo Add inline documentation.
@@ -259,6 +304,9 @@ function checkFnSlug( line ) {
 	return fnSlug;
 }
 
+////////
+// §3.4: checkMainElemId(…)
+
 /**
  * @todo Add inline documentation.
  */
@@ -271,6 +319,9 @@ function checkMainElemId( line ) {
 
 	return mainElemId;
 }
+
+////////
+// §3.5: checkUrl(…)
 
 /**
  * @todo Add inline documentation.
@@ -285,6 +336,9 @@ function checkUrl( line ) {
 	return url;
 }
 
+////////
+// §3.6: closeWebsiteMapper()
+
 /**
  * @todo Add inline documentation.
  */
@@ -293,6 +347,10 @@ function closeWebsiteMapper() {
 	process.exit( 0 );
 }
 
+////////
+// §3.7: generateScreenshot(…)
+
+// TODO: Remove function.
 /**
  * @todo Add inline documentation.
  */
@@ -342,12 +400,18 @@ async function generateScreenshot( url, elemId, fnSlug ) {
 	}
 }
 
+////////
+// §3.8: getTimeStamp()
+
 /**
  * @todo Add inline documentation.
  */
 function getTimeStamp() {
 	return moment().format( 'YYYYMMDD-HHmmss' );
 }
+
+////////
+// §3.9: promptUserForInputs(…)
 
 /**
  * @todo Add inline documentation.
@@ -356,12 +420,14 @@ async function promptUserForInputs( intf ) {
 	var stkIdx = 0;
 	var promptStk = [
 		'Enter URL of webpage to be captured',
-		"Enter ID string for webpage's main element",
+		"Enter 'body' or ID string of element to serve as basis for capture",
+		"Enter the width of the viewport in pixels (e.g., 1188)",
 		"Enter a slug for the screenshot's file name",
 	];
 	var inputs = {
 		url: undefined,
 		mainElemId: undefined,
+		captureWidth: undefined,
 		fnSlug: undefined
 	};
 	var promptCb = generateScreenshot;
@@ -369,6 +435,7 @@ async function promptUserForInputs( intf ) {
 
 	intf.setPrompt( '\n' + promptStk[ stkIdx ] + '> ' );
 	intf.prompt();
+	// TODO: Add error handling.
 	intf.on( 'line', ( line ) => {
 		results = procPromptLine( intf, line, inputs, stkIdx, promptStk );
 		inputs = results.inputs;
@@ -385,6 +452,7 @@ async function promptUserForInputs( intf ) {
 				'../Chromium-654752/chrome-win/chrome.exe',
 				inputs.url,
 				inputs.mainElemId,
+				inputs.captureWidth,
 				inputs.fnSlug,
 				true
 			);
@@ -397,6 +465,9 @@ async function promptUserForInputs( intf ) {
 		}
 	} );
 }
+
+////////
+// §3.10: procPromptLine(…)
 
 /**
  * @todo Add inline documentation.
@@ -414,6 +485,10 @@ function procPromptLine( intf, line, inputs, stkIdx, promptStk ) {
 			success = inputs.mainElemId !== undefined;
 			break;
 		case 2:
+			inputs.captureWidth = checkCaptureWidth( line );
+			success = inputs.captureWidth !== undefined;
+			break;
+		case 3:
 			inputs.fnSlug = checkFnSlug( line );
 			success = inputs.fnSlug !== undefined;
 			break;
@@ -425,5 +500,8 @@ function procPromptLine( intf, line, inputs, stkIdx, promptStk ) {
 		stkIdx: stkIdx
 	};
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// §4: Execution entry point
 
 promptUserForInputs( intf );
