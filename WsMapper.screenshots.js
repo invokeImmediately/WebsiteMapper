@@ -252,6 +252,246 @@ WsMapper.Screenshotter = class Screenshotter {
 	}
 }
 
+////////
+// §2.2: WsMapper.CaptIntf
+
+
+/**
+ * Creates an instance of CaptIntf to serve as an interface to the screen capture module.
+ *
+ * @class
+ *
+ * @param {readline.Interface} intf - Instance of readline.Interface.
+ */
+WsMapper.CaptIntf = class CaptIntf {
+
+	////////
+	// §2.2.1: Static members of WsMapper.CaptIntf
+
+	// Next step (ns) constants
+	static get nsInpCaptType() { return 1; }
+	static get nsChkCaptType() { return 2; }
+	static get nsInpUrl() { return 3; }
+	static get nsInpUrls() { return 4; }
+	static get nsChkUrls() { return 5; }
+	static get nsInpCaptBasisElem() { return 6; }
+	static get nsChkCaptBasisElem() { return 7; }
+	static get nsInpViewportW() { return 8; }
+	static get nsChkViewportW() { return 9; }
+	static get nsInpFnSlug() { return 10; }
+	static get nsChkFnSlug() { return 11; }
+	static get nsProcUrls() { return 12; }
+	static get nsFinished() { return 13; }
+
+	// Promt message (pmsg) constants
+	static get welcomePrompt() {
+		return "\nWebsiteMapper 0.0.0, by Daniel C. Rieck | Screen Capture Mode\nEnter 'exit' to " +
+			" quit. Default option is indicated by a '*'.\n--------------------------------------" +
+			"-------------------\n";
+	}
+
+	static get captTypePrompt() {
+		return "\nWhat type of capture do you want to perform?\n(*s/ingle|m/ultiple)\n> ";
+	}
+
+	////////
+	// §2.2.2: Constructor
+
+	/**
+	 * @todo Add inline documentation.
+	 */
+	constructor( intf ) {
+		let initialized = false;
+		let inst = this;
+		this.lastLine = undefined;
+		this.intf = intf;
+		this.stepMarker = 0;
+		this.isInitialized = function() {
+			return initialized;
+		}
+		this.intf.on( 'line', async ( line ) => {
+			inst.lastLine = line;
+			inst.execNextStep();
+		} ).on( 'close', async () => {
+			inst.closeInterface();
+		} );
+		this.begin = function() {
+			initialized = true;
+			inst.execNextStep();
+		}
+	}
+
+	////////
+	// §2.2.2: Public methods
+
+	/**
+	 * @todo Add inline documentation.
+	 */
+	askForCaptBasisElem() {
+		if ( !this.isInitialized() ) {
+			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
+				"'askForCaptBasisElem' without being initialized via the 'begin' method." );
+		}
+		// TODO: Finish writing function.
+	}
+
+	/**
+	 * @todo Add inline documentation.
+	 */
+	askForCaptType() {
+		if ( !this.isInitialized() ) {
+			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
+				"'askForCaptType' without being initialized via the 'begin' method." );
+		}
+		this.intf.setPrompt( WsMapper.CaptIntf.welcomePrompt + WsMapper.CaptIntf.captTypePrompt );
+		this.intf.prompt();
+	}
+
+	/**
+	 * @todo Add inline documentation.
+	 */
+	askForFnSlug() {
+		if ( !this.isInitialized() ) {
+			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
+				"'askForFnSlug' without being initialized via the 'begin' method." );
+		}
+		// TODO: Finish writing function.
+	}
+
+	/**
+	 * @todo Add inline documentation.
+	 */
+	askForUrl() {
+		if ( !this.isInitialized() ) {
+			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
+				"'askForUrl' without being initialized via the 'begin' method." );
+		}
+		// TODO: Finish writing function
+	}
+
+	/**
+	 * @todo Add inline documentation.
+	 */
+	askForUrls() {
+		if ( !this.isInitialized() ) {
+			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
+				"'askForUrls' without being initialized via the 'begin' method." );
+		}
+		// TODO: Finish writing function.
+	}
+
+	/**
+	 * @todo Add inline documentation.
+	 */
+	askForViewportW() {
+		if ( !this.isInitialized() ) {
+			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
+				"'askForViewportW' without being initialized via the 'begin' method." );
+		}
+		// TODO: Finish writing function.
+	}
+
+	/**
+	 * @todo Add inline documentation.
+	 */
+	checkCaptType() {
+		if ( !this.isInitialized() ) {
+			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
+				"'checkCaptType' without being initialized via the 'begin' method." );
+		}
+		this.checkForExitStr();
+		if ( this.lastLine == "" || this.lastLine == "s" || this.lastLine == "single" ) {
+			this.stepMarker = WsMapper.CaptIntf.nsInpUrl;
+		} else if ( this.lastLine == "m" || this.lastLine == "multiple" ) {
+		} else {
+			this.stepMarker = WsMapper.CaptIntf.nsInpCaptType;
+		}
+		// TODO: Finish writing function.
+	}
+
+	/**
+	 * @todo Add inline documentation.
+	 */
+	checkForExitStr() {
+		if ( !this.isInitialized() ) {
+			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
+				"'checkForExitStr' without being initialized via the 'begin' method." );
+		}
+		if ( this.line == "exit" ) {
+			this.intf.close();
+		}
+	}
+
+	/**
+	 * Close the interface because the user has finished capturing screenshots of websites.
+	 */
+	closeInterface() {
+		console.log( '\nThank you for using WebsiteMapper. Goodbye!\n' );
+		process.exit( 0 );
+	}
+
+	/**
+	 * @todo Add inline documentation.
+	 */
+	async execNextStep() {
+		try {
+			if ( !this.isInitialized() ) {
+				throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
+					"'execNextStep' without being initialized via the 'begin' method." );
+			}
+
+			// Determine and execute the next operational step that needs to be performed.
+			if ( this.stepMarker == WsMapper.CaptIntf.nsInpCaptType ) {
+				this.askForCaptType();
+			} else if ( this.stepMarker == WsMapper.CaptIntf.nsChkCaptType ) {
+				this.checkCaptType();
+			} else if ( this.stepMarker == WsMapper.CaptIntf.nsInpUrl ) {
+				this.askForUrl();
+			} else if ( this.stepMarker == WsMapper.CaptIntf.nsInpUrls ) {
+				this.askForUrls();
+			} else if ( this.stepMarker == WsMapper.CaptIntf.nsChkUrls ) {
+				this.checkUrls();
+			} else if ( this.stepMarker == WsMapper.CaptIntf.nsInpCaptBasisElem ) {
+				this.askForCaptBasisElem();
+			} else if ( this.stepMarker == WsMapper.CaptIntf.nsChkCaptBasisElem ) {
+				this.checkCaptBasisElem();
+			} else if ( this.stepMarker == WsMapper.CaptIntf.nsChkCaptBasisElem ) {
+				this.checkCaptBasisElem();
+			} else if ( this.stepMarker == WsMapper.CaptIntf.nsInpViewportW ) {
+				this.askForViewportW();
+			} else if ( this.stepMarker == WsMapper.CaptIntf.nsChkViewportW ) {
+				this.checkViewportW();
+			} else if ( this.stepMarker == WsMapper.CaptIntf.nsInpFnSlug ) {
+				this.askForFnSlug();
+			} else if ( this.stepMarker == WsMapper.CaptIntf.nsChkFnSlug ) {
+				this.checkFnSlug();
+			} else if ( this.stepMarker == WsMapper.CaptIntf.nsProcUrls ) {
+				this.procUrls();
+			} else if ( this.stepMarker == WsMapper.CaptIntf.nsFinished ) {
+				this.closeInterface();
+			} else {
+				this.openInterface();
+			}
+		} catch ( err ) {
+			console.log( "Fatal error: " + err.message );
+			this.closeInterface();
+		}
+	}
+
+	/**
+	 * @todo Add inline documentation.
+	 */
+	openInterface() {
+		if ( !this.isInitialized() ) {
+			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
+				"'openInterface' without being initialized via the 'begin' method." );
+		}
+		this.stepMarker = WsMapper.CaptIntf.nsInpCaptType;
+		this.execNextStep();
+	}
+};
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // §3: User interface
 
@@ -268,6 +508,19 @@ function advStkIfReady( success, stkIdx, promptStk, intf ) {
 	}
 
 	return stkIdx;
+}
+
+////////
+// §3.†: begin()
+
+function begin() {
+	//promptUserForInputs( intf );
+	try {
+		let captIntf = new WsMapper.CaptIntf( intf );
+		captIntf.begin();
+	} catch ( err ) {
+		console.log( err.message );
+	}
 }
 
 ////////
@@ -369,8 +622,7 @@ async function generateScreenshot( url, elemId, fnSlug ) {
 		} );
 		console.log( 'Navigating to the url (' + url + ').' );
 		await page.goto( url );
-		console.log( 'Measuring the dimensions of the page via element with ID \
-' + elemId + '.' );
+		console.log( 'Measuring the dimensions of the page via element with ID ' + elemId + '.' );
 		const dimensions = await page.evaluate( ( elemId ) => {
 			var mainElem = document.getElementById( elemId );
 
@@ -504,4 +756,4 @@ function procPromptLine( intf, line, inputs, stkIdx, promptStk ) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // §4: Execution entry point
 
-promptUserForInputs( intf );
+begin();
