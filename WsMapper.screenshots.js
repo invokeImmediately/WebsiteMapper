@@ -260,8 +260,6 @@ WsMapper.Screenshotter = class Screenshotter {
  * Creates an instance of CaptIntf to serve as an interface to the screen capture module.
  *
  * @class
- *
- * @param {readline.Interface} intf - Instance of readline.Interface.
  */
 WsMapper.CaptIntf = class CaptIntf {
 
@@ -274,10 +272,10 @@ WsMapper.CaptIntf = class CaptIntf {
 	static get nsInpUrl() { return 3; }
 	static get nsInpUrls() { return 4; }
 	static get nsChkUrls() { return 5; }
-	static get nsInpCaptBasisElem() { return 6; }
-	static get nsChkCaptBasisElem() { return 7; }
-	static get nsInpViewportW() { return 8; }
-	static get nsChkViewportW() { return 9; }
+	static get nsInpViewportW() { return 6; }
+	static get nsChkViewportW() { return 7; }
+	static get nsInpCaptBasisElem() { return 8; }
+	static get nsChkCaptBasisElem() { return 9; }
 	static get nsInpFnSlug() { return 10; }
 	static get nsChkFnSlug() { return 11; }
 	static get nsProcUrls() { return 12; }
@@ -286,19 +284,42 @@ WsMapper.CaptIntf = class CaptIntf {
 	// Promt message (pmsg) constants
 	static get welcomePrompt() {
 		return "\nWebsiteMapper 0.0.0, by Daniel C. Rieck | Screen Capture Mode\nEnter 'exit' to " +
-			" quit. Default option is indicated by a '*'.\n--------------------------------------" +
-			"-------------------\n";
+			"quit. Default option is indicated by a '†', freeform input by a '*'.\n--------------" +
+			"-----------------------------------------------------------------------\n";
 	}
 
 	static get captTypePrompt() {
-		return "\nWhat type of capture do you want to perform?\n(*s/ingle|m/ultiple)\n> ";
+		return "\nWhat type of capture do you want to perform?\n(†s/ingle|m/ultiple)\n> ";
+	}
+
+	static get urlPrompt() {
+		return "\nEnter the URL of the website you want to capture\n(http://*|https://*)\n> ";
+	}
+
+	static get urlsPrompt() {
+		return "\nEnter the URLs of the website you want to capture. Use a comma (, ) separated " +
+			"list.\n(e.g., https://*, https://*, https://*)\n> ";
+	}
+
+	static get viewportWPrompt() {
+		return "\nEnter the width of the viewport in pixels.\n(†1188|*)\n> ";
+	}
+
+	static get captBasisElemPrompt() {
+		return "\nEnter the selector string for the element that will serve as the basis for " +
+			"screen capture.\n(†body|*) (e.g., 'main', '#wsuwp-main', '.main-column', etc.])\n> ";
+	}
+
+	static get fnSlugPrompt() {
+		return "\nEnter a file name slug for storing screen captures:\n(†u/se url|*)\n> ";
 	}
 
 	////////
 	// §2.2.2: Constructor
 
 	/**
-	 * @todo Add inline documentation.
+	 * @constructs CaptIntf
+	 * @param {readline.Interface} intf - Instance of readline.Interface.
 	 */
 	constructor( intf ) {
 		let initialized = false;
@@ -306,6 +327,7 @@ WsMapper.CaptIntf = class CaptIntf {
 		this.lastLine = undefined;
 		this.intf = intf;
 		this.stepMarker = 0;
+		this.multiUrls = false;
 		this.isInitialized = function() {
 			return initialized;
 		}
@@ -322,87 +344,66 @@ WsMapper.CaptIntf = class CaptIntf {
 	}
 
 	////////
-	// §2.2.2: Public methods
+	// §2.2.3: Public methods
 
 	/**
-	 * @todo Add inline documentation.
+	 * Prompt user for the element that will serve as the basis for capture.
 	 */
 	askForCaptBasisElem() {
-		if ( !this.isInitialized() ) {
-			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
-				"'askForCaptBasisElem' without being initialized via the 'begin' method." );
-		}
-		// TODO: Finish writing function.
+		this.checkSelf( "askForCaptBasisElem" );
+		this.prompt( WsMapper.CaptIntf.captBasisElemPrompt )
 	}
 
 	/**
 	 * @todo Add inline documentation.
 	 */
 	askForCaptType() {
-		if ( !this.isInitialized() ) {
-			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
-				"'askForCaptType' without being initialized via the 'begin' method." );
-		}
-		this.intf.setPrompt( WsMapper.CaptIntf.welcomePrompt + WsMapper.CaptIntf.captTypePrompt );
-		this.intf.prompt();
+		this.checkSelf( "askForCaptType" );
+		this.prompt( WsMapper.CaptIntf.welcomePrompt + WsMapper.CaptIntf.captTypePrompt );
 	}
 
 	/**
 	 * @todo Add inline documentation.
 	 */
 	askForFnSlug() {
-		if ( !this.isInitialized() ) {
-			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
-				"'askForFnSlug' without being initialized via the 'begin' method." );
-		}
-		// TODO: Finish writing function.
+		this.checkSelf( "askForFnSlug" );
+		this.prompt( WsMapper.CaptIntf.fnSlugPrompt );
 	}
 
 	/**
 	 * @todo Add inline documentation.
 	 */
 	askForUrl() {
-		if ( !this.isInitialized() ) {
-			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
-				"'askForUrl' without being initialized via the 'begin' method." );
-		}
-		// TODO: Finish writing function
+		this.checkSelf( "askForUrl" );
+		this.prompt( WsMapper.CaptIntf.urlPrompt );
 	}
 
 	/**
 	 * @todo Add inline documentation.
 	 */
 	askForUrls() {
-		if ( !this.isInitialized() ) {
-			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
-				"'askForUrls' without being initialized via the 'begin' method." );
-		}
-		// TODO: Finish writing function.
+		this.checkSelf( "askForUrls" );
+		this.prompt( WsMapper.CaptIntf.urlsPrompt );
 	}
 
 	/**
 	 * @todo Add inline documentation.
 	 */
-	askForViewportW() {
-		if ( !this.isInitialized() ) {
-			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
-				"'askForViewportW' without being initialized via the 'begin' method." );
-		}
-		// TODO: Finish writing function.
+	a askForViewportW() {
+		this.checkSelf( "askForViewportW" );
+		this.prompt( WsMapper.CaptIntf.viewportWPrompt );
 	}
 
 	/**
 	 * @todo Add inline documentation.
 	 */
 	checkCaptType() {
-		if ( !this.isInitialized() ) {
-			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
-				"'checkCaptType' without being initialized via the 'begin' method." );
-		}
+		this.checkSelf( "checkCaptType" );
 		this.checkForExitStr();
 		if ( this.lastLine == "" || this.lastLine == "s" || this.lastLine == "single" ) {
 			this.stepMarker = WsMapper.CaptIntf.nsInpUrl;
 		} else if ( this.lastLine == "m" || this.lastLine == "multiple" ) {
+			this.stepMarker = WsMapper.CaptIntf.nsInpUrls;
 		} else {
 			this.stepMarker = WsMapper.CaptIntf.nsInpCaptType;
 		}
@@ -412,13 +413,20 @@ WsMapper.CaptIntf = class CaptIntf {
 	/**
 	 * @todo Add inline documentation.
 	 */
-	checkForExitStr() {
-		if ( !this.isInitialized() ) {
-			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
-				"'checkForExitStr' without being initialized via the 'begin' method." );
-		}
+	async checkForExitStr() {
+		this.checkSelf( "checkForExitStr" );
 		if ( this.line == "exit" ) {
 			this.intf.close();
+		}
+	}
+
+	/**
+	 * @todo Add inline documentation.
+	 */
+	checkSelf( funcThatChecked ) {
+		if ( !this.isInitialized() ) {
+			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
+				"'" + funcThatChecked +"' without being initialized via the 'begin' method." );
 		}
 	}
 
@@ -435,12 +443,7 @@ WsMapper.CaptIntf = class CaptIntf {
 	 */
 	async execNextStep() {
 		try {
-			if ( !this.isInitialized() ) {
-				throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
-					"'execNextStep' without being initialized via the 'begin' method." );
-			}
-
-			// Determine and execute the next operational step that needs to be performed.
+			checkSelf( "execNextStep" );
 			if ( this.stepMarker == WsMapper.CaptIntf.nsInpCaptType ) {
 				this.askForCaptType();
 			} else if ( this.stepMarker == WsMapper.CaptIntf.nsChkCaptType ) {
@@ -482,12 +485,21 @@ WsMapper.CaptIntf = class CaptIntf {
 	 * @todo Add inline documentation.
 	 */
 	openInterface() {
-		if ( !this.isInitialized() ) {
-			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
-				"'openInterface' without being initialized via the 'begin' method." );
-		}
+		this.checkSelf( "openInterface" );
 		this.stepMarker = WsMapper.CaptIntf.nsInpCaptType;
 		this.execNextStep();
+	}
+
+	/**
+	 * @todo Add inline documentation.
+	 */
+	prompt( msg ) {
+		if ( !this.isInitialized() ) {
+			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
+				"'prompt' without being initialized via the 'begin' method." );
+		}
+		this.intf.setPrompt( msg );
+		this.intf.prompt();
 	}
 };
 
