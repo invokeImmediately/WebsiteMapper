@@ -1,5 +1,5 @@
 /*!*************************************************************************************************
- * WsMapper.screenshot.js
+ * WsMapper.screenshot.js, v0.0.0
  * -------------------------------------------------------------------------------------------------
  * SUMMARY: Headless-Chromium-based screenshot capture tool based on an application of the Node
  *   library Puppeteer.
@@ -62,6 +62,7 @@ const intf = readline.createInterface( process.stdin, process.stdout );
  * Website Mapper namespace.
  *
  * @namespace
+ * @since 0.0.0
  */
 var WsMapper = WsMapper || {};
 
@@ -74,6 +75,7 @@ var WsMapper = WsMapper || {};
 /**
  * Uses headless Chromium to capture a screenshot of a specified webpage.
  *
+ * @since 0.0.0
  * @memberof WsMapper
  */
 WsMapper.Screenshotter = class Screenshotter {
@@ -81,6 +83,7 @@ WsMapper.Screenshotter = class Screenshotter {
 	/**
 	 * Creates an instance of Screenshotter.
 	 *
+	 * @since 0.0.0
 	 * @class
 	 *
 	 * @param {string} chromiumPath - File path to the location of the Chromium executable.
@@ -103,6 +106,7 @@ WsMapper.Screenshotter = class Screenshotter {
 	/**
 	 * Performs a screen capture of a webpage based on the properties of the instance.
 	 *
+	 * @since 0.0.0
 	 * @async
 	 * @public
 	 */
@@ -123,6 +127,8 @@ WsMapper.Screenshotter = class Screenshotter {
 	/**
 	 * Closes an open headless Chromium browser instance.
 	 *
+	 * @since 0.0.0
+	 *
 	 * @param {Browser} browser - A browser previously launched using the Puppeteer Node library.
 	 */
 	async closeBrowser( browser ) {
@@ -132,6 +138,8 @@ WsMapper.Screenshotter = class Screenshotter {
 
 	/**
 	 * Fetches a time stamp to be used for labeling screen capture images.
+	 *
+	 * @since 0.0.0
 	 *
 	 * @return {string} - The current time and date in YYYYMMDD-HHmmss format.
 	 */
@@ -144,10 +152,11 @@ WsMapper.Screenshotter = class Screenshotter {
 	 *
 	 * Specifies the window size of the browser as part of the launnching process.
 	 *
+	 * @since 0.0.0
+	 * @todo Have the window width and height specifiable via optional instance properties.
+	 *
 	 * @return {Browser} - The Browser instance that can be used to control the launched instance of
 	 *     headless Chromium.
-	 *
-	 * @todo Have the window width and height specifiable via optional instance properties.
 	 */
 	async loadBrowser() {
 		this.narrate( 'Loading headless Chromium browser.' )
@@ -162,6 +171,8 @@ WsMapper.Screenshotter = class Screenshotter {
 	/**
 	 * Reports the operations of the instance to the user as appropriate.
 	 *
+	 * @since 0.0.0
+	 *
 	 * @param {Array} msgs - A standard array, via rest syntax, of the arguments passed to the
 	 *     function.
 	 */
@@ -173,6 +184,8 @@ WsMapper.Screenshotter = class Screenshotter {
 
 	/**
 	 * Measure the dimensions of the portion of the page to be screen captured.
+	 *
+	 * @since 0.0.0
 	 *
 	 * @param {Page} page - The page that will be screen captured and which has been opened in a
 	 *     headless Chromium instance.
@@ -267,25 +280,26 @@ WsMapper.CaptIntf = class CaptIntf {
 	// §2.2.1: Static members of WsMapper.CaptIntf
 
 	// Next step (ns) constants
-	static get nsInpCaptType() { return 1; }
-	static get nsChkCaptType() { return 2; }
-	static get nsInpUrl() { return 3; }
-	static get nsInpUrls() { return 4; }
-	static get nsChkUrls() { return 5; }
-	static get nsInpViewportW() { return 6; }
-	static get nsChkViewportW() { return 7; }
-	static get nsInpCaptBasisElem() { return 8; }
-	static get nsChkCaptBasisElem() { return 9; }
-	static get nsInpFnSlug() { return 10; }
-	static get nsChkFnSlug() { return 11; }
-	static get nsProcUrls() { return 12; }
-	static get nsFinished() { return 13; }
+	static get nsDisplayWelcome() { return 1; }
+	static get nsInpCaptType() { return 2; }
+	static get nsChkCaptType() { return 3; }
+	static get nsInpUrl() { return 4; }
+	static get nsInpUrls() { return 5; }
+	static get nsChkUrls() { return 6; }
+	static get nsInpViewportW() { return 7; }
+	static get nsChkViewportW() { return 8; }
+	static get nsInpCaptBasisElem() { return 9; }
+	static get nsChkCaptBasisElem() { return 10; }
+	static get nsInpFnSlug() { return 11; }
+	static get nsChkFnSlug() { return 12; }
+	static get nsProcUrls() { return 13; }
+	static get nsFinished() { return 14; }
 
 	// Promt message (pmsg) constants
-	static get welcomePrompt() {
+	static get welcomeMsg() {
 		return "\nWebsiteMapper 0.0.0, by Daniel C. Rieck | Screen Capture Mode\nEnter 'exit' to " +
 			"quit. Default option is indicated by a '†', freeform input by a '*'.\n--------------" +
-			"-----------------------------------------------------------------------\n";
+			"-----------------------------------------------------------------------";
 	}
 
 	static get captTypePrompt() {
@@ -318,7 +332,11 @@ WsMapper.CaptIntf = class CaptIntf {
 	// §2.2.2: Constructor
 
 	/**
+	 * Construct an interface for collecting screenshots.
+	 *
+	 * @since 0.0.0
 	 * @constructs CaptIntf
+	 *
 	 * @param {readline.Interface} intf - Instance of readline.Interface.
 	 */
 	constructor( intf ) {
@@ -348,6 +366,8 @@ WsMapper.CaptIntf = class CaptIntf {
 
 	/**
 	 * Prompt user for the element that will serve as the basis for capture.
+	 *
+	 * @since 0.0.0
 	 */
 	askForCaptBasisElem() {
 		this.checkSelf( "askForCaptBasisElem" );
@@ -359,7 +379,8 @@ WsMapper.CaptIntf = class CaptIntf {
 	 */
 	askForCaptType() {
 		this.checkSelf( "askForCaptType" );
-		this.prompt( WsMapper.CaptIntf.welcomePrompt + WsMapper.CaptIntf.captTypePrompt );
+		this.stepMarker = WsMapper.CaptIntf.nsChkCaptType;
+		this.prompt( WsMapper.CaptIntf.captTypePrompt );
 	}
 
 	/**
@@ -389,7 +410,7 @@ WsMapper.CaptIntf = class CaptIntf {
 	/**
 	 * @todo Add inline documentation.
 	 */
-	a askForViewportW() {
+	askForViewportW() {
 		this.checkSelf( "askForViewportW" );
 		this.prompt( WsMapper.CaptIntf.viewportWPrompt );
 	}
@@ -403,20 +424,25 @@ WsMapper.CaptIntf = class CaptIntf {
 		if ( this.lastLine == "" || this.lastLine == "s" || this.lastLine == "single" ) {
 			this.stepMarker = WsMapper.CaptIntf.nsInpUrl;
 		} else if ( this.lastLine == "m" || this.lastLine == "multiple" ) {
+			this.multiUrls = true;
 			this.stepMarker = WsMapper.CaptIntf.nsInpUrls;
 		} else {
+			readline.moveCursor( process.stdout, 0, -4 );
+			readline.clearScreenDown( process.stdout );
+			console.log( "\nYour input of " + this.lastLine + " does not match one of the "
+				+ "available capture modes. Please try again." );
 			this.stepMarker = WsMapper.CaptIntf.nsInpCaptType;
 		}
-		// TODO: Finish writing function.
+		this.execNextStep();
 	}
 
 	/**
 	 * @todo Add inline documentation.
 	 */
-	async checkForExitStr() {
+	checkForExitStr() {
 		this.checkSelf( "checkForExitStr" );
-		if ( this.line == "exit" ) {
-			this.intf.close();
+		if ( this.lastLine == "exit" ) {
+			this.closeInterface();
 		}
 	}
 
@@ -434,8 +460,20 @@ WsMapper.CaptIntf = class CaptIntf {
 	 * Close the interface because the user has finished capturing screenshots of websites.
 	 */
 	closeInterface() {
-		console.log( '\nThank you for using WebsiteMapper. Goodbye!\n' );
+		this.intf.close();
+		console.log( '\nSure, the process will now exit. Thank you for using WebsiteMapper. ' +
+			'Goodbye!\n' );
 		process.exit( 0 );
+	}
+
+	/**
+	 * @todo Add inline documentation.
+	 */
+	dispWelcomeMsg() {
+		this.checkSelf( "dispWelcomeMsg" );
+		console.log( WsMapper.CaptIntf.welcomeMsg );
+		this.stepMarker = WsMapper.CaptIntf.nsInpCaptType;
+		this.execNextStep();
 	}
 
 	/**
@@ -443,8 +481,10 @@ WsMapper.CaptIntf = class CaptIntf {
 	 */
 	async execNextStep() {
 		try {
-			checkSelf( "execNextStep" );
-			if ( this.stepMarker == WsMapper.CaptIntf.nsInpCaptType ) {
+			this.checkSelf( "execNextStep" );
+			if ( this.stepMarker == WsMapper.CaptIntf.nsDisplayWelcome ) {
+				this.dispWelcomeMsg();
+			} else if ( this.stepMarker == WsMapper.CaptIntf.nsInpCaptType ) {
 				this.askForCaptType();
 			} else if ( this.stepMarker == WsMapper.CaptIntf.nsChkCaptType ) {
 				this.checkCaptType();
@@ -486,7 +526,7 @@ WsMapper.CaptIntf = class CaptIntf {
 	 */
 	openInterface() {
 		this.checkSelf( "openInterface" );
-		this.stepMarker = WsMapper.CaptIntf.nsInpCaptType;
+		this.stepMarker = WsMapper.CaptIntf.nsDisplayWelcome;
 		this.execNextStep();
 	}
 
@@ -494,10 +534,7 @@ WsMapper.CaptIntf = class CaptIntf {
 	 * @todo Add inline documentation.
 	 */
 	prompt( msg ) {
-		if ( !this.isInitialized() ) {
-			throw new Error( "An instance of WsMapper.CaptIntf attempted to execute method " +
-				"'prompt' without being initialized via the 'begin' method." );
-		}
+		this.checkSelf( 'prompt' );
 		this.intf.setPrompt( msg );
 		this.intf.prompt();
 	}
@@ -557,7 +594,9 @@ function checkCaptureWidth( line ) {
 // §3.3: checkFnSlug(…)
 
 /**
- * @todo Add inline documentation.
+ * Ensure that a file name prefix string collected from the user matches the expected format.
+ *
+ *
  */
 function checkFnSlug( line ) {
 	var fnSlug = undefined;
