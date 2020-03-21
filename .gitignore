@@ -61,5 +61,5 @@ typings/
 .next
 
 # Images
-.png
-.jpg
+*.png
+*.jpg
