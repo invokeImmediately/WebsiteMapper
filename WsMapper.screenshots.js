@@ -14,10 +14,10 @@
  *   without fee is hereby granted, provided that the above copyright notice and this permission
  *   notice appear in all copies.
  *
- *   THE SOFTWARE IS PROVIDED "AS IS" AND DANIEL RIECK DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
- *   SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL
- *   DANIEL RIECK BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY
- *   DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+ *   THE SOFTWARE IS PROVIDED "AS IS" AND DANIEL C. RIECK DISCLAIMS ALL WARRANTIES WITH REGARD TO
+ *   THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT
+ *   SHALL DANIEL C. RIECK BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR
+ *   ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  *   CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *   PERFORMANCE OF THIS SOFTWARE.
  **************************************************************************************************/
@@ -25,23 +25,27 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // TABLE OF CONTENTS
 // -----------------
-//   §1: Script dependencies..................................................................48
-//     §1.1: Node.js includes.................................................................51
-//     §1.2: Namespace declaration............................................................59
-//   §2: WsMapper modules.....................................................................69
-//     §2.1: WsMapper.Screenshotter class.....................................................72
-//   §3: User interface......................................................................256
-//     §3.1: advStkIfReady(…)................................................................259
-//     §3.2: checkCaptureWidth(…)............................................................274
-//     §3.3: checkFnPrefix(…)..................................................................292
-//     §3.4: checkMainElemId(…)..............................................................308
-//     §3.5: checkUrl(…).....................................................................324
-//     §3.6: closeWebsiteMapper()............................................................340
-//     §3.7: generateScreenshot(…)...........................................................351
-//     §3.8: getTimeStamp()..................................................................404
-//     §3.9: promptUserForInputs(…)..........................................................414
-//     §3.10: procPromptLine(…)..............................................................470
-//   §4: Execution entry point...............................................................505
+//   §1: Script dependencies..................................................................52
+//     §1.1: Node.js includes.................................................................55
+//     §1.2: Namespace declaration............................................................63
+//   §2: WsMapper modules.....................................................................74
+//     §2.1: WsMapper.Screenshotter class.....................................................77
+//     §2.2: WsMapper.CaptIntf...............................................................273
+//       §2.2.1: Constructor.................................................................283
+//       §2.2.3: Public methods..............................................................371
+//   §3: User interface......................................................................693
+//     §3.1: advStkIfReady(…)................................................................696
+//     §3.2: begin().........................................................................711
+//     §3.3: checkCaptureWidth(…)............................................................724
+//     §3.4: checkFnPrefix(…)................................................................742
+//     §3.5: checkMainElemId(…)..............................................................760
+//     §3.6: checkUrl(…).....................................................................776
+//     §3.7: closeWebsiteMapper()............................................................792
+//     §3.8: generateScreenshot(…)...........................................................803
+//     §3.9: getTimeStamp()..................................................................855
+//     §3.10: promptUserForInputs(…).........................................................865
+//     §3.11: procPromptLine(…)..............................................................921
+//   §4: Execution entry point...............................................................956
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -704,7 +708,7 @@ function advStkIfReady( success, stkIdx, promptStk, intf ) {
 }
 
 ////////
-// §3.†: begin()
+// §3.2: begin()
 
 function begin() {
 	//promptUserForInputs( intf );
@@ -717,7 +721,7 @@ function begin() {
 }
 
 ////////
-// §3.2: checkCaptureWidth(…)
+// §3.3: checkCaptureWidth(…)
 
 /**
  * @todo Add inline documentation.
@@ -735,7 +739,7 @@ function checkCaptureWidth( line ) {
 }
 
 ////////
-// §3.3: checkFnPrefix(…)
+// §3.4: checkFnPrefix(…)
 
 /**
  * Ensure that a file name prefix string collected from the user matches the expected format.
@@ -753,7 +757,7 @@ function checkFnPrefix( line ) {
 }
 
 ////////
-// §3.4: checkMainElemId(…)
+// §3.5: checkMainElemId(…)
 
 /**
  * @todo Add inline documentation.
@@ -769,7 +773,7 @@ function checkMainElemId( line ) {
 }
 
 ////////
-// §3.5: checkUrl(…)
+// §3.6: checkUrl(…)
 
 /**
  * @todo Add inline documentation.
@@ -785,7 +789,7 @@ function checkUrl( line ) {
 }
 
 ////////
-// §3.6: closeWebsiteMapper()
+// §3.7: closeWebsiteMapper()
 
 /**
  * @todo Add inline documentation.
@@ -796,7 +800,7 @@ function closeWebsiteMapper() {
 }
 
 ////////
-// §3.7: generateScreenshot(…)
+// §3.8: generateScreenshot(…)
 
 // TODO: Remove function.
 /**
@@ -848,7 +852,7 @@ async function generateScreenshot( url, elemId, fnPrefix ) {
 }
 
 ////////
-// §3.8: getTimeStamp()
+// §3.9: getTimeStamp()
 
 /**
  * @todo Add inline documentation.
@@ -858,7 +862,7 @@ function getTimeStamp() {
 }
 
 ////////
-// §3.9: promptUserForInputs(…)
+// §3.10: promptUserForInputs(…)
 
 /**
  * @todo Add inline documentation.
@@ -914,7 +918,7 @@ async function promptUserForInputs( intf ) {
 }
 
 ////////
-// §3.10: procPromptLine(…)
+// §3.11: procPromptLine(…)
 
 /**
  * @todo Add inline documentation.
