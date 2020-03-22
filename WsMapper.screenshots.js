@@ -459,6 +459,10 @@ WsMapper.CaptIntf = class CaptIntf {
 			} else if ( this.captBasisSel.charAt( 0 ) == '.' ) {
 				this.captBasisType = 'class';
 			}
+		} else if ( this.lastLine == "" ) {
+			validCaptBasisFound = true;
+			this.captBasisSel = 'body';
+			this.captBasisType = 'body';
 		}
 		if ( validCaptBasisFound ) {
 			this.nextStep = this.execSteps.inpViewportW;
