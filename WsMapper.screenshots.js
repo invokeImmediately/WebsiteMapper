@@ -32,20 +32,20 @@
 //     §2.1: WsMapper.Screenshotter class.....................................................77
 //     §2.2: WsMapper.CaptIntf...............................................................273
 //       §2.2.1: Constructor.................................................................283
-//       §2.2.3: Public methods..............................................................371
-//   §3: User interface......................................................................693
-//     §3.1: advStkIfReady(…)................................................................696
-//     §3.2: begin().........................................................................711
-//     §3.3: checkCaptureWidth(…)............................................................724
-//     §3.4: checkFnPrefix(…)................................................................742
-//     §3.5: checkMainElemId(…)..............................................................760
-//     §3.6: checkUrl(…).....................................................................776
-//     §3.7: closeWebsiteMapper()............................................................792
-//     §3.8: generateScreenshot(…)...........................................................803
-//     §3.9: getTimeStamp()..................................................................855
-//     §3.10: promptUserForInputs(…).........................................................865
-//     §3.11: procPromptLine(…)..............................................................921
-//   §4: Execution entry point...............................................................956
+//       §2.2.3: Public methods..............................................................375
+//   §3: User interface......................................................................703
+//     §3.1: advStkIfReady(…)................................................................706
+//     §3.2: begin().........................................................................721
+//     §3.3: checkCaptureWidth(…)............................................................734
+//     §3.4: checkFnPrefix(…)................................................................752
+//     §3.5: checkMainElemId(…)..............................................................770
+//     §3.6: checkUrl(…).....................................................................786
+//     §3.7: closeWebsiteMapper()............................................................802
+//     §3.8: generateScreenshot(…)...........................................................813
+//     §3.9: getTimeStamp()..................................................................865
+//     §3.10: promptUserForInputs(…).........................................................875
+//     §3.11: procPromptLine(…)..............................................................931
+//   §4: Execution entry point...............................................................966
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -312,7 +312,11 @@ WsMapper.CaptIntf = class CaptIntf {
 				"modes. Please try again.",
 			urlInpErr: "\nYour input of '%s' is not a properly encoded URL string in a format I " +
 				"recognize. Please try again.",
-			captBasisErr: ""
+			captBasisErr: "\nI could not interpret your input of '%s' into a valid selector " +
+				"string for an element to serve as the basis for screen capture. Please try again.",
+			vwNaN: "\nYour input of '%s' is not a number. Please try again.",
+			vwOoB: "\nThe viewport width of '%s' pixels you entered is out of bounds. Please try " +
+				"again."
 		};
 		this.multiUrls = false;
 		this.prompts = {
@@ -444,12 +448,12 @@ WsMapper.CaptIntf = class CaptIntf {
 	 */
 	checkCaptBasisElem() {
 		this.checkSelf( "checkCaptBasisElem" );
-		const selNeedle = "^(body|#[-_a-zA-Z]|#[-_a-zA-Z][^-0-9][-_a-zA-Z0-9]*|\.[-_a-zA-Z]|\.[-_" +
-			"a-zA-Z][^-0-9][-_a-zA-Z0-9]*)$";
+		const selNeedle = "^(body|#[-_a-zA-Z]|#[-_a-zA-Z][^-0-9][-_a-zA-Z0-9]*|\\.[-_a-zA-Z]|\\.[" +
+			"-_a-zA-Z][^-0-9][-_a-zA-Z0-9]*)$";
 		const reSearch = new RegExp( selNeedle );
 		const match = reSearch.exec( this.lastLine );
 		let validCaptBasisFound = false;
-		if ( match !== null ) {
+		if ( match != null ) {
 			validCaptBasisFound = true;
 			this.captBasisSel = this.lastLine;
 			if ( this.captBasisSel == 'body' ) {
@@ -519,15 +523,17 @@ WsMapper.CaptIntf = class CaptIntf {
 	 */
 	checkViewportW() {
 		this.checkSelf( "checkViewportW" );
-		this.viewportW = Number( this.lastLine );
+		this.viewportW = this.lastLine == "" ?
+			1188 :
+			Number( this.lastLine );
 		const vwInpIsNum = this.viewportW !== NaN;
 		const vwInpInBounds = vwInpIsNum && ( this.viewportW >= 320 && this.viewportW <= 3840 );
 		if ( !vwInpIsNum ) {
-			// TODO: Report error
+			this.reportInpErr( this.msgs.urlInpErr );
+			this.nextStep = this.execSteps.inpViewportW;
 		} else if ( !vwInpInBounds ) {
 			// TODO: Report error
 		} else {
-			// TODO: Report choice & set next step
 			this.nextStep = this.execSteps.inpFnPrefix;
 			this.reprintOpModeSels( "Viewport Width = " +  + "px" );
 		}
