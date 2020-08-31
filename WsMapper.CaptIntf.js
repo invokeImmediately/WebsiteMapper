@@ -1,3 +1,5 @@
+const readline = require( 'readline' );
+
 class CaptIntf {
 
 	////////
@@ -5,11 +7,9 @@ class CaptIntf {
 
 	/**
 	 * Construct an interface for collecting screenshots.
-	 *
-	 * @since 0.0.0
 	 * @constructs CaptIntf
-	 *
 	 * @param {readline.Interface} intf - Instance of readline.Interface.
+	 * @since 0.0.0
 	 */
 	constructor( intf ) {
 		// Private properties
@@ -97,7 +97,6 @@ class CaptIntf {
 
 	/**
 	 * Prompt user for the element that will serve as the basis for capture.
-	 *
 	 * @since 0.0.0
 	 */
 	askForCaptBasisElem() {
@@ -107,7 +106,8 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Prompt user for the capture type.
+	 * @since 0.0.0
 	 */
 	askForCaptType() {
 		this.checkSelf( "askForCaptType" );
@@ -116,7 +116,8 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Prompt user for the file name prefix that will be used to store the screen capture.
+	 * @since 0.0.0
 	 */
 	askForFnPrefix() {
 		this.checkSelf( "askForFnPrefix" );
@@ -125,7 +126,8 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Prompt user for a single URL to the web page that will be screen captured.
+	 * @since 0.0.0
 	 */
 	askForUrl() {
 		this.checkSelf( "askForUrl" );
@@ -134,7 +136,8 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Prompt user for multiple URLs to the collection web pages that will be screen captured.
+	 * @since 0.0.0
 	 */
 	askForUrls() {
 		this.checkSelf( "askForUrls" );
@@ -143,7 +146,8 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Prompt the user for the width of the viewport.
+	 * @since 0.0.0
 	 */
 	askForViewportW() {
 		this.checkSelf( "askForViewportW" );
@@ -152,7 +156,9 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Calculate the number of rows that the console output occupies, including the latest error
+	 *  message if applicable.
+	 * @since 0.0.0
 	 */
 	calcRowsForMsgs() {
 		let totRows = 0;
@@ -165,7 +171,10 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Ensure that the user properly entered either the body tag, an element ID, or a class-based
+	 *  element selector for isolating the DOM element that will serve as the basis for the screen
+	 *  capture.
+	 * @since 0.0.0
 	 */
 	checkCaptBasisElem() {
 		this.checkSelf( "checkCaptBasisElem" );
@@ -200,7 +209,8 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Ensure that the user properly indicated either a single- or multiple-url capture type.
+	 * @since 0.0.0
 	 */
 	checkCaptType() {
 		this.checkSelf( "checkCaptType" );
@@ -219,7 +229,8 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Check the user's latest input for the exit command.
+	 * @since 0.0.0
 	 */
 	checkForExitStr() {
 		this.checkSelf( "checkForExitStr" );
@@ -229,7 +240,19 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Check the validity the file name prefix entered by the user.
+	 * @todo Finish writing function.
+	 * @since 0.0.0
+	 */
+	checkFnPrefix() {
+		this.checkSelf( "checkFnPrefix" );
+	}
+
+	/**
+	 * Ensure that this instance of CaptIntf was properly initialized.
+	 * @throws {Error} Will throw an error if the instance was not initialized via the method
+	 *  isInitalized.
+	 * @since 0.0.0
 	 */
 	checkSelf( funcThatChecked ) {
 		if ( !this.isInitialized() ) {
@@ -239,8 +262,9 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
-	 * @todo Finish writing multiple URL sequence.
+	 * Check that the viewport width input by the user is a number that falls within acceptable
+	 *  bounds.
+	 * @since 0.0.0
 	 */
 	checkViewportW() {
 		this.checkSelf( "checkViewportW" );
@@ -250,20 +274,23 @@ class CaptIntf {
 		const vwInpIsNum = this.viewportW !== NaN;
 		const vwInpInBounds = vwInpIsNum && ( this.viewportW >= 320 && this.viewportW <= 3840 );
 		if ( !vwInpIsNum ) {
-			this.reportInpErr( this.msgs.urlInpErr );
+			this.reportInpErr( this.msgs.vwNaN );
 			this.nextStep = this.execSteps.inpViewportW;
 		} else if ( !vwInpInBounds ) {
-			// TODO: Report error
+			this.reportInpErr( this.msgs.vwOoB );
+			this.nextStep = this.execSteps.inpViewportW;
 		} else {
 			this.nextStep = this.execSteps.inpFnPrefix;
-			this.reprintOpModeSels( "Viewport Width = " +  + "px" );
+			this.reprintOpModeSels( "Viewport Width = " + this.viewportW + "px" );
 		}
 		this.execNextStep();
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Check the validity of the URL(s) the user entered for the web page(s) that will be screen
+	 *  captured.
 	 * @todo Finish writing multiple URL sequence.
+	 * @since 0.0.0
 	 */
 	checkUrls() {
 		this.checkSelf( "checkUrls" );
@@ -298,6 +325,7 @@ class CaptIntf {
 
 	/**
 	 * Close the interface because the user has finished capturing screenshots of websites.
+	 * @since 0.0.0
 	 */
 	closeInterface( msg ) {
 		if ( msg === undefined || typeof msg !== 'string' ) {
@@ -309,7 +337,8 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Display the welcome message to the user.
+	 * @since 0.0.0
 	 */
 	dispWelcomeMsg() {
 		this.checkSelf( "dispWelcomeMsg" );
@@ -319,7 +348,9 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Execute the next step in the sequence of operations involved in performing one or more screen
+	 *  captures as instructed by the user.
+	 * @since 0.0.0
 	 */
 	async execNextStep() {
 		try {
@@ -378,7 +409,9 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Open the screen capture interface represented by this instance and begin interacting with the
+	 *  user.
+	 * @since 0.0.0
 	 */
 	openInterface() {
 		this.checkSelf( "openInterface" );
@@ -387,7 +420,8 @@ class CaptIntf {
 	}
 
 	/**
-	 * @todo Add inline documentation.
+	 * Prompt the user for input with the specified message.
+	 * @since 0.0.0
 	 */
 	prompt( msg ) {
 		this.checkSelf( 'prompt' );
@@ -396,6 +430,10 @@ class CaptIntf {
 		this.intf.prompt();
 	}
 
+	/**
+	 * Report an input error to the user.
+	 * @since 0.0.0
+	 */
 	reportInpErr( msg ) {
 		readline.moveCursor( process.stdout, 0, -1 * this.calcRowsForMsgs() );
 		readline.clearScreenDown( process.stdout );
@@ -404,6 +442,11 @@ class CaptIntf {
 		console.log( msg, this.lastLine );
 	}
 
+	/**
+	 * Reprint the settings that have been collected from the user that will determine how the
+	 *  screen capture is performed.
+	 * @since 0.0.0
+	 */
 	reprintOpModeSels( latestSel ) {
 		let totRows = 0;
 		totRows += this.calcRowsForMsgs();
