@@ -1,10 +1,24 @@
-const readline = require( 'readline' );
+/**
+ * @todo Add MIT License
+ */
 
+const readline = require( 'readline' );
+// @todo const versioner = require( 'WsMapper.versioner.js' );
+
+/**
+ * @todo Add help messsaging system.
+ * @todo Add function GetIntfMsg to assist in execution; should trigger a fatal error if a message
+ *  is requested that doesn't exist.
+ * @todo Add function GetIntfPrompt to assist in execution; should trigger a fatal error if a prompt
+ *  is requested that doesn't exist. 
+ */
 class CaptIntf {
 
 	////////
 	// §2.2.1: Constructor
 
+	// @todo Incorporate use of gulp and versioner module above to automatically insert current
+	//  in text strings. Currently planning it to take the form @since »current«  
 	/**
 	 * Construct an interface for collecting screenshots.
 	 * @constructs CaptIntf
@@ -21,23 +35,35 @@ class CaptIntf {
 		this.lastLine = undefined;
 		this.nextStep = 0;
 		this.inpErr = false;
+		this.validFnPrefixFound = false;
 		this.msgs = {
+			// @todo Incorporate use of versioner above.
 			welcome: "\nWebsiteMapper 0.0.0, by Daniel C. Rieck | Screen Capture Mode\nEnter " +
 				"'exit' to quit. Default option is indicated by a '†', freeform input by a '*'.\n" +
 				"--------------------------------------------------------------------------------" +
 				"-----",
-			fatalErr: "\nBecause a fatal error was encountered, the process will now close. " +
-				"Thank you for using WsMapper. Goodbye!\n",
-			exit: "\nSure, the process will now exit. Thank you for using WsMapper. Goodbye!\n",
-			captTypeInpErr: "\nYour input of '%s' does not match one of the available capture " +
-				"modes. Please try again.",
-			urlInpErr: "\nYour input of '%s' is not a properly encoded URL string in a format I " +
-				"recognize. Please try again.",
-			captBasisErr: "\nI could not interpret your input of '%s' into a valid selector " +
-				"string for an element to serve as the basis for screen capture. Please try again.",
-			vwNaN: "\nYour input of '%s' is not a number. Please try again.",
-			vwOoB: "\nThe viewport width of '%s' pixels you entered is out of bounds. Please try " +
-				"again."
+			// @todo Update the fatal error message with instructions for contacting author.
+			fatalErr: "\nBecause a fatal error was encountered, the process will now close." +
+				" Thank you for trying to use WsMapper. Goodbye!\n",
+			exit: "\nSure, this process will now exit. Thank you for using WsMapper. Goodbye!\n",
+			captTypeInpErr: "\nYour input of '%s' does not match one of the available capture" +
+				" modes. Please try again.",
+			urlInpErr: "\nYour input of '%s' is not a properly encoded URL string in a format I" +
+				" recognize. Please try again.",
+			captBasisErr: "\nI could not interpret your input of '%s' into a valid selector" +
+				" string for an element to serve as the basis for screen capture. Please try again.",
+			vwNaN: "\nYour input of '%s' is not a number. Please try entering a width again.",
+			vwOoB: "\nThe viewport width of '%s' pixels you entered is out of bounds. Please" +
+				" enter a different width.",
+			invalFnPrefChars: "\nI found invalid characters in the file name prefix you entered." +
+				" Please enter a different prefix.",
+			invalFnPrefFromSUrl: "\nUnfortunately, after I converted the URL into a file name" +
+				" prefix, I found invalid characters in the result0. Please manually enter a" +
+				" prefix.",
+			denseFnPrefEntry: "Sorry friend; like I said earlier, the URL is not going to work." +
+				" C'est la vie! Please manually enter a prefix.",
+			endOfDevReached: "You have reached the current endpoint to which WsMapper has been" +
+				" developed. Thank you for trying it out; good bye!"
 		};
 		this.multiUrls = false;
 		this.prompts = {
@@ -49,7 +75,7 @@ class CaptIntf {
 			captBasisElem: "\nEnter the selector string for the element that will serve as the " +
 				"basis for screen capture.\n(†body|*) (e.g., 'main', '#wsuwp-main', " +
 				"'.main-column', etc.])\n> ",
-			fnPrefix: "\nEnter a file name prefix for storing screen captures:\n(†u/se url|*)\n> "
+			fnPrefix: "\nEnter a file name prefix for storing screen captures:\n(†u/se url|*)\n> ",
 		};
 		this.execSteps = {
 			displayWelcome: 1,
@@ -64,8 +90,10 @@ class CaptIntf {
 			chkCaptBasisElem: 10,
 			inpFnPrefix: 11,
 			chkFnPrefix: 12,
-			procUrls: 13,
-			finished: 14
+			confirmSettings: 13,
+			procUrls: 14,
+			finished: 15,
+			endOfDevReached: 16
 		};
 		this.modeStrStart = "OPERATING MODE SELECTIONS:\n";
 		this.modeStr = this.modeStrStart;
@@ -246,6 +274,27 @@ class CaptIntf {
 	 */
 	checkFnPrefix() {
 		this.checkSelf( "checkFnPrefix" );
+		let validUrlsFound = false;
+
+		// @todo Handle the case where the user wants the url to be interpreted as the file name
+		//  prefix.
+		if ( this.lastLine == "" || this.lastLine == "u" || this.lastLine == "use url" ) {
+			this.lastLine = "url";
+		}
+
+		// Check for the presence characters that are invalid for file path names in Windows OS.
+		const invalFnPrefNeedle = "^[^\\/:*?\"<>|]+$";
+		const reSearch = new RegExp( invalFnPrefNeedle );
+		const match = reSearch.exec( this.lastLine );
+		if ( match !== null ) {
+			this.validFnPrefixFound = true;
+			this.fnPrefix = [ this.lastLine ];
+			this.nextStep = this.execSteps.endOfDevReached;
+		} else {
+			this.reportInpErr( this.msgs.invalFnPrefChars );
+			this.nextStep = this.execSteps.inpFnPrefix;
+		}
+		this.execNextStep();
 	}
 
 	/**
@@ -350,53 +399,59 @@ class CaptIntf {
 	/**
 	 * Execute the next step in the sequence of operations involved in performing one or more screen
 	 *  captures as instructed by the user.
+	 * Needs to be asynchronous because of the web browser-mediated processes that occur after
+	 *  settings are prompted from the user.
 	 * @since 0.0.0
 	 */
 	async execNextStep() {
 		try {
+			let steps = this.execSteps;
 			this.checkSelf( "execNextStep" );
 			this.checkForExitStr();
 			switch( this.nextStep ) {
-				case this.execSteps.displayWelcome:
+				case steps.displayWelcome:
 					this.dispWelcomeMsg();
 					break;
-				case this.execSteps.inpCaptType:
+				case steps.inpCaptType:
 					this.askForCaptType();
 					break;
-				case this.execSteps.chkCaptType:
+				case steps.chkCaptType:
 					this.checkCaptType();
 					break;
-				case this.execSteps.inpUrl:
+				case steps.endOfDevReached:
+					this.handleEndOfDevReached();
+					break;
+				case steps.inpUrl:
 					this.askForUrl();
 					break;
-				case this.execSteps.inpUrls:
+				case steps.inpUrls:
 					this.askForUrls();
 					break;
-				case this.execSteps.chkUrls:
+				case steps.chkUrls:
 					this.checkUrls();
 					break;
-				case this.execSteps.inpCaptBasisElem:
+				case steps.inpCaptBasisElem:
 					this.askForCaptBasisElem();
 					break;
-				case this.execSteps.chkCaptBasisElem:
+				case steps.chkCaptBasisElem:
 					this.checkCaptBasisElem();
 					break;
-				case this.execSteps.inpViewportW:
+				case steps.inpViewportW:
 					this.askForViewportW();
 					break;
-				case this.execSteps.chkViewportW:
+				case steps.chkViewportW:
 					this.checkViewportW();
 					break;
-				case this.execSteps.inpFnPrefix:
+				case steps.inpFnPrefix:
 					this.askForFnPrefix();
 					break;
-				case this.execSteps.chkFnPrefix:
+				case steps.chkFnPrefix:
 					this.checkFnPrefix();
 					break;
-				case this.execSteps.procUrls:
+				case steps.procUrls:
 					this.procUrls();
 					break;
-				case this.execSteps.finished:
+				case steps.finished:
 					this.closeInterface();
 					break;
 				default:
@@ -406,6 +461,17 @@ class CaptIntf {
 			console.log( "Fatal error: " + err.message );
 			this.closeInterface( this.msgs.fatalErr );
 		}
+	}
+
+
+	/**
+	 * Handle the case where a user/tester has reached the current end point in the development of
+	 *  WsMapper.
+	 * @since 0.0.0
+	 */
+	handleEndOfDevReached() {
+		this.checkSelf( "handleEndOfDevReached" );
+		this.closeInterface( this.msgs.endOfDevReached );
 	}
 
 	/**
