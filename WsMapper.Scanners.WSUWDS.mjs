@@ -35,6 +35,8 @@
  ******************************************************************************/
 
 import puppeteer from 'puppeteer';
+//import readline from 'node:readline/promises';
+import readline from 'node:readline';
 
 (async () => {
   async function demoCode() {
@@ -66,6 +68,32 @@ import puppeteer from 'puppeteer';
     console.log('The title of this blog post is "%s".', fullTitle);
 
     await browser.close();
+  }
+
+  async function inputWsuwpPassword() {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+      prompt: '',
+    });
+
+    rl.query = 'What is your WSUWP password? ';
+    rl._writeToOutput = function _writeToOutput(stringToWrite) {
+      if (rl.line.length == 0) {
+        rl.output.write("\x1B[2K\x1B[200D"+rl.query);
+      } else {
+        rl.output.write("\x1B[2K\x1B[200D"+rl.query+"\x1B[90m["+((rl.line.length%2==1)?"=-":"-=")+"]\x1B[0m");
+      }
+    }
+
+    const password = await new Promise((resolve) => {
+     rl.question(rl.query, (password) => {
+      rl.close();
+      resolve(password);
+     });
+    });
+
+    return password;
   }
 
   async function wsuwpDemoCode() {
@@ -102,7 +130,9 @@ import puppeteer from 'puppeteer';
 
   async function iifeMain() {
     // await demoCode();
-    await wsuwpDemoCode();
+    // await wsuwpDemoCode();
+    const password = await inputWsuwpPassword();
+    console.log('\nThe password is “' + password + '”.' );
   }
 
   await iifeMain();
