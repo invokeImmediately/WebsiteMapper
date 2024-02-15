@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.0.0
+ * @version 0.0.0-0.1.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -35,10 +35,10 @@
  ******************************************************************************/
 
 import puppeteer from 'puppeteer';
-//import readline from 'node:readline/promises';
 import readline from 'node:readline';
+import notifier from 'node-notifier';
 
-(async () => {
+(async (iife) => {
   async function demoCode() {
     // Launch the browser and open a new blank page
     const browser = await puppeteer.launch();
@@ -70,14 +70,31 @@ import readline from 'node:readline';
     await browser.close();
   }
 
-  async function inputWsuwpPassword() {
+  async function inputData(query) {
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
       prompt: '',
     });
 
-    rl.query = 'What is your WSUWP password? ';
+    const data = await new Promise((resolve) => {
+     rl.question(query, (data) => {
+      rl.close();
+      resolve(data);
+     });
+    });
+
+    return data;
+  }
+
+  async function inputPassword(query) {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+      prompt: '',
+    });
+
+    rl.query = query;
     rl._writeToOutput = function _writeToOutput(stringToWrite) {
       if (rl.line.length == 0) {
         rl.output.write("\x1B[2K\x1B[200D"+rl.query);
@@ -88,6 +105,8 @@ import readline from 'node:readline';
 
     const password = await new Promise((resolve) => {
      rl.question(rl.query, (password) => {
+      rl.output.write('\n');
+      rl.history = rl.history.slice(1);
       rl.close();
       resolve(password);
      });
@@ -96,44 +115,96 @@ import readline from 'node:readline';
     return password;
   }
 
-  async function wsuwpDemoCode() {
-    // Launch the browser and open a new blank page
-    const browser = await puppeteer.launch({headless: "new",});
-    const page = await browser.newPage();
+  async function launchBrowser() {
+    printProgressMsg('Opening headless browser.');
+    const browser = await puppeteer.launch({headless: "new"});
+    notifier.notify({
+      title: `${iife.scriptModule}`,
+      message: 'Puppeteer has launched a browser from the terminal for WSUWP scanning.'
+    });
 
-    // Navigate the page to a URL
-    //await page.goto('https://daesa.wsu.edu');
-    await page.goto('https://daesa.wsu.edu/wp-admin/');
+    return browser;
+  }
 
-    // Set screen size
-    await page.setViewport({width: 1080, height: 1024});
-    await page.type('#loginform #user_login', 'daniel.rieck');
-    // TO-DO: Replace next line with a password query
-    // https://stackoverflow.com/questions/24037545/how-to-hide-password-in-the-nodejs-console
-    await page.type('#loginform #user_pass', 'pwdGoesHere');
-    await page.click('#loginform #wp-submit');
-    await page.waitForSelector('body.wp-admin')
+  async function logInToWsuwp(baseUrl) {
+    const session = {};
+
+    session.browser = await launchBrowser();
+
+    printProgressMsg('Loading new page.');
+    session.page = await session.browser.newPage();
+
+    printProgressMsg(`Navigating to ${baseUrl} to log into WSUWP.`);
+    await session.page.goto(
+      (
+        baseUrl.charAt(baseUrl.length - 1) == '/' ?
+          baseUrl :
+          baseUrl + '/'
+      ) + 'wp-admin/'
+    );
+
+    await session.page.setViewport({width: 1680, height: 1050});
+
+    session.userName = await inputData('WSUWP username: ');
+    await session.page.type('#loginform #user_login', session.userName);
+
+    const password = await inputPassword('WSUWP password: ');
+    await session.page.type('#loginform #user_pass', password);
+
+    printProgressMsg('Credentials entered; attempting to log in.');
+    await session.page.click('#loginform #wp-submit');
+    const progressIndicator =
+      await session.page.waitForSelector(
+        'body.wp-admin, body.wp-core-ui.login #login_error'
+      );
+    const loginSuccessful = await progressIndicator?.evaluate(
+      el => el.classList.contains('wp-admin')
+    );
+    if(!loginSuccessful) {
+      throw new Error("Couldn't log in.");
+    } else {
+      printProgressMsg('Log in was successful.');
+    }
 
     // Identify the title for the page based on the h1
-    const pageH1 = await page.waitForSelector('h1');
+    const pageH1 = await session.page.waitForSelector('h1');
     // const h1Text = await pageH1?.evaluate(el => el.innerText);
-    const h1Text = await page.evaluate(() => {
+    const h1Text = await session.page.evaluate(() => {
       const h1El4t = document.querySelector('h1');
       return h1El4t?.innerText;
     });
 
     // Print the full title
-    console.log('The title of this page is "%s".', h1Text);
+    console.log('The primary heading of the current page is "%s".', h1Text);
 
-    await browser.close();
+    return session;
   }
 
   async function iifeMain() {
-    // await demoCode();
-    // await wsuwpDemoCode();
-    const password = await inputWsuwpPassword();
-    console.log('\nThe password is “' + password + '”.' );
+    printWelcomeMsg();
+    const session = await logInToWsuwp('https://daesa.wsu.edu/');
+    session.browser.close();
+    printGoodbyeMsg();
+  }
+
+  function printGoodbyeMsg() {
+    console.log(
+      `\x1B[48;5;237m ${iife.scriptModule} v${iife.version} \x1B[38;5;222mNow Exiting \x1B[0m\n`
+    );
+  }
+
+  function printProgressMsg(msg) {
+    console.log(`\x1B[38;5;33m${msg}\x1B[0m`);
+  }
+
+  function printWelcomeMsg() {
+    console.log(
+      `\n\x1B[48;5;237m ${iife.scriptModule} v${iife.version} \x1B[38;5;222mNow Running \x1B[0m`
+    );
   }
 
   await iifeMain();
-})();
+})({
+  scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
+  version: '0.0.0-0.1.0',
+});
