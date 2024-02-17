@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.0.0-0.1.0
+ * @version 0.0.0-0.2.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -77,6 +77,11 @@ import notifier from 'node-notifier';
       prompt: '',
     });
 
+    rl.on('SIGINT', () => {
+      rl.output.write('\n');
+      process.emit('SIGINT');
+    });
+
     const data = await new Promise((resolve) => {
      rl.question(query, (data) => {
       rl.close();
@@ -92,6 +97,11 @@ import notifier from 'node-notifier';
       input: process.stdin,
       output: process.stdout,
       prompt: '',
+    });
+
+    rl.on('SIGINT', () => {
+      rl.output.write('\n');
+      process.emit('SIGINT');
     });
 
     rl.query = query;
@@ -124,6 +134,13 @@ import notifier from 'node-notifier';
     });
 
     return browser;
+  }
+
+  function listenForSIGINT() {
+    process.on("SIGINT", function () {
+      printGoodbyeMsg();
+      process.exit();
+    });
   }
 
   async function logInToWsuwp(baseUrl) {
@@ -181,6 +198,7 @@ import notifier from 'node-notifier';
   }
 
   async function iifeMain() {
+    listenForSIGINT();
     printWelcomeMsg();
     const session = await logInToWsuwp('https://daesa.wsu.edu/');
     session.browser.close();
@@ -206,5 +224,5 @@ import notifier from 'node-notifier';
   await iifeMain();
 })({
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.0.0-0.1.0',
+  version: '0.0.0-0.2.0',
 });
