@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.0.0-0.2.0
+ * @version 0.0.0-0.3.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -68,6 +68,43 @@ import notifier from 'node-notifier';
     console.log('The title of this blog post is "%s".', fullTitle);
 
     await browser.close();
+  }
+
+  async function extractWpUserData(baseUrl, session, userAccessMap) {
+    const webDomain = baseUrl.match(/https:\/\/(.+)\//)[1];
+    // Obtain the user table for the current page.
+    const userTable = await session.page.evaluate(() => {
+      const userTable = [];
+      const userRows = document.querySelectorAll('.wp-list-table tbody tr');
+      userRows.forEach((row) => {
+        userTable.push({
+          userName: row.querySelector('td.username a').innerText,
+          email: row.querySelector('td.email a').innerText,
+          role: row.querySelector('td.role').innerText
+        });
+      });
+
+      return userTable;
+    });
+
+    userTable.forEach(function(user) {
+      const safeUserName = user.userName.replace('.', '$');
+      if (Object.hasOwn(userAccessMap, safeUserName)) {
+        userAccessMap[safeUserName].siteAccess.push({
+          webDomain: webDomain,
+          role: user.role
+        });
+      } else {
+        userAccessMap[safeUserName] = {
+          wpUserName: user.userName,
+          wpEmail: user.email,
+          siteAccess: [{
+            webDomain: webDomain,
+            role: user.role
+          }]
+        }
+      }
+    });
   }
 
   async function inputData(query) {
@@ -151,14 +188,12 @@ import notifier from 'node-notifier';
     printProgressMsg('Loading new page.');
     session.page = await session.browser.newPage();
 
+    baseUrl = baseUrl.charAt(baseUrl.length - 1) == '/' ?
+      baseUrl :
+      baseUrl + '/';
+
     printProgressMsg(`Navigating to ${baseUrl} to log into WSUWP.`);
-    await session.page.goto(
-      (
-        baseUrl.charAt(baseUrl.length - 1) == '/' ?
-          baseUrl :
-          baseUrl + '/'
-      ) + 'wp-admin/'
-    );
+    await session.page.goto(`${baseUrl}wp-admin/`);
 
     await session.page.setViewport({width: 1680, height: 1050});
 
@@ -183,25 +218,59 @@ import notifier from 'node-notifier';
       printProgressMsg('Log in was successful.');
     }
 
-    // Identify the title for the page based on the h1
-    const pageH1 = await session.page.waitForSelector('h1');
-    // const h1Text = await pageH1?.evaluate(el => el.innerText);
-    const h1Text = await session.page.evaluate(() => {
-      const h1El4t = document.querySelector('h1');
-      return h1El4t?.innerText;
-    });
-
-    // Print the full title
-    console.log('The primary heading of the current page is "%s".', h1Text);
-
     return session;
+  }
+
+  async function mapWPUsers(baseUrl, session) {
+    const userAccessMap = {};
+    const navSlug = 'wp-admin/users.php';
+    const queryString = '?paged=';
+    let cur3tListPage = 1;
+    
+    baseUrl = baseUrl.charAt(baseUrl.length - 1) == '/' ?
+      baseUrl :
+      baseUrl + '/';
+    printProgressMsg(
+      `Navigating to ${baseUrl + navSlug} to obtain list of users with access to WSUWP.`
+    );
+
+    let userCount = 0;
+    let maxListPage = 0;
+    do {
+      await session.page.goto(
+        `${baseUrl + navSlug + queryString + cur3tListPage.toString()}`
+      );
+      printProgressMsg(
+        `Extracting users on list table page ${cur3tListPage.toString()}.`
+      );
+      if (userCount == 0) {
+        await session.page.waitForSelector('#wpbody .displaying-num');
+        userCount = await session.page.evaluate(() => {
+          const ucIndicator = document.querySelector(
+            '#wpbody .displaying-num'
+          );
+          const ucMatcher = /([0-9]+) items/;
+          return parseInt(ucIndicator.innerText.match(ucMatcher)[1]);
+        });
+        maxListPage = Math.ceil(userCount / 20);
+      }
+      await extractWpUserData(baseUrl, session, userAccessMap);
+      cur3tListPage++;
+    } while(cur3tListPage <= maxListPage);
+    printResultsMsg(`Found ${userCount} users with access to ${baseUrl}.`);
+
+    return userAccessMap;
   }
 
   async function iifeMain() {
     listenForSIGINT();
     printWelcomeMsg();
-    const session = await logInToWsuwp('https://daesa.wsu.edu/');
-    session.browser.close();
+    // const baseUrl = 'https://daesa.wsu.edu/';
+    const baseUrl = 'https://daesa.wsu.edu/intranet';
+    const session = await logInToWsuwp(baseUrl);
+    const userMap = await mapWPUsers(baseUrl, session);
+    console.log(JSON.stringify(userMap));
+    await session.browser.close();
     printGoodbyeMsg();
   }
 
@@ -211,8 +280,12 @@ import notifier from 'node-notifier';
     );
   }
 
+  function printResultsMsg(msg) {
+    console.log(`\x1B[38;2;${iife.ansiColors.yellow}m${msg}\x1B[0m`);
+  }
+
   function printProgressMsg(msg) {
-    console.log(`\x1B[38;5;33m${msg}\x1B[0m`);
+    console.log(`\x1B[38;2;${iife.ansiColors.blue}m${msg}\x1B[0m`);
   }
 
   function printWelcomeMsg() {
@@ -224,5 +297,21 @@ import notifier from 'node-notifier';
   await iifeMain();
 })({
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.0.0-0.2.0',
+  version: '0.0.0-0.3.0',
+  ansiColors: {
+    blue: '91;195;245',
+    green: '170;220;36',
+    orange: '225;103;39',
+    yellow: '243;231;0',
+  }
 });
+
+// ·> TO-DOs for Adding Features:
+// ·  ==========================
+// ·  - Command line arguments for URL list (whether expressed as string
+// ·     or file)
+// ·  - Accept arrays of URLs for scanning
+// ·  - Output results organized by users with access to sites with roles
+// ·  - Output results organized by sites with user+roles listings
+// ·  - Develop a companion scanner to automatically look up users in the WSU
+// ·<    employee directory
