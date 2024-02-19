@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.0.0-0.3.0
+ * @version 0.0.0-0.4.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -33,6 +33,10 @@
  *   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *   DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
+
+// ·> ===============================
+// ·  §1: Import Process Dependencies
+// ·< -------------------------------
 
 import puppeteer from 'puppeteer';
 import readline from 'node:readline';
@@ -70,40 +74,73 @@ import notifier from 'node-notifier';
     await browser.close();
   }
 
-  async function extractWpUserData(baseUrl, session, userAccessMap) {
-    const webDomain = baseUrl.match(/https:\/\/(.+)\//)[1];
-    // Obtain the user table for the current page.
-    const userTable = await session.page.evaluate(() => {
-      const userTable = [];
-      const userRows = document.querySelectorAll('.wp-list-table tbody tr');
-      userRows.forEach((row) => {
-        userTable.push({
-          userName: row.querySelector('td.username a').innerText,
-          email: row.querySelector('td.email a').innerText,
-          role: row.querySelector('td.role').innerText
-        });
-      });
+  // ·> =====================
+  // ·  §2: Process Messaging
+  // ·< ---------------------
 
-      return userTable;
+  function printErrorMsg(msg) {
+    console.log(`\x1B[38;2;${iife.ansiColors.red}m${msg}\x1B[0m`);
+  }
+
+  function printGoodbyeMsg() {
+    console.log(
+      `\x1B[48;5;237m ${iife.scriptModule} v${iife.version} \x1B[38;5;222mNow Exiting \x1B[0m\n`
+    );
+  }
+
+  function printProgressMsg(msg) {
+    console.log(`\x1B[38;2;${iife.ansiColors.blue}m${msg}\x1B[0m`);
+  }
+
+  function printResultsMsg(msg) {
+    console.log(`\x1B[38;2;${iife.ansiColors.yellow}m${msg}\x1B[0m`);
+  }
+
+  function printWelcomeMsg() {
+    console.log(
+      `\n\x1B[48;5;237m ${iife.scriptModule} v${iife.version} \x1B[38;5;222mNow Running \x1B[0m`
+    );
+  }
+
+  // ·> =============================
+  // ·  §3: Process Set Up and Inputs
+  // ·< -----------------------------
+
+  async function getUrlsFromProcessArgv() {
+    // Script requires that a URL was supplied at invocation.
+    if (process.argv.length < 3) {
+      return undefined;
+    }
+
+    // ·> The URLs argument could be JSON representing a list of URLs, a file
+    // ·<  containing a list of URLs, or a URL.
+    const urlsJSON = process.argv[2];
+    let urlsInput;
+    try {
+      urlsInput = JSON.parse(urlsJSON);
+    } catch (error) {
+      // TO-DO: Test the argument to see if it is a file.
+      return [
+        urlsJSON.charAt(urlsJSON.length - 1) == '/' ?
+          urlsJSON :
+          urlsJSON + '/'
+      ];
+    }
+
+    // ·> Ensure that only valid URLs are passed
+    console.log('Hey, made it here.');
+    const urls = urlsInput.filter((url) => {
+      return typeof url == 'string' && url.match(/https:\/\/.+/) !== null;
     });
+    if (urls.length == 0) {
+      return undefined;
+    }
 
-    userTable.forEach(function(user) {
-      const safeUserName = user.userName.replace('.', '$');
-      if (Object.hasOwn(userAccessMap, safeUserName)) {
-        userAccessMap[safeUserName].siteAccess.push({
-          webDomain: webDomain,
-          role: user.role
-        });
-      } else {
-        userAccessMap[safeUserName] = {
-          wpUserName: user.userName,
-          wpEmail: user.email,
-          siteAccess: [{
-            webDomain: webDomain,
-            role: user.role
-          }]
-        }
-      }
+    // ·> The script only accepts URLs that have a terminating slash.
+    return urls.map((url) => {
+      return url = url.charAt(url.length - 1) == '/' ?
+        url :
+        url + '/';
     });
   }
 
@@ -173,14 +210,7 @@ import notifier from 'node-notifier';
     return browser;
   }
 
-  function listenForSIGINT() {
-    process.on("SIGINT", function () {
-      printGoodbyeMsg();
-      process.exit();
-    });
-  }
-
-  async function logInToWsuwp(baseUrl) {
+  async function logInToWsuwp(urlsToScan) {
     const session = {};
 
     session.browser = await launchBrowser();
@@ -188,12 +218,8 @@ import notifier from 'node-notifier';
     printProgressMsg('Loading new page.');
     session.page = await session.browser.newPage();
 
-    baseUrl = baseUrl.charAt(baseUrl.length - 1) == '/' ?
-      baseUrl :
-      baseUrl + '/';
-
-    printProgressMsg(`Navigating to ${baseUrl} to log into WSUWP.`);
-    await session.page.goto(`${baseUrl}wp-admin/`);
+    printProgressMsg(`Navigating to ${urlsToScan[0]} to log into WSUWP.`);
+    await session.page.goto(`${urlsToScan[0]}wp-admin/`);
 
     await session.page.setViewport({width: 1680, height: 1050});
 
@@ -221,97 +247,145 @@ import notifier from 'node-notifier';
     return session;
   }
 
-  async function mapWPUsers(baseUrl, session) {
+  function listenForSIGINT() {
+    process.on("SIGINT", function () {
+      printGoodbyeMsg();
+      process.exit();
+    });
+  }
+
+  // ·> ========================
+  // ·  §4: User Data Extraction
+  // ·< ------------------------
+
+  async function extractWpUserData(baseUrl, session, userAccessMap) {
+    const webDomain = baseUrl.match(/https:\/\/(.+)\//)[1];
+    // Obtain the user table for the current page.
+    const userTable = await session.page.evaluate(() => {
+      const userTable = [];
+      const userRows = document.querySelectorAll('.wp-list-table tbody tr');
+      userRows.forEach((row) => {
+        userTable.push({
+          userName: row.querySelector('td.username a').innerText,
+          email: row.querySelector('td.email a').innerText,
+          role: row.querySelector('td.role').innerText
+        });
+      });
+
+      return userTable;
+    });
+
+    userTable.forEach(function(user) {
+      const safeUserName = user.userName.replace('.', '$');
+      if (Object.hasOwn(userAccessMap, safeUserName)) {
+        userAccessMap[safeUserName].siteAccess.push({
+          webDomain: webDomain,
+          role: user.role
+        });
+      } else {
+        userAccessMap[safeUserName] = {
+          wpUserName: user.userName,
+          wpEmail: user.email,
+          siteAccess: [{
+            webDomain: webDomain,
+            role: user.role
+          }]
+        }
+      }
+    });
+  }
+
+  async function mapWPUsers(urlsToScan, session) {
     const userAccessMap = {};
     const navSlug = 'wp-admin/users.php';
     const queryString = '?paged=';
-    let cur3tListPage = 1;
-    
-    baseUrl = baseUrl.charAt(baseUrl.length - 1) == '/' ?
-      baseUrl :
-      baseUrl + '/';
-    printProgressMsg(
-      `Navigating to ${baseUrl + navSlug} to obtain list of users with access to WSUWP.`
-    );
 
-    let userCount = 0;
-    let maxListPage = 0;
-    do {
-      await session.page.goto(
-        `${baseUrl + navSlug + queryString + cur3tListPage.toString()}`
-      );
+    for (let i = 0; i < urlsToScan.length; i++) {
+      const baseUrl = urlsToScan[i];
+      let cur3tListPage = 1;
+
       printProgressMsg(
-        `Extracting users on list table page ${cur3tListPage.toString()}.`
+        `Navigating to ${baseUrl + navSlug} to obtain list of users with access to WSUWP.`
       );
-      if (userCount == 0) {
-        await session.page.waitForSelector('#wpbody .displaying-num');
-        userCount = await session.page.evaluate(() => {
-          const ucIndicator = document.querySelector(
-            '#wpbody .displaying-num'
-          );
-          const ucMatcher = /([0-9]+) items/;
-          return parseInt(ucIndicator.innerText.match(ucMatcher)[1]);
-        });
-        maxListPage = Math.ceil(userCount / 20);
-      }
-      await extractWpUserData(baseUrl, session, userAccessMap);
-      cur3tListPage++;
-    } while(cur3tListPage <= maxListPage);
-    printResultsMsg(`Found ${userCount} users with access to ${baseUrl}.`);
+
+      let userCount = 0;
+      let maxListPage = 0;
+      do {
+        await session.page.goto(
+          `${baseUrl + navSlug + queryString + cur3tListPage.toString()}`
+        );
+        printProgressMsg(
+          `Extracting users on list table page ${cur3tListPage.toString()}.`
+        );
+        if (userCount == 0) {
+          await session.page.waitForSelector('#wpbody .displaying-num');
+          userCount = await session.page.evaluate(() => {
+            const ucIndicator = document.querySelector(
+              '#wpbody .displaying-num'
+            );
+            const ucMatcher = /([0-9]+) items/;
+            return parseInt(ucIndicator.innerText.match(ucMatcher)[1]);
+          });
+          maxListPage = Math.ceil(userCount / 20);
+        }
+        await extractWpUserData(baseUrl, session, userAccessMap);
+        cur3tListPage++;
+      } while(cur3tListPage <= maxListPage);
+      printResultsMsg(`Found ${userCount} users with access to ${baseUrl}.`);
+    }
 
     return userAccessMap;
   }
 
+  // ·> =========================
+  // ·  §5: Execution Entry Point
+  // ·< -------------------------
+
   async function iifeMain() {
     listenForSIGINT();
     printWelcomeMsg();
-    // const baseUrl = 'https://daesa.wsu.edu/';
-    const baseUrl = 'https://daesa.wsu.edu/intranet';
-    const session = await logInToWsuwp(baseUrl);
-    const userMap = await mapWPUsers(baseUrl, session);
+
+    const urlsToScan = await getUrlsFromProcessArgv();
+    if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
+      printErrorMsg('URLs supplied to process were invalid.');
+      printGoodbyeMsg();
+      process.exit();
+    }
+
+    const session = await logInToWsuwp(urlsToScan);
+
+    const userMap = await mapWPUsers(urlsToScan, session);
     console.log(JSON.stringify(userMap));
+
     await session.browser.close();
     printGoodbyeMsg();
-  }
-
-  function printGoodbyeMsg() {
-    console.log(
-      `\x1B[48;5;237m ${iife.scriptModule} v${iife.version} \x1B[38;5;222mNow Exiting \x1B[0m\n`
-    );
-  }
-
-  function printResultsMsg(msg) {
-    console.log(`\x1B[38;2;${iife.ansiColors.yellow}m${msg}\x1B[0m`);
-  }
-
-  function printProgressMsg(msg) {
-    console.log(`\x1B[38;2;${iife.ansiColors.blue}m${msg}\x1B[0m`);
-  }
-
-  function printWelcomeMsg() {
-    console.log(
-      `\n\x1B[48;5;237m ${iife.scriptModule} v${iife.version} \x1B[38;5;222mNow Running \x1B[0m`
-    );
+    process.exit();
   }
 
   await iifeMain();
 })({
-  scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.0.0-0.3.0',
   ansiColors: {
     blue: '91;195;245',
     green: '170;220;36',
     orange: '225;103;39',
+    red: '230;20;62',
     yellow: '243;231;0',
-  }
+  },
+  scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
+  version: '0.0.0-0.4.0',
 });
 
 // ·> TO-DOs for Adding Features:
 // ·  ==========================
 // ·  - Command line arguments for URL list (whether expressed as string
 // ·     or file)
+// ·    - Write function «getUrlsFromProcessArgv» ✓
+// ·    - Update function «logInToWsuwp» ✓
+// ·    - Update function «mapWPUsers»
 // ·  - Accept arrays of URLs for scanning
 // ·  - Output results organized by users with access to sites with roles
+// ·    - Each domain has a column and lists the role for the user, if any
+// ·    - Each row is a user/network ID
 // ·  - Output results organized by sites with user+roles listings
 // ·  - Develop a companion scanner to automatically look up users in the WSU
 // ·<    employee directory
