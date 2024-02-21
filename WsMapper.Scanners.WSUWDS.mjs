@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.0.0-0.4.0
+ * @version 0.0.0-0.5.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -34,13 +34,24 @@
  *   DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
+// ·> =============================================
+// ·  TABLE OF CONTENTS:
+// ·   Sections of Script File Organized by Purpose
+// ·  ---------------------------------------------
+// ·  §1: Import Process Dependencies.......................................48
+// ·  §2: Process Messaging.................................................89
+// ·  §3: Process Set Up and Inputs........................................117
+// ·  §4: User Data Extraction.............................................269
+// ·< §5: Execution Entry Point............................................352
+
 // ·> ===============================
 // ·  §1: Import Process Dependencies
 // ·< -------------------------------
 
+import notifier from 'node-notifier';
 import puppeteer from 'puppeteer';
 import readline from 'node:readline';
-import notifier from 'node-notifier';
+import fs from 'node:fs/promises';
 
 (async (iife) => {
   async function demoCode() {
@@ -128,7 +139,6 @@ import notifier from 'node-notifier';
     }
 
     // ·> Ensure that only valid URLs are passed
-    console.log('Hey, made it here.');
     const urls = urlsInput.filter((url) => {
       return typeof url == 'string' && url.match(/https:\/\/.+/) !== null;
     });
@@ -276,23 +286,36 @@ import notifier from 'node-notifier';
     });
 
     userTable.forEach(function(user) {
-      const safeUserName = user.userName.replace('.', '$');
-      if (Object.hasOwn(userAccessMap, safeUserName)) {
-        userAccessMap[safeUserName].siteAccess.push({
-          webDomain: webDomain,
-          role: user.role
-        });
+      // const safeUserName = user.userName.replace('.', '$');
+      if (Object.hasOwn(userAccessMap, user.userName)) {
+        userAccessMap[user.userName].siteAccess[webDomain] = user.role;
       } else {
-        userAccessMap[safeUserName] = {
-          wpUserName: user.userName,
+        userAccessMap[user.userName] = {
           wpEmail: user.email,
-          siteAccess: [{
-            webDomain: webDomain,
-            role: user.role
-          }]
-        }
+          siteAccess: {}
+        };
+        userAccessMap[user.userName].siteAccess[webDomain] = user.role;
       }
     });
+  }
+
+  function getWpUserDataFileName() {
+    const now = new Date();
+    return iife.scriptModule.match(/(.+)\.mjs/)[1] + '.wpUserData.' +
+      now.getFullYear() + now.getMonth().toString().padStart(2, '0') +
+      now.getDay().toString().padStart(2, '0') + '.csv';
+  }
+
+  function getDomainsFromWpUserData(userAccessMap) {
+    const domainList = new Set();
+    for (const user in userAccessMap) {
+      const sites = Object.keys(userAccessMap[user].siteAccess);
+      for (let i = 0; i < sites.length; i++) {
+        domainList.add(sites[i]);
+      }
+    }
+
+    return [...domainList];
   }
 
   async function mapWPUsers(urlsToScan, session) {
@@ -337,6 +360,35 @@ import notifier from 'node-notifier';
     return userAccessMap;
   }
 
+  async function writeUserMapToFile(userAccessMap) {
+    const fileName = getWpUserDataFileName();
+    const domainList = getDomainsFromWpUserData(userAccessMap).sort();
+
+    // Start the output for the CSV file with the header row.
+    let output = `User Name,WSU Email,` + [...domainList].join(',');
+
+    // Add the access level per domain for each user as a row.
+    const users = Object.keys(userAccessMap).sort();
+    for (let i = 0; i < users.length; i++) {
+      output += `\n${users[i]},${userAccessMap[users[i]].wpEmail}`;
+      for (let j = 0; j < domainList.length; j++) {
+        output += ',' + (
+            typeof userAccessMap[users[i]].siteAccess[domainList[j]] == 'undefined' ?
+              '-' :
+              userAccessMap[users[i]].siteAccess[domainList[j]]
+          );
+      }
+    }
+
+    // Write the output to a *.csv file.
+    try {
+      await fs.writeFile(process.cwd() + '\\' +
+        getWpUserDataFileName(), output);
+    } catch (error) {
+      printErrorMsg(error);
+    }
+  }
+
   // ·> =========================
   // ·  §5: Execution Entry Point
   // ·< -------------------------
@@ -354,8 +406,9 @@ import notifier from 'node-notifier';
 
     const session = await logInToWsuwp(urlsToScan);
 
-    const userMap = await mapWPUsers(urlsToScan, session);
-    console.log(JSON.stringify(userMap));
+    const userAccessMap = await mapWPUsers(urlsToScan, session);
+
+    await writeUserMapToFile(userAccessMap);
 
     await session.browser.close();
     printGoodbyeMsg();
@@ -372,7 +425,7 @@ import notifier from 'node-notifier';
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.0.0-0.4.0',
+  version: '0.0.0-0.5.0',
 });
 
 // ·> TO-DOs for Adding Features:
