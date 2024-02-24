@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.0.0-0.5.0
+ * @version 0.1.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -425,7 +425,7 @@ import fs from 'node:fs/promises';
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.0.0-0.5.0',
+  version: '0.1.0',
 });
 
 // ·> TO-DOs for Adding Features:
