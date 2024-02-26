@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.1.0
+ * @version 0.1.0-0.1.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -38,20 +38,26 @@
 // ·  TABLE OF CONTENTS:
 // ·   Sections of Script File Organized by Purpose
 // ·  ---------------------------------------------
-// ·  §1: Import Process Dependencies.......................................48
-// ·  §2: Process Messaging.................................................89
-// ·  §3: Process Set Up and Inputs........................................117
-// ·  §4: User Data Extraction.............................................269
-// ·< §5: Execution Entry Point............................................352
+// ·  §1: Import Process Dependencies.......................................51
+// ·  §2: Process Messaging.................................................95
+// ·  §3: Process Timing...................................................123
+// ·  §4: Process Set Up and Inputs........................................144
+// ·  §5: User Data Extraction.............................................295
+// ·  §6: Execution Entry Point............................................420
+// ·  §7: Execution Entry Point............................................483
+// ·< §8: To-dos and Plans for Adding Features.............................521
 
 // ·> ===============================
 // ·  §1: Import Process Dependencies
 // ·< -------------------------------
 
+import fs from 'node:fs/promises';
 import notifier from 'node-notifier';
 import puppeteer from 'puppeteer';
 import readline from 'node:readline';
-import fs from 'node:fs/promises';
+import {
+  setTimeout,
+} from 'timers/promises';
 
 (async (iife) => {
   async function demoCode() {
@@ -113,8 +119,29 @@ import fs from 'node:fs/promises';
     );
   }
 
+  // ·> ==================
+  // ·  §3: Process Timing
+  // ·< ------------------
+  async function waitForTime(timeInMs) {
+    const result = await setTimeout(timeInMs, true);
+  }
+
+  async function waitForRandomTime(medianTimeInMs, intervalHalfWidth) {
+    if (intervalHalfWidth > medianTimeInMs) {
+      medianTimeInMs = intervalHalfWidth;
+    }
+    const time =
+      Math.round(
+        Math.random() * intervalHalfWidth * 2 +
+        (medianTimeInMs - intervalHalfWidth)
+      );
+    await waitForTime(time);
+
+    return time;
+  }
+
   // ·> =============================
-  // ·  §3: Process Set Up and Inputs
+  // ·  §4: Process Set Up and Inputs
   // ·< -----------------------------
 
   async function getUrlsFromProcessArgv() {
@@ -265,7 +292,7 @@ import fs from 'node:fs/promises';
   }
 
   // ·> ========================
-  // ·  §4: User Data Extraction
+  // ·  §5: User Data Extraction
   // ·< ------------------------
 
   async function extractWpUserData(baseUrl, session, userAccessMap) {
@@ -365,12 +392,12 @@ import fs from 'node:fs/promises';
     const domainList = getDomainsFromWpUserData(userAccessMap).sort();
 
     // Start the output for the CSV file with the header row.
-    let output = `User Name,WSU Email,` + [...domainList].join(',');
+    let output = `User Name,WSU Email,Person Name,Position Title,WSU Unit,` + [...domainList].join(',');
 
     // Add the access level per domain for each user as a row.
     const users = Object.keys(userAccessMap).sort();
     for (let i = 0; i < users.length; i++) {
-      output += `\n${users[i]},${userAccessMap[users[i]].wpEmail}`;
+      output += `\n${users[i]},${userAccessMap[users[i]].wpEmail},${userAccessMap[users[i]].personName},${userAccessMap[users[i]].title},${userAccessMap[users[i]].wsuUnit}`;
       for (let j = 0; j < domainList.length; j++) {
         output += ',' + (
             typeof userAccessMap[users[i]].siteAccess[domainList[j]] == 'undefined' ?
@@ -389,8 +416,71 @@ import fs from 'node:fs/promises';
     }
   }
 
+  // ·> =======================
+  // ·  §6: WSU Employee Lookup
+  // ·< -----------------------
+
+  async function queryWpUsersAsWsuEmployees(session, userAccessMap) {
+    // To-do: Finish writing function
+    const users = Object.keys(userAccessMap);
+    console.log(users);
+    for (let i = 0; i < users.length; i++) {
+      const searchResult =
+        await lookUpWsuEmployee(session, userAccessMap[users[i]].wpEmail);
+      userAccessMap[users[i]].personName = searchResult.name;
+      userAccessMap[users[i]].title = searchResult.title;
+      userAccessMap[users[i]].wsuUnit = searchResult.wsuUnit;
+
+      await waitForRandomTime(2750, 1750);
+    }
+  }
+
+  async function lookUpWsuEmployee(session, wsuEmail) {
+    printProgressMsg(`Navigating to WSU Search to look up employees.`);
+    await session.page.goto('https://search.wsu.edu/employees/');
+
+    printProgressMsg(
+      `Searching for employee with email address ${wsuEmail}.`
+    );
+    await session.page.type(
+      '.wsu-search__search-bar input.wsu-search__input', wsuEmail
+    );
+    await session.page.click('.wsu-search__search-bar button.wsu-search__submit');
+    await session.page.waitForSelector('.wsu-global-search__results');
+
+    printProgressMsg(
+      `Evaluating search results.`
+    );
+
+    const result = await session.page.evaluate(() => {
+      // ·> To-do: Handle the possibility that multiple results are returned;
+      // ·   BSM email revealed and edge case where someone had a network ID
+      // ·   that represents a last name, and other people with the same last
+      // ·<  name also had accounts.
+
+      const result =
+        document.querySelector('.wsu-global-search__results .wsu-card');
+      if (result === null) {
+        return {
+          name: '-',
+          title: '-',
+          wsuUnit: '-',
+        };
+      }
+
+      return {
+        name: result.querySelector('.wsu-card__person-name').innerText,
+        title: result.querySelector('.wsu-card__person-title').innerText,
+        wsuUnit: result.querySelector('.wsu-meta-dept').innerText
+          .replace('Affiliation\n', ''),
+      };
+    });
+
+    return result;
+  }
+
   // ·> =========================
-  // ·  §5: Execution Entry Point
+  // ·  §7: Execution Entry Point
   // ·< -------------------------
 
   async function iifeMain() {
@@ -405,9 +495,8 @@ import fs from 'node:fs/promises';
     }
 
     const session = await logInToWsuwp(urlsToScan);
-
     const userAccessMap = await mapWPUsers(urlsToScan, session);
-
+    await queryWpUsersAsWsuEmployees(session, userAccessMap);
     await writeUserMapToFile(userAccessMap);
 
     await session.browser.close();
@@ -425,20 +514,25 @@ import fs from 'node:fs/promises';
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.1.0',
+  version: '0.1.0-0.1.0',
 });
 
-// ·> TO-DOs for Adding Features:
-// ·  ==========================
-// ·  - Command line arguments for URL list (whether expressed as string
-// ·     or file)
-// ·    - Write function «getUrlsFromProcessArgv» ✓
-// ·    - Update function «logInToWsuwp» ✓
-// ·    - Update function «mapWPUsers»
-// ·  - Accept arrays of URLs for scanning
-// ·  - Output results organized by users with access to sites with roles
-// ·    - Each domain has a column and lists the role for the user, if any
-// ·    - Each row is a user/network ID
-// ·  - Output results organized by sites with user+roles listings
-// ·  - Develop a companion scanner to automatically look up users in the WSU
-// ·<    employee directory
+// ·> ========================================
+// ·  §8: To-dos and Plans for Adding Features
+// ·  ----------------------------------------
+// ·  • v0.2.0: Develop a companion scanner to automatically look up users in
+// ·     the WSU employee directory
+// ·    - Look up multiple employees in the directory
+// ·    - Pace out queries to avoid unfairly consuming bandwidth
+// ·  • v0.3.0: Obtain a list of all WordPress domains that a WSUWP user has
+// ·     access to based on networks
+// ·    - Accept different commands based on command line arguments
+// ·  • v0.4.0: Check on who has been editing pages
+// ·    - Accommodate Different reporting options: *.csv files, printing tables
+// ·       to the terminal for the last 10 edits, etc.
+// ·  • v0.5.0: Take an a11y inventory
+// ·  • v0.6.0: Look for broken links, orphaned pages, etc.
+// ·  • v0.7.0: Content complexity analysis (word count, headings, tag counts,
+// ·     etc.)
+// ·  • v0.8.0: Website tree mapping
+// ·  • Command line arguments for URL list (as file)
