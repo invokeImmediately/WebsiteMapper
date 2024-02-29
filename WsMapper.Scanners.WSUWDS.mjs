@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.1.0-0.1.0
+ * @version 0.1.0-0.1.1
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -43,9 +43,9 @@
 // ·  §3: Process Timing...................................................123
 // ·  §4: Process Set Up and Inputs........................................144
 // ·  §5: User Data Extraction.............................................295
-// ·  §6: Execution Entry Point............................................420
-// ·  §7: Execution Entry Point............................................483
-// ·< §8: To-dos and Plans for Adding Features.............................521
+// ·  §6: WSU Employee Lookup..............................................419
+// ·  §7: Execution Entry Point............................................488
+// ·< §8: To-dos and Plans for Adding Features.............................526
 
 // ·> ===============================
 // ·  §1: Import Process Dependencies
@@ -388,7 +388,6 @@ import {
   }
 
   async function writeUserMapToFile(userAccessMap) {
-    const fileName = getWpUserDataFileName();
     const domainList = getDomainsFromWpUserData(userAccessMap).sort();
 
     // Start the output for the CSV file with the header row.
@@ -425,13 +424,15 @@ import {
     const users = Object.keys(userAccessMap);
     console.log(users);
     for (let i = 0; i < users.length; i++) {
+      if (i != 0) {
+        printProgressMsg('Pausing briefly before searching for next employee.');
+        await waitForRandomTime(2750, 1750);
+      }
       const searchResult =
         await lookUpWsuEmployee(session, userAccessMap[users[i]].wpEmail);
       userAccessMap[users[i]].personName = searchResult.name;
       userAccessMap[users[i]].title = searchResult.title;
       userAccessMap[users[i]].wsuUnit = searchResult.wsuUnit;
-
-      await waitForRandomTime(2750, 1750);
     }
   }
 
@@ -468,10 +469,14 @@ import {
         };
       }
 
+      const emp5Name = result.querySelector('.wsu-card__person-name');
+      const emp5Title = result.querySelector('.wsu-card__person-title');
+      const emp5Unit = result.querySelector('.wsu-meta-dept');
+
       return {
-        name: result.querySelector('.wsu-card__person-name').innerText,
-        title: result.querySelector('.wsu-card__person-title').innerText,
-        wsuUnit: result.querySelector('.wsu-meta-dept').innerText
+        name: emp5Name === null ? '-' : emp5Name.innerText,
+        title: emp5Title === null ? '-' : emp5Title.innerText,
+        wsuUnit: emp5Unit === null ? '-' : emp5Unit.innerText
           .replace('Affiliation\n', ''),
       };
     });
@@ -514,7 +519,7 @@ import {
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.1.0-0.1.0',
+  version: '0.1.0-0.1.1',
 });
 
 // ·> ========================================
