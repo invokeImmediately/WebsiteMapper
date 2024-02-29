@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.1.0-0.1.1
+ * @version 0.1.0-0.1.2
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -43,9 +43,9 @@
 // ·  §3: Process Timing...................................................123
 // ·  §4: Process Set Up and Inputs........................................144
 // ·  §5: User Data Extraction.............................................295
-// ·  §6: WSU Employee Lookup..............................................419
-// ·  §7: Execution Entry Point............................................488
-// ·< §8: To-dos and Plans for Adding Features.............................526
+// ·  §6: WSU Employee Lookup..............................................420
+// ·  §7: Execution Entry Point............................................489
+// ·< §8: To-dos and Plans for Adding Features.............................527
 
 // ·> ===============================
 // ·  §1: Import Process Dependencies
@@ -328,9 +328,10 @@ import {
 
   function getWpUserDataFileName() {
     const now = new Date();
+    const todaysMonth = (now.getMonth() + 1).toString().padStart(2, '0');
+    const todaysDay = now.getDate().toString().padStart(2, '0');
     return iife.scriptModule.match(/(.+)\.mjs/)[1] + '.wpUserData.' +
-      now.getFullYear() + now.getMonth().toString().padStart(2, '0') +
-      now.getDay().toString().padStart(2, '0') + '.csv';
+      now.getFullYear() + todaysMonth + todaysDay + '.csv';
   }
 
   function getDomainsFromWpUserData(userAccessMap) {
@@ -519,7 +520,7 @@ import {
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.1.0-0.1.1',
+  version: '0.1.0-0.1.2',
 });
 
 // ·> ========================================
