@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.1.0-0.1.2
+ * @version 0.1.0-0.1.3
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -43,9 +43,9 @@
 // ·  §3: Process Timing...................................................123
 // ·  §4: Process Set Up and Inputs........................................144
 // ·  §5: User Data Extraction.............................................295
-// ·  §6: WSU Employee Lookup..............................................420
-// ·  §7: Execution Entry Point............................................489
-// ·< §8: To-dos and Plans for Adding Features.............................527
+// ·  §6: WSU Employee Lookup..............................................429
+// ·  §7: Execution Entry Point............................................497
+// ·< §8: To-dos and Plans for Adding Features.............................535
 
 // ·> ===============================
 // ·  §1: Import Process Dependencies
@@ -397,7 +397,16 @@ import {
     // Add the access level per domain for each user as a row.
     const users = Object.keys(userAccessMap).sort();
     for (let i = 0; i < users.length; i++) {
-      output += `\n${users[i]},${userAccessMap[users[i]].wpEmail},${userAccessMap[users[i]].personName},${userAccessMap[users[i]].title},${userAccessMap[users[i]].wsuUnit}`;
+      output += `\n${users[i]},${userAccessMap[users[i]].wpEmail},`;
+      output += userAccessMap[users[i]].personName.search(',') === -1 ?
+        userAccessMap[users[i]].personName + ',':
+        `"${userAccessMap[users[i]].personName}",`;
+      output += userAccessMap[users[i]].title.search(',') === -1 ?
+        userAccessMap[users[i]].title + ',':
+        `"${userAccessMap[users[i]].title}",`;
+      output += userAccessMap[users[i]].wsuUnit.search(',') === -1 ?
+        userAccessMap[users[i]].wsuUnit :
+        `"${userAccessMap[users[i]].wsuUnit}"`;
       for (let j = 0; j < domainList.length; j++) {
         output += ',' + (
             typeof userAccessMap[users[i]].siteAccess[domainList[j]] == 'undefined' ?
@@ -423,7 +432,6 @@ import {
   async function queryWpUsersAsWsuEmployees(session, userAccessMap) {
     // To-do: Finish writing function
     const users = Object.keys(userAccessMap);
-    console.log(users);
     for (let i = 0; i < users.length; i++) {
       if (i != 0) {
         printProgressMsg('Pausing briefly before searching for next employee.');
@@ -520,7 +528,7 @@ import {
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.1.0-0.1.2',
+  version: '0.1.0-0.1.3',
 });
 
 // ·> ========================================
