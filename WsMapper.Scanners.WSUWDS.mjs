@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.1.0-0.1.3
+ * @version 0.1.0-0.1.4
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -462,15 +462,15 @@ import {
       `Evaluating search results.`
     );
 
-    const result = await session.page.evaluate(() => {
+    const result = await session.page.evaluate((wsuEmail) => {
       // ·> To-do: Handle the possibility that multiple results are returned;
       // ·   BSM email revealed and edge case where someone had a network ID
       // ·   that represents a last name, and other people with the same last
       // ·<  name also had accounts.
 
-      const result =
-        document.querySelector('.wsu-global-search__results .wsu-card');
-      if (result === null) {
+      const results =
+        document.querySelectorAll('.wsu-global-search__results .wsu-card');
+      if (results.length == 0) {
         return {
           name: '-',
           title: '-',
@@ -478,9 +478,23 @@ import {
         };
       }
 
-      const emp5Name = result.querySelector('.wsu-card__person-name');
-      const emp5Title = result.querySelector('.wsu-card__person-title');
-      const emp5Unit = result.querySelector('.wsu-meta-dept');
+      let emp5Name = null;
+      let emp5Title = null;
+      let emp5Unit = null;
+      let emp5email = null;
+      for (let i = 0; i < results.length; i++) {
+          emp5email = results[i].querySelector(
+            '.wsu-meta-email a'
+          );
+        if (emp5email !== null && emp5email.innerText == wsuEmail) {
+          emp5Name = results[i].querySelector('.wsu-card__person-name');
+          emp5Title = results[i].querySelector('.wsu-card__person-title');
+          emp5Unit = results[i].querySelector('.wsu-meta-dept');
+          break;
+        } else {
+          continue;
+        }
+      }
 
       return {
         name: emp5Name === null ? '-' : emp5Name.innerText,
@@ -488,7 +502,7 @@ import {
         wsuUnit: emp5Unit === null ? '-' : emp5Unit.innerText
           .replace('Affiliation\n', ''),
       };
-    });
+    }, wsuEmail);
 
     return result;
   }
@@ -528,7 +542,7 @@ import {
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.1.0-0.1.3',
+  version: '0.1.0-0.1.4',
 });
 
 // ·> ========================================
