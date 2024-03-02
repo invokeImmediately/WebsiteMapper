@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.1.0-0.1.4
+ * @version 0.1.0-0.1.5
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -220,8 +220,11 @@ import {
       if (rl.line.length == 0) {
         rl.output.write("\x1B[2K\x1B[200D"+rl.query);
       } else {
-        rl.output.write("\x1B[2K\x1B[200D"+rl.query+"\x1B[90m["+((rl.line.length%2==1)?"=-":"-=")+"]\x1B[0m");
-      }
+        rl.output.write(
+          "\x1B[2K\x1B[200D" + rl.query + "\x1B[90m" +
+            "*".repeat(rl.line.length) + "\x1B[0m"
+        );
+     }
     }
 
     const password = await new Promise((resolve) => {
@@ -542,7 +545,7 @@ import {
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.1.0-0.1.4',
+  version: '0.1.0-0.1.5',
 });
 
 // ·> ========================================
