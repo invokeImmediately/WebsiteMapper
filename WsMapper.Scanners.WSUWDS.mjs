@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.2.0
+ * @version 0.2.0-0.1.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -38,18 +38,20 @@
 // ·  TABLE OF CONTENTS:
 // ·   Sections of Script File Organized by Purpose
 // ·  ---------------------------------------------
-// ·  §1: Import Process Dependencies.......................................51
-// ·  §2: Process Messaging.................................................95
-// ·  §3: Process Timing...................................................123
-// ·  §4: Process Set Up and Inputs........................................144
-// ·  §5: User Data Extraction.............................................298
-// ·  §6: WSU Employee Lookup..............................................432
-// ·  §7: Execution Entry Point............................................514
-// ·< §8: To-dos and Plans for Adding Features.............................552
+// ·  §01: Import Process Dependencies......................................53
+// ·  §02: Process Messaging................................................97
+// ·  §03: Process Timing..................................................125
+// ·  §04: Process Set Up and Inputs.......................................146
+// ·  §05: Process Command Execution.......................................278
+// ·  §06: Headless Browser Control........................................299
+// ·  §07: User Data Extraction............................................351
+// ·  §08: WSU Employee Lookup.............................................485
+// ·  §09: Execution Entry Point...........................................567
+// ·< §10: To-dos and Plans for Adding Features............................592
 
-// ·> ===============================
-// ·  §1: Import Process Dependencies
-// ·< -------------------------------
+// ·> ================================
+// ·  §01: Import Process Dependencies
+// ·< --------------------------------
 
 import fs from 'node:fs/promises';
 import notifier from 'node-notifier';
@@ -91,9 +93,9 @@ import {
     await browser.close();
   }
 
-  // ·> =====================
-  // ·  §2: Process Messaging
-  // ·< ---------------------
+  // ·> ======================
+  // ·  §02: Process Messaging
+  // ·< ----------------------
 
   function printErrorMsg(msg) {
     console.log(`\x1B[38;2;${iife.ansiColors.red}m${msg}\x1B[0m`);
@@ -119,9 +121,9 @@ import {
     );
   }
 
-  // ·> ==================
-  // ·  §3: Process Timing
-  // ·< ------------------
+  // ·> ===================
+  // ·  §03: Process Timing
+  // ·< -------------------
   async function waitForTime(timeInMs) {
     const result = await setTimeout(timeInMs, true);
   }
@@ -140,19 +142,25 @@ import {
     return time;
   }
 
-  // ·> =============================
-  // ·  §4: Process Set Up and Inputs
-  // ·< -----------------------------
+  // ·> ==============================
+  // ·  §04: Process Set Up and Inputs
+  // ·< ------------------------------
+
+  function getAvailableCommands() {
+    return {
+      "scanUserAccessLevels": scanUserAccessLevels,
+    };
+  }
 
   async function getUrlsFromProcessArgv() {
-    // Script requires that a URL was supplied at invocation.
-    if (process.argv.length < 3) {
+    // Command requires that at least one URL was supplied at invocation.
+    if (process.argv.length < 4) {
       return undefined;
     }
 
     // ·> The URLs argument could be JSON representing a list of URLs, a file
     // ·<  containing a list of URLs, or a URL.
-    const urlsJSON = process.argv[2];
+    const urlsJSON = process.argv[3];
     let urlsInput;
     try {
       urlsInput = JSON.parse(urlsJSON);
@@ -239,6 +247,58 @@ import {
     return password;
   }
 
+  function listenForSIGINT() {
+    process.on("SIGINT", function () {
+      printGoodbyeMsg();
+      process.exit();
+    });
+  }
+
+  async function executeCommandFromArgv() {
+    const availableCommands = getAvailableCommands();
+
+    // Specification of a command is required for the script to function.
+    if (process.argv.length < 3) {
+      return;
+    }
+    const requestedCommand = process.argv[2];
+    try {
+      if (typeof availableCommands[requestedCommand] == 'undefined') {
+        throw new ReferenceError(
+          `I do not recognize the command “${requestedCommand}”. Available commands are:\n${Object.keys(availableCommands).join(', ')}.`
+        );
+      }
+      await availableCommands[requestedCommand]();
+    } catch (error) {
+      printErrorMsg(error.message);
+    }
+  }
+
+  // ·> ==============================
+  // ·  §05: Process Command Execution
+  // ·< ------------------------------
+
+  async function scanUserAccessLevels() {
+    const urlsToScan = await getUrlsFromProcessArgv();
+    if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
+      printErrorMsg('URLs supplied to process were invalid.');
+      printGoodbyeMsg();
+      process.exit();
+    }
+
+    const session = await logInToWsuwp(urlsToScan);
+
+    const userAccessMap = await mapWPUsers(urlsToScan, session);
+    await queryWpUsersAsWsuEmployees(session, userAccessMap);
+    await writeUserMapToFile(userAccessMap);
+
+    await session.browser.close();
+  }
+
+  // ·> =============================
+  // ·  §06: Headless Browser Control
+  // ·< -----------------------------
+
   async function launchBrowser() {
     printProgressMsg('Opening headless browser.');
     const browser = await puppeteer.launch({headless: "new"});
@@ -287,16 +347,9 @@ import {
     return session;
   }
 
-  function listenForSIGINT() {
-    process.on("SIGINT", function () {
-      printGoodbyeMsg();
-      process.exit();
-    });
-  }
-
-  // ·> ========================
-  // ·  §5: User Data Extraction
-  // ·< ------------------------
+  // ·> =========================
+  // ·  §07: User Data Extraction
+  // ·< -------------------------
 
   async function extractWpUserData(baseUrl, session, userAccessMap) {
     const webDomain = baseUrl.match(/https:\/\/(.+)\//)[1];
@@ -428,9 +481,9 @@ import {
     }
   }
 
-  // ·> =======================
-  // ·  §6: WSU Employee Lookup
-  // ·< -----------------------
+  // ·> ========================
+  // ·  §08: WSU Employee Lookup
+  // ·< ------------------------
 
   async function queryWpUsersAsWsuEmployees(session, userAccessMap) {
     // To-do: Finish writing function
@@ -510,27 +563,14 @@ import {
     return result;
   }
 
-  // ·> =========================
-  // ·  §7: Execution Entry Point
-  // ·< -------------------------
+  // ·> ==========================
+  // ·  §09: Execution Entry Point
+  // ·< --------------------------
 
   async function iifeMain() {
     listenForSIGINT();
     printWelcomeMsg();
-
-    const urlsToScan = await getUrlsFromProcessArgv();
-    if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
-      printErrorMsg('URLs supplied to process were invalid.');
-      printGoodbyeMsg();
-      process.exit();
-    }
-
-    const session = await logInToWsuwp(urlsToScan);
-    const userAccessMap = await mapWPUsers(urlsToScan, session);
-    await queryWpUsersAsWsuEmployees(session, userAccessMap);
-    await writeUserMapToFile(userAccessMap);
-
-    await session.browser.close();
+    await executeCommandFromArgv();
     printGoodbyeMsg();
     process.exit();
   }
@@ -545,21 +585,24 @@ import {
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.2.0',
+  version: '0.2.0-0.1.0',
 });
 
-// ·> ========================================
-// ·  §8: To-dos and Plans for Adding Features
-// ·  ----------------------------------------
+// ·> =========================================
+// ·  §10: To-dos and Plans for Adding Features
+// ·  -----------------------------------------
 // ·  • v0.3.0: Obtain a list of all WordPress domains that a WSUWP user has
 // ·     access to based on networks
 // ·    - Accept different commands based on command line arguments
-// ·  • v0.4.0: Check on who has been editing pages
+// ·    - Accept aliases for commands
+// ·  • v0.4.0: Extract CSS style sheet code from WP websites
+// ·    - Use the PostCSS package to analyze style sheets
+// ·  • v0.5.0: Check on who has been editing pages
 // ·    - Accommodate Different reporting options: *.csv files, printing tables
 // ·       to the terminal for the last 10 edits, etc.
-// ·  • v0.5.0: Take an a11y inventory
-// ·  • v0.6.0: Look for broken links, orphaned pages, etc.
-// ·  • v0.7.0: Content complexity analysis (word count, headings, tag counts,
+// ·  • v0.6.0: Take an a11y inventory
+// ·  • v0.7.0: Look for broken links, orphaned pages, etc.
+// ·  • v0.8.0: Content complexity analysis (word count, headings, tag counts,
 // ·     etc.)
-// ·  • v0.8.0: Website tree mapping
-// ·  • Command line arguments for URL list (as file)
+// ·  • v0.9.0: Website tree mapping
+// ·< • Command line arguments for URL list (as file)
