@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.1.0-0.1.5
+ * @version 0.2.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -42,10 +42,10 @@
 // ·  §2: Process Messaging.................................................95
 // ·  §3: Process Timing...................................................123
 // ·  §4: Process Set Up and Inputs........................................144
-// ·  §5: User Data Extraction.............................................295
-// ·  §6: WSU Employee Lookup..............................................429
-// ·  §7: Execution Entry Point............................................497
-// ·< §8: To-dos and Plans for Adding Features.............................535
+// ·  §5: User Data Extraction.............................................298
+// ·  §6: WSU Employee Lookup..............................................432
+// ·  §7: Execution Entry Point............................................514
+// ·< §8: To-dos and Plans for Adding Features.............................552
 
 // ·> ===============================
 // ·  §1: Import Process Dependencies
@@ -545,16 +545,12 @@ import {
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.1.0-0.1.5',
+  version: '0.2.0',
 });
 
 // ·> ========================================
 // ·  §8: To-dos and Plans for Adding Features
 // ·  ----------------------------------------
-// ·  • v0.2.0: Develop a companion scanner to automatically look up users in
-// ·     the WSU employee directory
-// ·    - Look up multiple employees in the directory
-// ·    - Pace out queries to avoid unfairly consuming bandwidth
 // ·  • v0.3.0: Obtain a list of all WordPress domains that a WSUWP user has
 // ·     access to based on networks
 // ·    - Accept different commands based on command line arguments
