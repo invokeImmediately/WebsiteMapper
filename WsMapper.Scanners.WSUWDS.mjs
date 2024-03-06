@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.2.0-0.1.0
+ * @version 0.2.0-0.2.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -38,16 +38,17 @@
 // ·  TABLE OF CONTENTS:
 // ·   Sections of Script File Organized by Purpose
 // ·  ---------------------------------------------
-// ·  §01: Import Process Dependencies......................................53
-// ·  §02: Process Messaging................................................97
-// ·  §03: Process Timing..................................................125
-// ·  §04: Process Set Up and Inputs.......................................146
-// ·  §05: Process Command Execution.......................................278
-// ·  §06: Headless Browser Control........................................299
-// ·  §07: User Data Extraction............................................351
-// ·  §08: WSU Employee Lookup.............................................485
-// ·  §09: Execution Entry Point...........................................567
-// ·< §10: To-dos and Plans for Adding Features............................592
+// ·  §01: Import Process Dependencies......................................54
+// ·  §02: Process Messaging................................................98
+// ·  §03: Process Timing..................................................126
+// ·  §04: Process Set Up and Inputs.......................................147
+// ·  §05: Process Command Execution.......................................280
+// ·  §06: Headless Browser Control........................................317
+// ·  §07: User Data Extraction............................................369
+// ·  §08: WSU Employee Lookup.............................................503
+// ·  §09: WP Site Access Mapping..........................................585
+// ·  §10: Execution Entry Point...........................................671
+// ·< §11: To-dos and Plans for Adding Features............................696
 
 // ·> ================================
 // ·  §01: Import Process Dependencies
@@ -149,6 +150,7 @@ import {
   function getAvailableCommands() {
     return {
       "scanUserAccessLevels": scanUserAccessLevels,
+      "scanWpSiteAccess": scanWpSiteAccess,
     };
   }
 
@@ -291,6 +293,22 @@ import {
     const userAccessMap = await mapWPUsers(urlsToScan, session);
     await queryWpUsersAsWsuEmployees(session, userAccessMap);
     await writeUserMapToFile(userAccessMap);
+
+    await session.browser.close();
+  }
+
+  async function scanWpSiteAccess() {
+    const urlsToScan = await getUrlsFromProcessArgv();
+    if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
+      printErrorMsg('URLs supplied to process were invalid.');
+      printGoodbyeMsg();
+      process.exit();
+    }
+
+    const session = await logInToWsuwp(urlsToScan);
+
+    const wpSiteAccessMap = await mapWPSiteAccess(urlsToScan, session);
+    await writeWPSiteAccessMapToCSVFile(wpSiteAccessMap);
 
     await session.browser.close();
   }
@@ -563,8 +581,94 @@ import {
     return result;
   }
 
+  // ·> ===========================
+  // ·  §09: WP Site Access Mapping
+  // ·< ---------------------------
+
+  function getWpSiteAccessFileName() {
+    const now = new Date();
+    const todaysMonth = (now.getMonth() + 1).toString().padStart(2, '0');
+    const todaysDay = now.getDate().toString().padStart(2, '0');
+    return iife.scriptModule.match(/(.+)\.mjs/)[1] + '.wpSiteAccess.' +
+      now.getFullYear() + todaysMonth + todaysDay + '.csv';
+  }
+
+  async function mapWPSiteAccess(urlsToScan, session) {
+    // TO-DO: Finish writing function
+    const url = urlsToScan[0];
+    printProgressMsg(
+      `Scanning the quicklinks “My Networks” menu at ${url} to map WP site access.`
+    );
+
+    await session.page.exposeFunction('printErrorMsg', printErrorMsg);
+    await session.page.exposeFunction('printResultsMsg', printResultsMsg);
+
+    const wpSiteAccessMap = await session.page.evaluate(async () => {
+      const wpSiteAccessMap = [];
+      const networksMenu =
+        document.querySelector(
+          '.wp-admin #wp-admin-bar-my-networks'
+        );
+
+      if (networksMenu === null) {
+        await printErrorMsg('I could not find the network access menu.');
+        return;
+      }
+
+      const networks =
+        [...networksMenu.querySelectorAll(
+          '#wp-admin-bar-my-networks-list > li'
+        )];
+
+      for (let i=0; i < networks.length; i++) {
+        const networkName = networks[i].firstChild.innerText;
+        await printResultsMsg(
+          `Scanning website access within network “${networkName}”.`
+        );
+        const sitesInNetwork =
+          [...networks[i].querySelectorAll('ul[id^="wp-admin-bar-network-"][id$="-list"] > li:not(.ms-sites-search)')];
+        for (let j = 0; j < sitesInNetwork.length; j++) {
+          const siteLinks = sitesInNetwork[j].querySelector('ul.ab-submenu');
+          wpSiteAccessMap.push({
+            linkToSite: siteLinks.lastChild.firstChild.href,
+            linkToAdmin: siteLinks.firstChild.firstChild.href,
+            siteTitle: sitesInNetwork[j].firstChild.innerText,
+            wpNetwork: networkName,
+          });
+        }
+      }
+
+      return wpSiteAccessMap;
+    });
+
+    return wpSiteAccessMap;
+  }
+
+  async function writeWPSiteAccessMapToCSVFile(wpSiteAccessMap) {
+    // TO-DO: Finish writing function
+    // ·> Column structure for CSV:
+    // ·<  Link to site, Link to admin dashboard, Site title, WP network, Installed Themes, Active Theme
+    // Start the output for the CSV file with the header row.
+    let output = `Link To Site,Link To Admin Dashboard,Site Title,Network`;
+
+    // Add access info for every scanned site
+    for (let i = 0; i < wpSiteAccessMap.length; i++) {
+      output +=
+        `\n${wpSiteAccessMap[i].linkToSite},${wpSiteAccessMap[i].linkToAdmin},${wpSiteAccessMap[i].siteTitle},${wpSiteAccessMap[i].wpNetwork}`
+    }
+
+    // Write the output to a *.csv file.
+    const fileName = getWpSiteAccessFileName();
+    printProgressMsg(`Writing WP site access results to “${fileName}”.`);
+    try {
+      await fs.writeFile(process.cwd() + '\\' + fileName, output);
+    } catch (error) {
+      printErrorMsg(error);
+    }
+  }
+
   // ·> ==========================
-  // ·  §09: Execution Entry Point
+  // ·  §10: Execution Entry Point
   // ·< --------------------------
 
   async function iifeMain() {
@@ -585,14 +689,14 @@ import {
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.2.0-0.1.0',
+  version: '0.2.0-0.2.0',
 });
 
 // ·> =========================================
-// ·  §10: To-dos and Plans for Adding Features
+// ·  §11: To-dos and Plans for Adding Features
 // ·  -----------------------------------------
-// ·  • v0.3.0: Obtain a list of all WordPress domains that a WSUWP user has
-// ·     access to based on networks
+// ·  • v0.3.0: Obtain a list of all WordPress domains that the logged in WSUWP
+// ·     user has access to based on networks
 // ·    - Accept different commands based on command line arguments
 // ·    - Accept aliases for commands
 // ·  • v0.4.0: Extract CSS style sheet code from WP websites
