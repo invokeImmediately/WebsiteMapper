@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.2.0-0.2.0
+ * @version 0.2.0-0.2.1
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -38,17 +38,18 @@
 // ·  TABLE OF CONTENTS:
 // ·   Sections of Script File Organized by Purpose
 // ·  ---------------------------------------------
-// ·  §01: Import Process Dependencies......................................54
-// ·  §02: Process Messaging................................................98
-// ·  §03: Process Timing..................................................126
-// ·  §04: Process Set Up and Inputs.......................................147
-// ·  §05: Process Command Execution.......................................280
-// ·  §06: Headless Browser Control........................................317
-// ·  §07: User Data Extraction............................................369
-// ·  §08: WSU Employee Lookup.............................................503
-// ·  §09: WP Site Access Mapping..........................................585
-// ·  §10: Execution Entry Point...........................................671
-// ·< §11: To-dos and Plans for Adding Features............................696
+// ·  §01: Import Process Dependencies......................................55
+// ·  §02: Process Messaging................................................99
+// ·  §03: Process Timing..................................................127
+// ·  §04: Process Set Up and Inputs.......................................148
+// ·  §05: Process Output..................................................281
+// ·  §06: Process Command Execution.......................................294
+// ·  §07: Headless Browser Control........................................331
+// ·  §08: User Data Extraction............................................383
+// ·  §09: WSU Employee Lookup.............................................511
+// ·  §10: WP Site Access Mapping..........................................593
+// ·  §11: Execution Entry Point...........................................673
+// ·< §12: To-dos and Plans for Adding Features............................698
 
 // ·> ================================
 // ·  §01: Import Process Dependencies
@@ -276,8 +277,21 @@ import {
     }
   }
 
+  // ·> ===================
+  // ·  §05: Process Output
+  // ·< -------------------
+
+  async writeResultsToCSV(fileName, filePurpose, results) {
+    printProgressMsg(`Writing ${filePurposee} to “${fileName}”.`);
+    try {
+      await fs.writeFile(process.cwd() + '\\Results\\' + fileName, results);
+    } catch (error) {
+      printErrorMsg(error);
+    }
+  }
+
   // ·> ==============================
-  // ·  §05: Process Command Execution
+  // ·  §06: Process Command Execution
   // ·< ------------------------------
 
   async function scanUserAccessLevels() {
@@ -314,7 +328,7 @@ import {
   }
 
   // ·> =============================
-  // ·  §06: Headless Browser Control
+  // ·  §07: Headless Browser Control
   // ·< -----------------------------
 
   async function launchBrowser() {
@@ -366,7 +380,7 @@ import {
   }
 
   // ·> =========================
-  // ·  §07: User Data Extraction
+  // ·  §08: User Data Extraction
   // ·< -------------------------
 
   async function extractWpUserData(baseUrl, session, userAccessMap) {
@@ -490,17 +504,11 @@ import {
       }
     }
 
-    // Write the output to a *.csv file.
-    try {
-      await fs.writeFile(process.cwd() + '\\' +
-        getWpUserDataFileName(), output);
-    } catch (error) {
-      printErrorMsg(error);
-    }
+    await writeResultsToCSV(getWpUserDataFileName(), 'WP user data', output);
   }
 
   // ·> ========================
-  // ·  §08: WSU Employee Lookup
+  // ·  §09: WSU Employee Lookup
   // ·< ------------------------
 
   async function queryWpUsersAsWsuEmployees(session, userAccessMap) {
@@ -582,7 +590,7 @@ import {
   }
 
   // ·> ===========================
-  // ·  §09: WP Site Access Mapping
+  // ·  §10: WP Site Access Mapping
   // ·< ---------------------------
 
   function getWpSiteAccessFileName() {
@@ -657,18 +665,12 @@ import {
         `\n${wpSiteAccessMap[i].linkToSite},${wpSiteAccessMap[i].linkToAdmin},${wpSiteAccessMap[i].siteTitle},${wpSiteAccessMap[i].wpNetwork}`
     }
 
-    // Write the output to a *.csv file.
-    const fileName = getWpSiteAccessFileName();
-    printProgressMsg(`Writing WP site access results to “${fileName}”.`);
-    try {
-      await fs.writeFile(process.cwd() + '\\' + fileName, output);
-    } catch (error) {
-      printErrorMsg(error);
-    }
+    await writeResultsToCSV(getWpSiteAccessFileName(), 'WP site access results',
+      output);
   }
 
   // ·> ==========================
-  // ·  §10: Execution Entry Point
+  // ·  §11: Execution Entry Point
   // ·< --------------------------
 
   async function iifeMain() {
@@ -689,11 +691,11 @@ import {
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.2.0-0.2.0',
+  version: '0.2.0-0.2.1',
 });
 
 // ·> =========================================
-// ·  §11: To-dos and Plans for Adding Features
+// ·  §12: To-dos and Plans for Adding Features
 // ·  -----------------------------------------
 // ·  • v0.3.0: Obtain a list of all WordPress domains that the logged in WSUWP
 // ·     user has access to based on networks
