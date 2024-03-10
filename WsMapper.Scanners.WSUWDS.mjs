@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.2.0-0.2.1
+ * @version 0.2.0-0.3.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -48,8 +48,8 @@
 // ·  §08: User Data Extraction............................................383
 // ·  §09: WSU Employee Lookup.............................................511
 // ·  §10: WP Site Access Mapping..........................................593
-// ·  §11: Execution Entry Point...........................................673
-// ·< §12: To-dos and Plans for Adding Features............................698
+// ·  §11: Execution Entry Point...........................................694
+// ·< §12: To-dos and Plans for Adding Features............................719
 
 // ·> ================================
 // ·  §01: Import Process Dependencies
@@ -281,8 +281,8 @@ import {
   // ·  §05: Process Output
   // ·< -------------------
 
-  async writeResultsToCSV(fileName, filePurpose, results) {
-    printProgressMsg(`Writing ${filePurposee} to “${fileName}”.`);
+  async function writeResultsToCSV(fileName, filePurpose, results) {
+    printProgressMsg(`Writing ${filePurpose} to “${fileName}”.`);
     try {
       await fs.writeFile(process.cwd() + '\\Results\\' + fileName, results);
     } catch (error) {
@@ -593,6 +593,26 @@ import {
   // ·  §10: WP Site Access Mapping
   // ·< ---------------------------
 
+  async function addWpThemeUsageToSiteAccessMap(session, wpSiteAccessMap) {
+    for (let i = 0; i < wpSiteAccessMap.length; i++) {
+      printProgressMsg(
+        `Checking theme used on site ${wpSiteAccessMap[i].linkToSite.replace(/https?:\/\//g,'').replace(/\/$/,'')}.`
+      );
+      await session.page.goto(wpSiteAccessMap[i].linkToAdmin +
+        'themes.php');
+      const themeInUse = await session.page.evaluate(async () => {
+        const activeTheme =
+          document.querySelector('#wpcontent .theme-browser .theme.active');
+        if (activeTheme === null) {
+          return '-';
+        }
+        return activeTheme.querySelector('.theme-name').innerText
+          .replace('Active: ', '').trim();
+      });
+      wpSiteAccessMap[i].themeInUse = themeInUse;
+    }
+  }
+
   function getWpSiteAccessFileName() {
     const now = new Date();
     const todaysMonth = (now.getMonth() + 1).toString().padStart(2, '0');
@@ -602,7 +622,6 @@ import {
   }
 
   async function mapWPSiteAccess(urlsToScan, session) {
-    // TO-DO: Finish writing function
     const url = urlsToScan[0];
     printProgressMsg(
       `Scanning the quicklinks “My Networks” menu at ${url} to map WP site access.`
@@ -611,7 +630,7 @@ import {
     await session.page.exposeFunction('printErrorMsg', printErrorMsg);
     await session.page.exposeFunction('printResultsMsg', printResultsMsg);
 
-    const wpSiteAccessMap = await session.page.evaluate(async () => {
+    let wpSiteAccessMap = await session.page.evaluate(async () => {
       const wpSiteAccessMap = [];
       const networksMenu =
         document.querySelector(
@@ -649,6 +668,8 @@ import {
       return wpSiteAccessMap;
     });
 
+    await addWpThemeUsageToSiteAccessMap(session, wpSiteAccessMap);
+
     return wpSiteAccessMap;
   }
 
@@ -657,12 +678,12 @@ import {
     // ·> Column structure for CSV:
     // ·<  Link to site, Link to admin dashboard, Site title, WP network, Installed Themes, Active Theme
     // Start the output for the CSV file with the header row.
-    let output = `Link To Site,Link To Admin Dashboard,Site Title,Network`;
+    let output = `Link To Site,Link To Admin Dashboard,Site Title,Network,Theme`;
 
     // Add access info for every scanned site
     for (let i = 0; i < wpSiteAccessMap.length; i++) {
       output +=
-        `\n${wpSiteAccessMap[i].linkToSite},${wpSiteAccessMap[i].linkToAdmin},${wpSiteAccessMap[i].siteTitle},${wpSiteAccessMap[i].wpNetwork}`
+        `\n${wpSiteAccessMap[i].linkToSite},${wpSiteAccessMap[i].linkToAdmin},${wpSiteAccessMap[i].siteTitle},${wpSiteAccessMap[i].wpNetwork},${wpSiteAccessMap[i].themeInUse}`
     }
 
     await writeResultsToCSV(getWpSiteAccessFileName(), 'WP site access results',
@@ -691,7 +712,7 @@ import {
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.2.0-0.2.1',
+  version: '0.2.0-0.3.0',
 });
 
 // ·> =========================================
@@ -711,4 +732,7 @@ import {
 // ·  • v0.8.0: Content complexity analysis (word count, headings, tag counts,
 // ·     etc.)
 // ·  • v0.9.0: Website tree mapping
-// ·< • Command line arguments for URL list (as file)
+// ·  • Other features to be added:
+// ·    - Report the time it takes for commands to run
+// ·    - Handling HTTP errors during navigation
+// ·<   - Command line arguments for URL list (as file)
