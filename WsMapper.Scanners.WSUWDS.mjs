@@ -40,16 +40,16 @@
 // ·  ---------------------------------------------
 // ·  §01: Import Process Dependencies......................................55
 // ·  §02: Process Messaging................................................99
-// ·  §03: Process Timing..................................................127
-// ·  §04: Process Set Up and Inputs.......................................148
-// ·  §05: Process Output..................................................281
-// ·  §06: Process Command Execution.......................................294
-// ·  §07: Headless Browser Control........................................331
-// ·  §08: User Data Extraction............................................383
-// ·  §09: WSU Employee Lookup.............................................511
-// ·  §10: WP Site Access Mapping..........................................593
-// ·  §11: Execution Entry Point...........................................694
-// ·< §12: To-dos and Plans for Adding Features............................719
+// ·  §03: Process Timing..................................................130
+// ·  §04: Process Set Up and Inputs.......................................151
+// ·  §05: Process Output..................................................286
+// ·  §06: Process Command Execution.......................................299
+// ·  §07: Headless Browser Control........................................336
+// ·  §08: User Data Extraction............................................388
+// ·  §09: WSU Employee Lookup.............................................516
+// ·  §10: WP Site Access Mapping..........................................598
+// ·  §11: Execution Entry Point...........................................699
+// ·< §12: To-dos and Plans for Adding Features............................725
 
 // ·> ================================
 // ·  §01: Import Process Dependencies
@@ -103,7 +103,10 @@ import {
     console.log(`\x1B[38;2;${iife.ansiColors.red}m${msg}\x1B[0m`);
   }
 
-  function printGoodbyeMsg() {
+  function printGoodbyeMsg(exe5nTime) {
+    printProgressMsg(
+      `Process completed in ${(exe5nTime / 1000).toFixed(2)}s.`
+    );
     console.log(
       `\x1B[48;5;237m ${iife.scriptModule} v${iife.version} \x1B[38;5;222mNow Exiting \x1B[0m\n`
     );
@@ -275,6 +278,8 @@ import {
     } catch (error) {
       printErrorMsg(error.message);
     }
+
+    return new Date();
   }
 
   // ·> ===================
@@ -697,8 +702,9 @@ import {
   async function iifeMain() {
     listenForSIGINT();
     printWelcomeMsg();
-    await executeCommandFromArgv();
-    printGoodbyeMsg();
+    const exe5nStart = new Date()
+    const exe5nEnd = await executeCommandFromArgv();
+    printGoodbyeMsg(exe5nEnd - exe5nStart);
     process.exit();
   }
 
