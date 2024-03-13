@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.2.0-0.3.0
+ * @version 0.2.0-0.3.1
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -42,14 +42,14 @@
 // ·  §02: Process Messaging................................................99
 // ·  §03: Process Timing..................................................130
 // ·  §04: Process Set Up and Inputs.......................................151
-// ·  §05: Process Output..................................................286
-// ·  §06: Process Command Execution.......................................299
-// ·  §07: Headless Browser Control........................................336
-// ·  §08: User Data Extraction............................................388
-// ·  §09: WSU Employee Lookup.............................................516
-// ·  §10: WP Site Access Mapping..........................................598
-// ·  §11: Execution Entry Point...........................................699
-// ·< §12: To-dos and Plans for Adding Features............................725
+// ·  §05: Process Output..................................................287
+// ·  §06: Process Command Execution.......................................300
+// ·  §07: Headless Browser Control........................................345
+// ·  §08: User Data Extraction............................................397
+// ·  §09: WSU Employee Lookup.............................................525
+// ·  §10: WP Site Access Mapping..........................................607
+// ·  §11: Execution Entry Point...........................................708
+// ·< §12: To-dos and Plans for Adding Features............................734
 
 // ·> ================================
 // ·  §01: Import Process Dependencies
@@ -268,18 +268,19 @@ import {
       return;
     }
     const requestedCommand = process.argv[2];
+    let exe5nStart = undefined;
     try {
       if (typeof availableCommands[requestedCommand] == 'undefined') {
         throw new ReferenceError(
           `I do not recognize the command “${requestedCommand}”. Available commands are:\n${Object.keys(availableCommands).join(', ')}.`
         );
       }
-      await availableCommands[requestedCommand]();
+      exe5nStart = await availableCommands[requestedCommand]();
     } catch (error) {
       printErrorMsg(error.message);
     }
 
-    return new Date();
+    return exe5nStart;
   }
 
   // ·> ===================
@@ -309,11 +310,15 @@ import {
 
     const session = await logInToWsuwp(urlsToScan);
 
+    const exe5nStart = new Date();
+
     const userAccessMap = await mapWPUsers(urlsToScan, session);
     await queryWpUsersAsWsuEmployees(session, userAccessMap);
     await writeUserMapToFile(userAccessMap);
 
     await session.browser.close();
+
+    return exe5nStart;
   }
 
   async function scanWpSiteAccess() {
@@ -326,10 +331,14 @@ import {
 
     const session = await logInToWsuwp(urlsToScan);
 
+    const exe5nStart = new Date();
+
     const wpSiteAccessMap = await mapWPSiteAccess(urlsToScan, session);
     await writeWPSiteAccessMapToCSVFile(wpSiteAccessMap);
 
     await session.browser.close();
+
+    return exe5nStart;
   }
 
   // ·> =============================
@@ -718,7 +727,7 @@ import {
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.2.0-0.3.0',
+  version: '0.2.0-0.3.1',
 });
 
 // ·> =========================================
