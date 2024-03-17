@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.2.0-0.4.0
+ * @version 0.2.0-0.4.1
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -437,9 +437,12 @@ import {
       const userTable = [];
       const userRows = document.querySelectorAll('.wp-list-table tbody tr');
       userRows.forEach((row) => {
+        const emailValue = row.querySelector('td.email a').innerText;
         userTable.push({
           userName: row.querySelector('td.username a').innerText,
-          email: row.querySelector('td.email a').innerText,
+          email: emailValue == '' ?
+            '-' :
+            emailValue,
           role: row.querySelector('td.role').innerText
         });
       });
@@ -575,6 +578,10 @@ import {
   }
 
   async function lookUpWsuEmployee(session, wsuEmail) {
+    if (wsuEmail == '' || wsuEmail == '-') {
+      printProgressMsg(`Bypassing search for a WP user with a blank email.`);
+      return '-';
+    }
     printProgressMsg(`Navigating to WSU Search to look up employees.`);
     await session.page.goto('https://search.wsu.edu/employees/');
 
@@ -744,8 +751,8 @@ import {
   async function iifeMain() {
     listenForSIGINT();
     printWelcomeMsg();
-    const exe5nStart = new Date()
-    const exe5nEnd = await executeCommandFromArgv();
+    const exe5nStart = await executeCommandFromArgv();
+    const exe5nEnd = new Date();
     printGoodbyeMsg(exe5nEnd - exe5nStart);
     process.exit();
   }
@@ -760,7 +767,7 @@ import {
     yellow: '243;231;0',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.2.0-0.3.1',
+  version: '0.2.0-0.4.1',
 });
 
 // ·> =========================================
