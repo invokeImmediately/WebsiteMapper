@@ -8,7 +8,7 @@
  * Scanner for analyzing WordPress management activity on websites running the
  *  Web Design System and hosted on WSU WordPress.
  *
- * @version 0.2.0-0.3.1
+ * @version 0.2.0-0.4.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -40,16 +40,16 @@
 // ·  ---------------------------------------------
 // ·  §01: Import Process Dependencies......................................55
 // ·  §02: Process Messaging................................................99
-// ·  §03: Process Timing..................................................130
-// ·  §04: Process Set Up and Inputs.......................................151
-// ·  §05: Process Output..................................................287
-// ·  §06: Process Command Execution.......................................300
-// ·  §07: Headless Browser Control........................................345
-// ·  §08: User Data Extraction............................................397
-// ·  §09: WSU Employee Lookup.............................................525
-// ·  §10: WP Site Access Mapping..........................................607
-// ·  §11: Execution Entry Point...........................................708
-// ·< §12: To-dos and Plans for Adding Features............................734
+// ·  §03: Process Timing..................................................137
+// ·  §04: Process Set Up and Inputs.......................................158
+// ·  §05: Process Output..................................................313
+// ·  §06: Process Command Execution.......................................326
+// ·  §07: Headless Browser Control........................................378
+// ·  §08: User Data Extraction............................................430
+// ·  §09: WSU Employee Lookup.............................................558
+// ·  §10: WP Site Access Mapping..........................................640
+// ·  §11: Execution Entry Point...........................................741
+// ·< §12: To-dos and Plans for Adding Features............................767
 
 // ·> ================================
 // ·  §01: Import Process Dependencies
@@ -112,6 +112,13 @@ import {
     );
   }
 
+  function printProcessHelp() {
+    const availableCommands = getAvailableCommands();
+    console.log(
+      `WebsiteMapper module for automatically scanning WDS websites hosted on WSU WordPress to map various properties including site access, user access levels, etc. \n\nAvailable commands: ${Object.keys(availableCommands).join(', ')}`
+    );
+  }
+
   function printProgressMsg(msg) {
     console.log(`\x1B[38;2;${iife.ansiColors.blue}m${msg}\x1B[0m`);
   }
@@ -153,8 +160,26 @@ import {
 
   function getAvailableCommands() {
     return {
-      "scanUserAccessLevels": scanUserAccessLevels,
-      "scanWpSiteAccess": scanWpSiteAccess,
+      "help": {
+        cb: provideProcessHelp,
+        help: "Syntax: help (\"command|alias\")?\nAliases: h\nDescription: Get information about the commands that are available from this WebsiteMapper module for scanning WDS websites hosted on WSU WordPress."
+      },
+      "scanUserAccessLevels": {
+        cb: scanUserAccessLevels,
+        help: "Syntax: scanUserAccessLevels|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\nAliases: user access levels, user access, ua, ual\nDescription: Scan a series of WDS websites hosted on WSU WordPress to build a list of WP users and their access levels. Requires WP authentication using an account with admin access to each site in the list.",
+      },
+      "scanWpSiteAccess": {
+        cb: scanWpSiteAccess,
+        help: "Syntax: scanWpSiteAccess|alias 'url'\nAliases: wordpress site access, wp site access, site access, wpsa, sa\nDescription: …",
+      },
+    };
+  }
+
+  function getCommandAliases() {
+    return {
+      "help": /^h$/i,
+      "scanUserAccessLevels": /^(?:user access(?: levels?)?|ual?)$/i,
+      "scanWpSiteAccess": /^(?:(?:wordpress |wp )?site access|(?:wp)?sa)$/i,
     };
   }
 
@@ -271,11 +296,12 @@ import {
     let exe5nStart = undefined;
     try {
       if (typeof availableCommands[requestedCommand] == 'undefined') {
+        // TO-DO: Check if the command matches an alias
         throw new ReferenceError(
           `I do not recognize the command “${requestedCommand}”. Available commands are:\n${Object.keys(availableCommands).join(', ')}.`
         );
       }
-      exe5nStart = await availableCommands[requestedCommand]();
+      exe5nStart = await availableCommands[requestedCommand].cb();
     } catch (error) {
       printErrorMsg(error.message);
     }
@@ -299,6 +325,13 @@ import {
   // ·> ==============================
   // ·  §06: Process Command Execution
   // ·< ------------------------------
+
+  async function provideProcessHelp() {
+    const exe5nStart = new Date();
+    printProcessHelp();
+
+    return exe5nStart;
+  }
 
   async function scanUserAccessLevels() {
     const urlsToScan = await getUrlsFromProcessArgv();
@@ -737,6 +770,7 @@ import {
 // ·     user has access to based on networks
 // ·    - Accept different commands based on command line arguments
 // ·    - Accept aliases for commands
+// ·    - Default and help commands
 // ·  • v0.4.0: Extract CSS style sheet code from WP websites
 // ·    - Use the PostCSS package to analyze style sheets
 // ·  • v0.5.0: Check on who has been editing pages
