@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.2.0-0.4.2
+ * @version 0.2.0-0.5.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -49,7 +49,7 @@
 // ·  §09: WSU Employee Lookup.............................................561
 // ·  §10: WP Site Access Mapping..........................................647
 // ·  §11: Execution Entry Point...........................................748
-// ·< §12: To-dos and Plans for Adding Features............................774
+// ·< §12: To-dos and Plans for Adding Features............................776
 
 // ·> ================================
 // ·  §01: Import Process Dependencies
@@ -105,17 +105,17 @@ import {
 
   function printGoodbyeMsg(exe5nTime) {
     printProgressMsg(
-      `Process completed in ${(exe5nTime / 1000).toFixed(2)}s.`
+      `\nProcess completed in ${(exe5nTime / 1000).toFixed(2)}s.`
     );
     console.log(
-      `\x1B[48;5;237m ${iife.scriptModule} v${iife.version} \x1B[38;5;222mNow Exiting \x1B[0m\n`
+      `\n\x1B[48;5;237m \x1B[38;2;${iife.ansiColors.white}m${iife.scriptModule}\x1B[38;2;${iife.ansiColors.brightGray}m v${iife.version} \x1B[38;5;222mNow Exiting \x1B[0m\n`
     );
   }
 
   function printProcessHelp() {
     const availableCommands = getAvailableCommands();
     console.log(
-      `WebsiteMapper module for automatically scanning WDS websites hosted on WSU WordPress to map various properties including site access, user access levels, etc. \n\nAvailable commands: ${Object.keys(availableCommands).join(', ')}`
+      `This \x1B[38;2;${iife.ansiColors.white}mWebsiteMapper module\x1B[0m is designed to automatically scan WDS websites hosted on WSU WordPress to map important characteristics including network-based site access, user access levels, employee information, etc. Scanned information is generally stored in CSV files written to the \x1B[38;2;${iife.ansiColors.white}mResults\x1B[0m sub-folder located in the module's working directory.\n\n\x1B[38;2;${iife.ansiColors.white}mAvailable commands:\x1B[0m ${Object.keys(availableCommands).join(', ')}`
     );
   }
 
@@ -129,7 +129,7 @@ import {
 
   function printWelcomeMsg() {
     console.log(
-      `\n\x1B[48;5;237m ${iife.scriptModule} v${iife.version} \x1B[38;5;222mNow Running \x1B[0m`
+      `\n\x1B[48;5;237m \x1B[38;2;${iife.ansiColors.white}m${iife.scriptModule}\x1B[38;2;${iife.ansiColors.brightGray}m v${iife.version} \x1B[38;5;222mNow Running \x1B[0m\n`
     );
   }
 
@@ -761,13 +761,15 @@ import {
 })({
   ansiColors: {
     blue: '91;195;245',
+    brightGray: '192;192;192',
     green: '170;220;36',
     orange: '225;103;39',
     red: '230;20;62',
     yellow: '243;231;0',
+    white: '255;255;255',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.2.0-0.4.1',
+  version: '0.2.0-0.5.0',
 });
 
 // ·> =========================================
