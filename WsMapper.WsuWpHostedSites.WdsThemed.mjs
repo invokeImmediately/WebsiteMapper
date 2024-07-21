@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.2.0-0.5.0
+ * @version 0.2.0-0.5.1
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -42,14 +42,14 @@
 // ·  §02: Process Messaging................................................99
 // ·  §03: Process Timing..................................................137
 // ·  §04: Process Set Up and Inputs.......................................158
-// ·  §05: Process Output..................................................313
-// ·  §06: Process Command Execution.......................................326
-// ·  §07: Headless Browser Control........................................378
-// ·  §08: User Data Extraction............................................430
-// ·  §09: WSU Employee Lookup.............................................561
-// ·  §10: WP Site Access Mapping..........................................647
-// ·  §11: Execution Entry Point...........................................748
-// ·< §12: To-dos and Plans for Adding Features............................776
+// ·  §05: Process Output..................................................315
+// ·  §06: Process Command Execution.......................................328
+// ·  §07: Headless Browser Control........................................382
+// ·  §08: User Data Extraction............................................434
+// ·  §09: WSU Employee Lookup.............................................565
+// ·  §10: WP Site Access Mapping..........................................651
+// ·  §11: Execution Entry Point...........................................752
+// ·< §12: To-dos and Plans for Adding Features............................780
 
 // ·> ================================
 // ·  §01: Import Process Dependencies
@@ -289,16 +289,18 @@ import {
     const availableCommands = getAvailableCommands();
 
     // Specification of a command is required for the script to function.
+    let requestedCommand;
     if (process.argv.length < 3) {
-      return;
+      requestedCommand = 'help';
+    } else {
+      requestedCommand= process.argv[2];
     }
-    const requestedCommand = process.argv[2];
     let exe5nStart = undefined;
     try {
       if (typeof availableCommands[requestedCommand] == 'undefined') {
         // TO-DO: Check if the command matches an alias
         throw new ReferenceError(
-          `I do not recognize the command “${requestedCommand}”. Available commands are:\n${Object.keys(availableCommands).join(', ')}.`
+          `I do not recognize the command “${requestedCommand}.” Available commands are:\n${Object.keys(availableCommands).join(', ')}`
         );
       }
       exe5nStart = await availableCommands[requestedCommand].cb();
@@ -328,6 +330,8 @@ import {
 
   async function provideProcessHelp() {
     const exe5nStart = new Date();
+
+    // TO-DO: Determine whether
     printProcessHelp();
 
     return exe5nStart;
@@ -769,7 +773,7 @@ import {
     white: '255;255;255',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.2.0-0.5.0',
+  version: '0.2.0-0.5.1',
 });
 
 // ·> =========================================
