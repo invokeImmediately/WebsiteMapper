@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.2.0-0.5.1
+ * @version 0.2.0-0.6.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -44,12 +44,12 @@
 // ·  §04: Process Set Up and Inputs.......................................158
 // ·  §05: Process Output..................................................315
 // ·  §06: Process Command Execution.......................................328
-// ·  §07: Headless Browser Control........................................382
-// ·  §08: User Data Extraction............................................434
-// ·  §09: WSU Employee Lookup.............................................565
-// ·  §10: WP Site Access Mapping..........................................651
-// ·  §11: Execution Entry Point...........................................752
-// ·< §12: To-dos and Plans for Adding Features............................780
+// ·  §07: Headless Browser Control........................................398
+// ·  §08: User Data Extraction............................................450
+// ·  §09: WSU Employee Lookup.............................................581
+// ·  §10: WP Site Access Mapping..........................................667
+// ·  §11: Execution Entry Point...........................................768
+// ·< §12: To-dos and Plans for Adding Features............................796
 
 // ·> ================================
 // ·  §01: Import Process Dependencies
@@ -162,15 +162,15 @@ import {
     return {
       "help": {
         cb: provideProcessHelp,
-        help: "Syntax: help (\"command|alias\")?\nAliases: h\nDescription: Get information about the commands that are available from this WebsiteMapper module for scanning WDS websites hosted on WSU WordPress."
+        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m help (\"command|alias\")?\n\x1B[1m\x1B[3mAliases:\x1B[0m h\n\x1B[1m\x1B[3mDescription:\x1B[0m Get information about the commands that are available from this WebsiteMapper module for scanning WDS websites hosted on WSU WordPress."
       },
       "scanUserAccessLevels": {
         cb: scanUserAccessLevels,
-        help: "Syntax: scanUserAccessLevels|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\nAliases: user access levels, user access, ua, ual\nDescription: Scan a series of WDS websites hosted on WSU WordPress to build a list of WP users and their access levels. Requires WP authentication using an account with admin access to each site in the list.",
+        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m scanUserAccessLevels|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n\x1B[1m\x1B[3mAliases:\x1B[0m user access levels, user access, ua, ual\n\x1B[1m\x1B[3mDescription:\x1B[0m Scan a series of WDS websites hosted on WSU WordPress to build a list of WP users and their access levels. Requires WP authentication using an account with admin access to each site in the list.",
       },
       "scanWpSiteAccess": {
         cb: scanWpSiteAccess,
-        help: "Syntax: scanWpSiteAccess|alias 'url'\nAliases: wordpress site access, wp site access, site access, wpsa, sa\nDescription: …",
+        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m scanWpSiteAccess|alias 'url'\n\x1B[1m\x1B[3mAliases:\x1B[0m wordpress site access, wp site access, site access, wpsa, sa\n\x1B[1m\x1B[3mDescription:\x1B[0m Log into a WSU WordPress site and scan the networks menu to map the sites that the user can access. If possible to determine based on the user's permissions, include the theme that is in use on each site.",
       },
     };
   }
@@ -331,9 +331,25 @@ import {
   async function provideProcessHelp() {
     const exe5nStart = new Date();
 
-    // TO-DO: Determine whether
-    printProcessHelp();
+    // ·> Determine whether help was requested with a specific command. If not,
+    // ·<  provide general information about the module and its purpose.
+    if (process.argv.length < 4) {
+      printProcessHelp();
+      return exe5nStart;
+    }
 
+    // ·> Ensure that the command for which help was requested exists. If not,
+    // ·<  provide general information about the module and its purpose.
+    const requestedCommand = process.argv[3];
+    const availableCommands = getAvailableCommands();
+    if (typeof availableCommands[requestedCommand] == 'undefined') {
+      // TO-DO: Check whether an alias for an existing command was used.
+      printProcessHelp();
+      return exe5nStart;
+    }
+
+    // Provide specific information about the requested command.
+    console.log(availableCommands[requestedCommand].help);
     return exe5nStart;
   }
 
@@ -773,7 +789,7 @@ import {
     white: '255;255;255',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.2.0-0.5.1',
+  version: '0.2.0-0.6.0',
 });
 
 // ·> =========================================
