@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.2.0-0.6.0
+ * @version 0.2.0-0.7.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -42,14 +42,14 @@
 // ·  §02: Process Messaging................................................99
 // ·  §03: Process Timing..................................................137
 // ·  §04: Process Set Up and Inputs.......................................158
-// ·  §05: Process Output..................................................315
-// ·  §06: Process Command Execution.......................................328
-// ·  §07: Headless Browser Control........................................398
-// ·  §08: User Data Extraction............................................450
-// ·  §09: WSU Employee Lookup.............................................581
-// ·  §10: WP Site Access Mapping..........................................667
-// ·  §11: Execution Entry Point...........................................768
-// ·< §12: To-dos and Plans for Adding Features............................796
+// ·  §05: Process Output..................................................321
+// ·  §06: Process Command Execution.......................................334
+// ·  §07: Headless Browser Control........................................423
+// ·  §08: User Data Extraction............................................475
+// ·  §09: WSU Employee Lookup.............................................606
+// ·  §10: WP Site Access Mapping..........................................692
+// ·  §11: Execution Entry Point...........................................793
+// ·< §12: To-dos and Plans for Adding Features............................821
 
 // ·> ================================
 // ·  §01: Import Process Dependencies
@@ -297,11 +297,17 @@ import {
     }
     let exe5nStart = undefined;
     try {
-      if (typeof availableCommands[requestedCommand] == 'undefined') {
-        // TO-DO: Check if the command matches an alias
+      const commandFound =
+        typeof availableCommands[requestedCommand] == 'undefined';
+      const aliasFound = commandFound ?
+        getCommandFromAlias(requestedCommand) :
+        undefined;
+      if (!commandFound && !aliasFound) {
         throw new ReferenceError(
           `I do not recognize the command “${requestedCommand}.” Available commands are:\n${Object.keys(availableCommands).join(', ')}`
         );
+      } else if (aliasFound) {
+        requestedCommand = aliasFound;
       }
       exe5nStart = await availableCommands[requestedCommand].cb();
     } catch (error) {
@@ -328,6 +334,19 @@ import {
   // ·  §06: Process Command Execution
   // ·< ------------------------------
 
+  function getCommandFromAlias(pro6veAlias) {
+    const aliases = getCommandAliases();
+    let foundAlias = null;
+    for (let key in aliases) {
+      if (pro6veAlias.match(aliases[key]) !== null) {
+        foundAlias = key;
+        break;
+      }
+    }
+
+    return foundAlias;
+  }
+
   async function provideProcessHelp() {
     const exe5nStart = new Date();
 
@@ -340,12 +359,18 @@ import {
 
     // ·> Ensure that the command for which help was requested exists. If not,
     // ·<  provide general information about the module and its purpose.
-    const requestedCommand = process.argv[3];
+    let requestedCommand = process.argv[3];
     const availableCommands = getAvailableCommands();
-    if (typeof availableCommands[requestedCommand] == 'undefined') {
-      // TO-DO: Check whether an alias for an existing command was used.
+    const commandFound =
+      typeof availableCommands[requestedCommand] == 'undefined';
+    const aliasFound = commandFound ?
+      getCommandFromAlias(requestedCommand) :
+      undefined;
+    if (!commandFound && !aliasFound) {
       printProcessHelp();
       return exe5nStart;
+    } else if (aliasFound) {
+      requestedCommand = aliasFound;
     }
 
     // Provide specific information about the requested command.
@@ -789,7 +814,7 @@ import {
     white: '255;255;255',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.2.0-0.6.0',
+  version: '0.2.0-0.7.0',
 });
 
 // ·> =========================================
