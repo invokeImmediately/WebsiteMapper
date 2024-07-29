@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.2.0-0.7.0
+ * @version 0.3.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -814,17 +814,12 @@ import {
     white: '255;255;255',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.2.0-0.7.0',
+  version: '0.3.0',
 });
 
 // ·> =========================================
 // ·  §12: To-dos and Plans for Adding Features
 // ·  -----------------------------------------
-// ·  • v0.3.0: Obtain a list of all WordPress domains that the logged in WSUWP
-// ·     user has access to based on networks
-// ·    - Accept different commands based on command line arguments
-// ·    - Accept aliases for commands
-// ·    - Default and help commands
 // ·  • v0.4.0: Extract CSS style sheet code from WP websites
 // ·    - Use the PostCSS package to analyze style sheets
 // ·  • v0.5.0: Check on who has been editing pages
