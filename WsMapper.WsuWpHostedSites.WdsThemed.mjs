@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.3.0-0.0.1
+ * @version 0.3.1
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -815,7 +815,7 @@ import {
     white: '255;255;255',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.3.0-0.0.1',
+  version: '0.3.1',
 });
 
 // ·> =========================================
