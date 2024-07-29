@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.3.0
+ * @version 0.3.0-0.0.1
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -136,6 +136,7 @@ import {
   // ·> ===================
   // ·  §03: Process Timing
   // ·< -------------------
+
   async function waitForTime(timeInMs) {
     const result = await setTimeout(timeInMs, true);
   }
@@ -298,7 +299,7 @@ import {
     let exe5nStart = undefined;
     try {
       const commandFound =
-        typeof availableCommands[requestedCommand] == 'undefined';
+        typeof availableCommands[requestedCommand] != 'undefined';
       const aliasFound = commandFound ?
         getCommandFromAlias(requestedCommand) :
         undefined;
@@ -814,7 +815,7 @@ import {
     white: '255;255;255',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.3.0',
+  version: '0.3.0-0.0.1',
 });
 
 // ·> =========================================
