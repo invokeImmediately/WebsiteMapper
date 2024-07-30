@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.3.1
+ * @version 0.3.1-0.1.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -48,8 +48,9 @@
 // ·  §08: User Data Extraction............................................475
 // ·  §09: WSU Employee Lookup.............................................606
 // ·  §10: WP Site Access Mapping..........................................692
-// ·  §11: Execution Entry Point...........................................793
-// ·< §12: To-dos and Plans for Adding Features............................821
+// ·  §11: WSUWP Site Page Mapping.........................................793
+// ·  §12: Execution Entry Point...........................................793
+// ·< §13: To-dos and Plans for Adding Features............................821
 
 // ·> ================================
 // ·  §01: Import Process Dependencies
@@ -164,6 +165,10 @@ import {
       "help": {
         cb: provideProcessHelp,
         help: "\x1B[1m\x1B[3mSyntax:\x1B[0m help (\"command|alias\")?\n\x1B[1m\x1B[3mAliases:\x1B[0m h\n\x1B[1m\x1B[3mDescription:\x1B[0m Get information about the commands that are available from this WebsiteMapper module for scanning WDS websites hosted on WSU WordPress."
+      },
+      "mapPagesOnSites": {
+        cb: mapPagesOnSites,
+        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m mapPagesOnSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n\x1B[1m\x1B[3mAliases:\x1B[0m map pages, mpos, mp\n\x1B[1m\x1B[3mDescription:\x1B[0m Scan through a series of one or more WDS websites hosted on WSU WordPress to map out the pages that are being maintained on each site. Include information who last updated each page and an overview of the accessibility issues present on each page.",
       },
       "scanUserAccessLevels": {
         cb: scanUserAccessLevels,
@@ -331,6 +336,12 @@ import {
     }
   }
 
+  function getCsvOutputFromData(data) {
+    return data.search(',') === -1 ?
+      data + ',' :
+      `"${data}",`;
+  }
+
   // ·> ==============================
   // ·  §06: Process Command Execution
   // ·< ------------------------------
@@ -346,6 +357,35 @@ import {
     }
 
     return foundAlias;
+  }
+
+  async function mapPagesOnSites() {
+    const urlsToScan = await getUrlsFromProcessArgv();
+    if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
+      printErrorMsg('URLs supplied to process were invalid.');
+      printGoodbyeMsg();
+      process.exit();
+    }
+
+    // ·> Log in to WordPress based on the first URL provided to the module. It
+    // ·   will be assumed that the user will stay logged in during visits to
+    // ·<  subsequent website domains.
+    const session = await logInToWsuwp(urlsToScan);
+
+    // Begin counting execution time after logging in.
+    const exe5nStart = new Date();
+
+    // TO-DO: Finish writing function.
+    const pageMap = {};
+    for (let i = 0; i < urlsToScan.length; i++) {
+      // TO-DO: Finish writing the following function called below.
+      await mapPagesOnSite(pageMap, urlsToScan[i], session);
+    }
+
+    // Now that the command is complete, close the browser session.
+    await session.browser.close();
+
+    return exe5nStart;
   }
 
   async function provideProcessHelp() {
@@ -387,14 +427,20 @@ import {
       process.exit();
     }
 
+    // ·> Log in to WordPress based on the first URL provided to the module. It
+    // ·   will be assumed that the user will stay logged in during visits to
+    // ·<  subsequent website domains.
     const session = await logInToWsuwp(urlsToScan);
 
+    // Begin counting execution time after logging in.
     const exe5nStart = new Date();
 
+    // Map the users who have access to the requested WSUWP websites.
     const userAccessMap = await mapWPUsers(urlsToScan, session);
     await queryWpUsersAsWsuEmployees(session, userAccessMap);
     await writeUserMapToFile(userAccessMap);
 
+    // Now that the command is complete, close the browser session.
     await session.browser.close();
 
     return exe5nStart;
@@ -408,13 +454,20 @@ import {
       process.exit();
     }
 
+    // ·> Log in to WordPress based on the first URL provided to the module. It
+    // ·   will be assumed that the user will stay logged in during visits to
+    // ·<  subsequent website domains.
     const session = await logInToWsuwp(urlsToScan);
 
+    // Begin counting execution time after logging in.
     const exe5nStart = new Date();
 
+    // ·> Map site access across the user's WordPress networks and write the
+    // ·<  results to a CSV file.
     const wpSiteAccessMap = await mapWPSiteAccess(urlsToScan, session);
     await writeWPSiteAccessMapToCSVFile(wpSiteAccessMap);
 
+    // Now that the command is complete, close the browser session.
     await session.browser.close();
 
     return exe5nStart;
@@ -582,15 +635,9 @@ import {
     const users = Object.keys(userAccessMap).sort();
     for (let i = 0; i < users.length; i++) {
       output += `\n${users[i]},${userAccessMap[users[i]].wpEmail},`;
-      output += userAccessMap[users[i]].personName.search(',') === -1 ?
-        userAccessMap[users[i]].personName + ',':
-        `"${userAccessMap[users[i]].personName}",`;
-      output += userAccessMap[users[i]].title.search(',') === -1 ?
-        userAccessMap[users[i]].title + ',':
-        `"${userAccessMap[users[i]].title}",`;
-      output += userAccessMap[users[i]].wsuUnit.search(',') === -1 ?
-        userAccessMap[users[i]].wsuUnit :
-        `"${userAccessMap[users[i]].wsuUnit}"`;
+      output += getCsvOutputFromData(userAccessMap[users[i]].personName);
+      output += getCsvOutputFromData(userAccessMap[users[i]].title);
+      output += getCsvOutputFromData(userAccessMap[users[i]].wsuUnit);
       for (let j = 0; j < domainList.length; j++) {
         output += ',' + (
             typeof userAccessMap[users[i]].siteAccess[domainList[j]] == 'undefined' ?
@@ -790,8 +837,145 @@ import {
       output);
   }
 
-  // ·> ==========================
-  // ·  §11: Execution Entry Point
+  // ·> ============================
+  // ·  §11: WSUWP Site Page Mapping
+  // ·< ----------------------------
+
+  async function mapPagesOnSite(pageMap, siteUrl, session) {
+    const navSlug = 'wp-admin/edit.php';
+    const queryString = '?post_type=page&paged=';
+    let cur3tListPage = 1;
+
+    printProgressMsg(
+      `Navigating to the “All Pages” admin screen of ${siteUrl} to map the pages being maintained on the site.`
+    );
+
+    // Run through each page of the site’s “All Pages” listing.
+    let pagesCount = 0;
+    let maxListPage = 0;
+    do {
+      await session.page.goto(
+        `${siteUrl + navSlug + queryString + cur3tListPage.toString()}`
+      );
+      printProgressMsg(
+        `Extracting pages on list table page ${cur3tListPage.toString()}.`
+      );
+
+      // Determine the total number of pages that will be mapped.
+      if (pagesCount == 0) {
+        await session.page.waitForSelector('#wpbody .displaying-num');
+        pagesCount = await session.page.evaluate(() => {
+          const ucIndicator = document.querySelector(
+            '#wpbody .displaying-num'
+          );
+          const pageCountMatcher = /([0-9]+) items/;
+          return parseInt(ucIndicator.innerText.match(pageCountMatcher)[1]);
+        });
+        maxListPage = Math.ceil(pagesCount / 20);
+      }
+
+      // Extract page data.
+      // TO-DO: Finish writing this portion of the function.
+      const pgPostTable = await extractPgPostDataOnCur3tListPage(session);
+
+      // TO-DO: Add extracted page posts data to map.
+      const domain = getInst7nNameFromUrl(siteUrl);
+      addPgPostTableDataToPageMap(pgPostTable, pageMap, domain, cur3tListPage);
+
+      cur3tListPage++;
+    } while(cur3tListPage <= maxListPage);
+    printResultsMsg(`Found and mapped ${pagesCount} page posts on ${siteUrl}. Page map has ${Object.keys(pageMap).length} entries.`);
+    writePageMapToFile(pageMap);
+  }
+
+  function getInst7nNameFromUrl(siteUrl) {
+    const inst7nMatches = siteUrl.match(/https?:\/\/(.+)\.wsu.edu\/(.*?)\/?$/);
+    return inst7nMatches[2] != "" ?
+      (inst7nMatches[1] + '_' + inst7nMatches[2]).replace('/', '_') :
+      inst7nMatches[1];
+  }
+
+  async function extractPgPostDataOnCur3tListPage(session) {
+    const pgPostTable = await session.page.evaluate(() => {
+      const pgPostTable = [];
+      const pgPostRows =
+        document.querySelectorAll('.wp-list-table tbody tr');
+      pgPostRows.forEach((pgPost) => {
+        // ·> TO-DO: Make this code more robust by implementing error handling
+        // ·<  with processes such as regular expressions.
+        pgPostTable.push({
+          postId: pgPost.id.match(/post-([0-9]+)/)[1],
+          title: pgPost.querySelector('td.title a.row-title').innerText,
+          editUrl: pgPost.querySelector('td.title a.row-title').href,
+          viewUrl: pgPost.querySelector('td.title span.view a').href,
+          published: pgPost.querySelector('td.date').innerText
+            .replace('\n', ' '),
+          lastUpdatedBy: pgPost.querySelector('td.wsu_last_updated')
+            .innerText.match(/(.*)\n.*/)[1],
+          lastUpdatedOn: pgPost.querySelector('td.wsu_last_updated')
+            .innerText.match(/.*\n(.*)/)[1],
+          a11yIndicators: pgPost.querySelector('td.accessibility').innerText,
+        });
+      });
+
+      return pgPostTable;
+    });
+
+    return pgPostTable;
+  }
+
+  function addPgPostTableDataToPageMap(
+    pgPostTable, pageMap, domain, cur3tListPage
+  ) {
+    let listingPos4n = 1;
+    pgPostTable.forEach(function (page) {
+      if (!Object.hasOwn(pageMap, `${domain}-${page.postId}`)) {
+        pageMap[`${domain}-${page.postId}`] = {
+          installation: domain,
+          position: listingPos4n + (cur3tListPage - 1) * 20,
+          postId: page.postId,
+          title: page.title,
+          editUrl: page.editUrl,
+          viewUrl: page.viewUrl,
+          published: page.published,
+          lastUpdatedBy: page.lastUpdatedBy,
+          lastUpdatedOn: page.lastUpdatedOn,
+          a11yIndicators: page.a11yIndicators,
+        };
+        listingPos4n++;
+      }
+    });
+  }
+
+  async function writePageMapToFile(pageMap) {
+    // Start the output for the CSV file with the header row.
+    let output = `Installation,Listing Position,Post ID,Title,Edit at URL,View at URL,Published,Last Updated By, Last Updated On, A11y Indicators`;
+
+    // Add the access level per domain for each user as a row.
+    const pages = Object.keys(pageMap);
+    for (let i = 0; i < pages.length; i++) {
+      output += '\n' + getCsvOutputFromData(pageMap[pages[i]].installation);
+      output += pageMap[pages[i]].position + ',';
+      output += getCsvOutputFromData(pageMap[pages[i]].postId);
+      output += getCsvOutputFromData(pageMap[pages[i]].title);
+      output += getCsvOutputFromData(pageMap[pages[i]].editUrl);
+      output += getCsvOutputFromData(pageMap[pages[i]].viewUrl);
+      output += getCsvOutputFromData(pageMap[pages[i]].published);
+      output += getCsvOutputFromData(pageMap[pages[i]].lastUpdatedBy);
+      output += getCsvOutputFromData(pageMap[pages[i]].lastUpdatedOn);
+      output += getCsvOutputFromData(pageMap[pages[i]].a11yIndicators);
+    }
+
+    const now = new Date();
+    const todaysMonth = (now.getMonth() + 1).toString().padStart(2, '0');
+    const todaysDay = now.getDate().toString().padStart(2, '0');
+
+    await writeResultsToCSV(iife.scriptModule.match(/(.+)\.mjs/)[1] + '.wpPageData.' +
+      now.getFullYear() + todaysMonth + todaysDay + '.csv', 'WP page data', output);
+  }
+
+   // ·> ==========================
+  // ·  §12: Execution Entry Point
   // ·< --------------------------
 
   async function iifeMain() {
@@ -815,17 +999,18 @@ import {
     white: '255;255;255',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.3.1',
+  version: '0.3.1-0.1.0',
 });
 
 // ·> =========================================
-// ·  §12: To-dos and Plans for Adding Features
+// ·  §13: To-dos and Plans for Adding Features
 // ·  -----------------------------------------
-// ·  • v0.4.0: Extract CSS style sheet code from WP websites
-// ·    - Use the PostCSS package to analyze style sheets
-// ·  • v0.5.0: Check on who has been editing pages
+// ·  • v0.4.0: Map the page posts being maintained on a WSUWP website and check
+// ·     on who has been editing pages.
 // ·    - Accommodate Different reporting options: *.csv files, printing tables
 // ·       to the terminal for the last 10 edits, etc.
+// ·  • v0.5.0: Extract CSS style sheet code from WP websites
+// ·    - Use the PostCSS package to analyze style sheets
 // ·  • v0.6.0: Take an a11y inventory
 // ·  • v0.7.0: Look for broken links, orphaned pages, etc.
 // ·  • v0.8.0: Content complexity analysis (word count, headings, tag counts,
