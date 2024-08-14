@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.3.1-0.1.1
+ * @version 0.3.1-0.1.2
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -38,19 +38,19 @@
 // ·  TABLE OF CONTENTS:
 // ·   Sections of Script File Organized by Purpose
 // ·  ---------------------------------------------
-// ·  §01: Import Process Dependencies......................................55
-// ·  §02: Process Messaging................................................99
-// ·  §03: Process Timing..................................................137
-// ·  §04: Process Set Up and Inputs.......................................158
-// ·  §05: Process Output..................................................321
-// ·  §06: Process Command Execution.......................................334
-// ·  §07: Headless Browser Control........................................423
-// ·  §08: User Data Extraction............................................475
-// ·  §09: WSU Employee Lookup.............................................606
-// ·  §10: WP Site Access Mapping..........................................692
-// ·  §11: WSUWP Site Page Mapping.........................................793
-// ·  §12: Execution Entry Point...........................................793
-// ·< §13: To-dos and Plans for Adding Features............................821
+// ·  §01: Import Process Dependencies......................................56
+// ·  §02: Process Messaging...............................................100
+// ·  §03: Process Timing..................................................138
+// ·  §04: Process Set Up and Inputs.......................................160
+// ·  §05: Process Output..................................................327
+// ·  §06: Process Command Execution.......................................349
+// ·  §07: Headless Browser Control........................................479
+// ·  §08: User Data Extraction............................................531
+// ·  §09: WSU Employee Lookup.............................................656
+// ·  §10: WP Site Access Mapping..........................................742
+// ·  §11: WSUWP Site Page Mapping.........................................843
+// ·  §12: Execution Entry Point..........................................1013
+// ·< §13: To-dos and Plans for Adding Features...........................1041
 
 // ·> ================================
 // ·  §01: Import Process Dependencies
@@ -336,10 +336,13 @@ import {
     }
   }
 
-  function getCsvOutputFromData(data) {
+  function getCsvOutputFromData(data, forFirstColumn = false) {
+    const delimiter = forFirstColumn ?
+      '' :
+      ',';
     return data.search(',') === -1 ?
-      data + ',' :
-      `"${data}",`;
+      `${delimiter}${data}` :
+      `${delimiter}"${data}"`;
   }
 
   // ·> ==============================
@@ -375,12 +378,11 @@ import {
     // Begin counting execution time after logging in.
     const exe5nStart = new Date();
 
-    // TO-DO: Finish writing function.
     const pageMap = {};
     for (let i = 0; i < urlsToScan.length; i++) {
-      // TO-DO: Finish writing the following function called below.
       await mapPagesOnSite(pageMap, urlsToScan[i], session);
     }
+    writePageMapToFile(pageMap);
 
     // Now that the command is complete, close the browser session.
     await session.browser.close();
@@ -634,7 +636,7 @@ import {
     // Add the access level per domain for each user as a row.
     const users = Object.keys(userAccessMap).sort();
     for (let i = 0; i < users.length; i++) {
-      output += `\n${users[i]},${userAccessMap[users[i]].wpEmail},`;
+      output += `\n${users[i]},${userAccessMap[users[i]].wpEmail}`;
       output += getCsvOutputFromData(userAccessMap[users[i]].personName);
       output += getCsvOutputFromData(userAccessMap[users[i]].title);
       output += getCsvOutputFromData(userAccessMap[users[i]].wsuUnit);
@@ -853,6 +855,7 @@ import {
     // Run through each page of the site’s “All Pages” listing.
     let pagesCount = 0;
     let maxListPage = 0;
+    const domain = getInst7nNameFromUrl(siteUrl);
     do {
       await session.page.goto(
         `${siteUrl + navSlug + queryString + cur3tListPage.toString()}`
@@ -863,8 +866,13 @@ import {
 
       // Determine the total number of pages that will be mapped.
       if (pagesCount == 0) {
-        await session.page.waitForSelector('#wpbody .displaying-num');
+        await session.page.waitForSelector(
+          '#wpbody .displaying-num, body#error-page'
+        );
         pagesCount = await session.page.evaluate(() => {
+          if (document.querySelector('body#error-page') !== null) {
+            return -1;
+          }
           const ucIndicator = document.querySelector(
             '#wpbody .displaying-num'
           );
@@ -873,19 +881,36 @@ import {
         });
         maxListPage = Math.ceil(pagesCount / 20);
       }
+      if (pagesCount == -1) {
+        printProgressMsg(
+          `Error page encountered on ${siteUrl}; moving on to next site.`
+        );
+        pageMap[`${domain}-0`] = {
+          installation: domain,
+          position: '-',
+          postId: '-',
+          title: '-',
+          editUrl: '-',
+          viewUrl: '-',
+          published: '-',
+          lastUpdatedBy: '-',
+          lastUpdatedOn: '-',
+          a11yIndicators: '-',
+        };
+
+        return;
+      }
 
       // Extract page data.
       // TO-DO: Finish writing this portion of the function.
       const pgPostTable = await extractPgPostDataOnCur3tListPage(session);
 
       // TO-DO: Add extracted page posts data to map.
-      const domain = getInst7nNameFromUrl(siteUrl);
       addPgPostTableDataToPageMap(pgPostTable, pageMap, domain, cur3tListPage);
 
       cur3tListPage++;
     } while(cur3tListPage <= maxListPage);
     printResultsMsg(`Found and mapped ${pagesCount} page posts on ${siteUrl}. Page map has ${Object.keys(pageMap).length} entries.`);
-    writePageMapToFile(pageMap);
   }
 
   function getInst7nNameFromUrl(siteUrl) {
@@ -893,6 +918,20 @@ import {
     return inst7nMatches[2] != "" ?
       (inst7nMatches[1] + '_' + inst7nMatches[2]).replace('/', '_') :
       inst7nMatches[1];
+  }
+
+  function getWpPageMapFileName() {
+    const now = {};
+    now.date = new Date();
+    now.month = (now.date.getMonth() + 1).toString().padStart(2, '0');
+    now.day = now.date.getDate().toString().padStart(2, '0');
+    now.hours = now.date.getHours().toString().padStart(2, '0');
+    now.min3s = now.date.getMinutes().toString().padStart(2, '0');
+    now.sec3s = now.date.getSeconds().toString().padStart(2, '0');
+
+    return iife.scriptModule.match(/(.+)\.mjs/)[1] + '.wpPageData.' +
+      now.date.getFullYear() + now.month + now.day + now.hours + now.min3s +
+      now.sec3s + '.csv';
   }
 
   async function extractPgPostDataOnCur3tListPage(session) {
@@ -954,8 +993,9 @@ import {
     // Add the access level per domain for each user as a row.
     const pages = Object.keys(pageMap);
     for (let i = 0; i < pages.length; i++) {
-      output += '\n' + getCsvOutputFromData(pageMap[pages[i]].installation);
-      output += pageMap[pages[i]].position + ',';
+      output += '\n' + getCsvOutputFromData(pageMap[pages[i]].installation,
+        true);
+      output += ',' + pageMap[pages[i]].position;
       output += getCsvOutputFromData(pageMap[pages[i]].postId);
       output += getCsvOutputFromData(pageMap[pages[i]].title);
       output += getCsvOutputFromData(pageMap[pages[i]].editUrl);
@@ -966,12 +1006,7 @@ import {
       output += getCsvOutputFromData(pageMap[pages[i]].a11yIndicators);
     }
 
-    const now = new Date();
-    const todaysMonth = (now.getMonth() + 1).toString().padStart(2, '0');
-    const todaysDay = now.getDate().toString().padStart(2, '0');
-
-    await writeResultsToCSV(iife.scriptModule.match(/(.+)\.mjs/)[1] + '.wpPageData.' +
-      now.getFullYear() + todaysMonth + todaysDay + '.csv', 'WP page data', output);
+    await writeResultsToCSV(getWpPageMapFileName(), 'WP page data', output);
   }
 
    // ·> ==========================
@@ -999,7 +1034,7 @@ import {
     white: '255;255;255',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.3.1-0.1.1',
+  version: '0.3.1-0.1.2',
 });
 
 // ·> =========================================
