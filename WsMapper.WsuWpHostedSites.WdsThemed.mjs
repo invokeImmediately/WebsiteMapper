@@ -1,14 +1,14 @@
 /*!*****************************************************************************
- * ▓▒▒▒ WsMapper.WsuWpHostedSites. ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓
- * ▓▒▒▒  ▐   ▌█▀▀▄ ▄▀▀▀▐▀█▀▌█  █ █▀▀▀ ▐▀▄▀▌█▀▀▀ █▀▀▄ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓
- * ▓▓▒▒  ▐ █ ▌█  █ ▀▀▀█  █  █▀▀█ █▀▀  █ ▀ ▌█▀▀  █  █ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓
- * ▓▓▒▒   ▀ ▀ ▀▀▀  ▀▀▀   █  █  ▀ ▀▀▀▀ █   ▀▀▀▀▀ ▀▀▀  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓
- * ▓▓▓▒  .mjs ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓
+ * █▒▒▒ WsMapper.WsuWpHostedSites.                  ▒▒▒▒▓▒▒▓▒▒▓▒▒▓▓▒▒▓▓▒▒▓▓▒▒███
+ * █▒▒▒  ▐   ▌█▀▀▄ ▄▀▀▀▐▀█▀▌█  █ █▀▀▀ ▐▀▄▀▌█▀▀▀ █▀▀▄ ▒▒▒▒▓▒▒▓▒▒▓▒▒▓▓▒▒▓▓▒▒▓▓▒▒██
+ * ██▒▒▒ ▐ █ ▌█  █ ▀▀▀█  █  █▀▀█ █▀▀  █ ▀ ▌█▀▀  █  █ ▒▒▒▒▓▒▒▓▒▒▓▒▒▓▓▒▒▓▓▒▒▓▓▒▒██
+ * ██▒▒▒  ▀ ▀ ▀▀▀  ▀▀▀   █  █  ▀ ▀▀▀▀ █   ▀▀▀▀▀ ▀▀▀  ▒▒▒▒▒▓▒▒▓▒▒▓▒▒▓▓▒▒▓▓▒▒▓▓▒▒█
+ * ███▒▒ .mjs ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▒▒▓▒▒▓▒▒▓▓▒▒▓▓▒▒▓▓▒▒█
  * 
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.3.1-0.1.2
+ * @version 0.3.1-0.2.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -34,35 +34,86 @@
  *   DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-// ·> =============================================
+// ·> ==========================================================================
 // ·  TABLE OF CONTENTS:
 // ·   Sections of Script File Organized by Purpose
 // ·  ---------------------------------------------
-// ·  §01: Import Process Dependencies......................................56
-// ·  §02: Process Messaging...............................................100
-// ·  §03: Process Timing..................................................138
-// ·  §04: Process Set Up and Inputs.......................................160
-// ·  §05: Process Output..................................................327
-// ·  §06: Process Command Execution.......................................349
-// ·  §07: Headless Browser Control........................................479
-// ·  §08: User Data Extraction............................................531
-// ·  §09: WSU Employee Lookup.............................................656
-// ·  §10: WP Site Access Mapping..........................................742
-// ·  §11: WSUWP Site Page Mapping.........................................843
-// ·  §12: Execution Entry Point..........................................1013
-// ·< §13: To-dos and Plans for Adding Features...........................1041
+// ·  §01: Import Process Dependencies......................................99
+// ·  §02: IIFE to Encapsulate Process.....................................115
+// ·  §03: Process Messaging...............................................151
+// ·    §3.1: printErrorMsg................................................154
+// ·    §3.2: printErrorMsg................................................159
+// ·    §3.3: printProcessHelp.............................................169
+// ·    §3.4: printProgressMsg.............................................177
+// ·    §3.5: printResultsMsg..............................................182
+// ·    §3.6: printWelcomeMsg..............................................187
+// ·  §04: Process Timing..................................................195
+// ·    §4.1: waitForTime..................................................198
+// ·    §4.2: waitForRandomTime............................................203
+// ·  §05: Process Set Up and Inputs.......................................219
+// ·    §5.1: executeCommandFromArgv.......................................222
+// ·    §5.2: getAvailableCommands.........................................255
+// ·    §5.3: getCommandAliases............................................277
+// ·    §5.4: getUrlsFromFile..............................................286
+// ·    §5.5: getUrlsFromProcessArgv.......................................311
+// ·    §5.6: inputData....................................................357
+// ·    §5.7: inputPassword................................................380
+// ·    §5.8: listenForSIGINT..............................................417
+// ·  §06: Process Output..................................................426
+// ·    §6.1: getCsvOutputFromData.........................................429
+// ·    §6.2: writeResultsToCSV............................................439
+// ·  §07: Process Command Execution.......................................450
+// ·    §7.1: getCommandFromAlias..........................................453
+// ·    §7.2: mapPagesOnSites..............................................467
+// ·    §7.3: provideProcessHelp...........................................496
+// ·    §7.4: scanUserAccessLevels.........................................528
+// ·    §7.5: scanWpSiteAccess.............................................556
+// ·  §08: Headless Browser Control........................................585
+// ·    §8.1: launchBrowser................................................588
+// ·    §8.2: logInToWsuwp.................................................600
+// ·  §09: User Data Extraction............................................639
+// ·    §9.1: extractWpUserData............................................642
+// ·    §9.2: getWpUserDataFileName........................................677
+// ·    §9.3: getDomainsFromWpUserData.....................................686
+// ·    §9.4: mapWPUsers...................................................699
+// ·    §9.5: writeUserMapToFile...........................................742
+// ·  §10: WSU Employee Lookup.............................................769
+// ·    §10.1: lookUpWsuEmployee...........................................772
+// ·    §10.2: queryWpUsersAsWsuEmployees..................................839
+// ·  §11: WP Site Access Mapping..........................................857
+// ·    §11.1: addWpThemeUsageToSiteAccessMap..............................860
+// ·    §11.2: getWpSiteAccessFileName.....................................881
+// ·    §11.3: mapWPSiteAccess.............................................890
+// ·    §11.4: writeWPSiteAccessMapToCSVFile...............................943
+// ·  §12: WSUWP Site Page Mapping.........................................962
+// ·    §12.1: addPgPostTableDataToPageMap.................................965
+// ·    §12.2: extractPgPostDataOnCur3tListPage............................989
+// ·    §12.3: getInst7nNameFromUrl.......................................1019
+// ·    §12.4: getWpPageMapFileName.......................................1027
+// ·    §12.5: mapPagesOnSite.............................................1042
+// ·    §12.6: writePageMapToFile.........................................1113
+// ·  §13: IIFE Execution Entry Point.....................................1138
+// ·< §14: To-dos and Plans for Adding Features...........................1166
 
-// ·> ================================
+// ·> ==========================================================================
 // ·  §01: Import Process Dependencies
 // ·< --------------------------------
 
 import fs from 'node:fs/promises';
+import events from 'node:events';
+import {
+  open
+} from 'node:fs/promises';
 import notifier from 'node-notifier';
 import puppeteer from 'puppeteer';
 import readline from 'node:readline';
 import {
-  setTimeout,
+  setTimeout
 } from 'timers/promises';
+
+// ·> ==========================================================================
+// ·  §02: IIFE to Encapsulate Process
+// ·< --------------------------------
 
 (async (iife) => {
   async function demoCode() {
@@ -96,14 +147,16 @@ import {
     await browser.close();
   }
 
-  // ·> ======================
-  // ·  §02: Process Messaging
-  // ·< ----------------------
+  // ·> ========================================================================
+  // ·  §3: Process Messaging
+  // ·< ---------------------
 
+  // --- §3.1: printErrorMsg ---
   function printErrorMsg(msg) {
     console.log(`\x1B[38;2;${iife.ansiColors.red}m${msg}\x1B[0m`);
   }
 
+  // --- §3.2: printErrorMsg ---
   function printGoodbyeMsg(exe5nTime) {
     printProgressMsg(
       `\nProcess completed in ${(exe5nTime / 1000).toFixed(2)}s.`
@@ -113,6 +166,7 @@ import {
     );
   }
 
+  // --- §3.3: printProcessHelp ---
   function printProcessHelp() {
     const availableCommands = getAvailableCommands();
     console.log(
@@ -120,28 +174,33 @@ import {
     );
   }
 
+  // --- §3.4: printProgressMsg ---
   function printProgressMsg(msg) {
     console.log(`\x1B[38;2;${iife.ansiColors.blue}m${msg}\x1B[0m`);
   }
 
+  // --- §3.5: printResultsMsg ---
   function printResultsMsg(msg) {
     console.log(`\x1B[38;2;${iife.ansiColors.yellow}m${msg}\x1B[0m`);
   }
 
+  // --- §3.6: printWelcomeMsg ---
   function printWelcomeMsg() {
     console.log(
       `\n\x1B[48;5;237m \x1B[38;2;${iife.ansiColors.white}m${iife.scriptModule}\x1B[38;2;${iife.ansiColors.brightGray}m v${iife.version} \x1B[38;5;222mNow Running \x1B[0m\n`
     );
   }
 
-  // ·> ===================
-  // ·  §03: Process Timing
-  // ·< -------------------
+  // ·> ========================================================================
+  // ·  §4: Process Timing
+  // ·< ------------------
 
+  // --- §4.1: waitForTime ---
   async function waitForTime(timeInMs) {
     const result = await setTimeout(timeInMs, true);
   }
 
+  // --- §4.2: waitForRandomTime ---
   async function waitForRandomTime(medianTimeInMs, intervalHalfWidth) {
     if (intervalHalfWidth > medianTimeInMs) {
       medianTimeInMs = intervalHalfWidth;
@@ -156,10 +215,44 @@ import {
     return time;
   }
 
-  // ·> ==============================
-  // ·  §04: Process Set Up and Inputs
-  // ·< ------------------------------
+  // ·> ========================================================================
+  // ·  §5: Process Set Up and Inputs
+  // ·< -----------------------------
 
+  // --- §5.1: executeCommandFromArgv ---
+  async function executeCommandFromArgv() {
+    const availableCommands = getAvailableCommands();
+
+    // Specification of a command is required for the script to function.
+    let requestedCommand;
+    if (process.argv.length < 3) {
+      requestedCommand = 'help';
+    } else {
+      requestedCommand= process.argv[2];
+    }
+    let exe5nStart = undefined;
+    try {
+      const commandFound =
+        typeof availableCommands[requestedCommand] != 'undefined';
+      const aliasFound = commandFound ?
+        getCommandFromAlias(requestedCommand) :
+        undefined;
+      if (!commandFound && !aliasFound) {
+        throw new ReferenceError(
+          `I do not recognize the command “${requestedCommand}.” Available commands are:\n${Object.keys(availableCommands).join(', ')}`
+        );
+      } else if (aliasFound) {
+        requestedCommand = aliasFound;
+      }
+      exe5nStart = await availableCommands[requestedCommand].cb();
+    } catch (error) {
+      printErrorMsg(error.message);
+    }
+
+    return exe5nStart;
+  }
+
+  // --- §5.2: getAvailableCommands ---
   function getAvailableCommands() {
     return {
       "help": {
@@ -181,6 +274,7 @@ import {
     };
   }
 
+  // --- §5.3: getCommandAliases ---
   function getCommandAliases() {
     return {
       "help": /^h$/i,
@@ -189,6 +283,32 @@ import {
     };
   }
 
+  // --- §5.4: getUrlsFromFile ---
+  async function getUrlsFromFile(fileName) {
+    try {
+      const sourcefile = await open(fileName);
+      const rl = readline.createInterface({
+        input: sourcefile.createReadStream(),
+        crlfDelay: Infinity
+      });
+
+      const urls = [];
+      rl.on('line', function(line) {
+        if (typeof line == 'string' && line.match(/https:\/\/.+/) !== null) {
+          urls.push(line);
+        }
+      });
+
+      await events.once(rl, 'close');
+
+      return urls;
+    } catch(er3) {
+      console.error(er3);
+      return null;
+    }
+  }
+
+  // --- §5.5: getUrlsFromProcessArgv ---
   async function getUrlsFromProcessArgv() {
     // Command requires that at least one URL was supplied at invocation.
     if (process.argv.length < 4) {
@@ -202,13 +322,21 @@ import {
     try {
       urlsInput = JSON.parse(urlsJSON);
     } catch (error) {
-      // TO-DO: Test the argument to see if it is a file.
-      return [
-        urlsJSON.charAt(urlsJSON.length - 1) == '/' ?
-          urlsJSON :
-          urlsJSON + '/'
-      ];
-    }
+      // Check if the argument is a single URL.
+      if (typeof url == 'string' && url.match(/https:\/\/.+/) !== null) {
+        return [
+          urlsJSON.charAt(urlsJSON.length - 1) == '/' ?
+            urlsJSON :
+            urlsJSON + '/'
+        ];
+      }
+
+      // Check the argument to see if it is a file containing a list of URLs.
+      const urlsFromFile = await getUrlsFromFile(urlsJSON);
+      if (urlsFromFile !== null) {
+        return urlsFromFile;
+      }
+   }
 
     // ·> Ensure that only valid URLs are passed
     const urls = urlsInput.filter((url) => {
@@ -226,6 +354,7 @@ import {
     });
   }
 
+  // --- §5.6: inputData ---
   async function inputData(query) {
     const rl = readline.createInterface({
       input: process.stdin,
@@ -248,6 +377,7 @@ import {
     return data;
   }
 
+  // --- §5.7: inputPassword ---
   async function inputPassword(query) {
     const rl = readline.createInterface({
       input: process.stdin,
@@ -284,6 +414,7 @@ import {
     return password;
   }
 
+  // --- §5.8: listenForSIGINT ---
   function listenForSIGINT() {
     process.on("SIGINT", function () {
       printGoodbyeMsg();
@@ -291,51 +422,11 @@ import {
     });
   }
 
-  async function executeCommandFromArgv() {
-    const availableCommands = getAvailableCommands();
+  // ·> ========================================================================
+  // ·  §6: Process Output
+  // ·< ------------------
 
-    // Specification of a command is required for the script to function.
-    let requestedCommand;
-    if (process.argv.length < 3) {
-      requestedCommand = 'help';
-    } else {
-      requestedCommand= process.argv[2];
-    }
-    let exe5nStart = undefined;
-    try {
-      const commandFound =
-        typeof availableCommands[requestedCommand] != 'undefined';
-      const aliasFound = commandFound ?
-        getCommandFromAlias(requestedCommand) :
-        undefined;
-      if (!commandFound && !aliasFound) {
-        throw new ReferenceError(
-          `I do not recognize the command “${requestedCommand}.” Available commands are:\n${Object.keys(availableCommands).join(', ')}`
-        );
-      } else if (aliasFound) {
-        requestedCommand = aliasFound;
-      }
-      exe5nStart = await availableCommands[requestedCommand].cb();
-    } catch (error) {
-      printErrorMsg(error.message);
-    }
-
-    return exe5nStart;
-  }
-
-  // ·> ===================
-  // ·  §05: Process Output
-  // ·< -------------------
-
-  async function writeResultsToCSV(fileName, filePurpose, results) {
-    printProgressMsg(`Writing ${filePurpose} to “${fileName}”.`);
-    try {
-      await fs.writeFile(process.cwd() + '\\Results\\' + fileName, results);
-    } catch (error) {
-      printErrorMsg(error);
-    }
-  }
-
+  // --- §6.1: getCsvOutputFromData ---
   function getCsvOutputFromData(data, forFirstColumn = false) {
     const delimiter = forFirstColumn ?
       '' :
@@ -345,10 +436,21 @@ import {
       `${delimiter}"${data}"`;
   }
 
-  // ·> ==============================
-  // ·  §06: Process Command Execution
-  // ·< ------------------------------
+  // --- §6.2: writeResultsToCSV ---
+  async function writeResultsToCSV(fileName, filePurpose, results) {
+    printProgressMsg(`Writing ${filePurpose} to “${fileName}”.`);
+    try {
+      await fs.writeFile(process.cwd() + '\\Results\\' + fileName, results);
+    } catch (error) {
+      printErrorMsg(error);
+    }
+  }
 
+  // ·> ========================================================================
+  // ·  §7: Process Command Execution
+  // ·< -----------------------------
+
+  // --- §7.1: getCommandFromAlias ---
   function getCommandFromAlias(pro6veAlias) {
     const aliases = getCommandAliases();
     let foundAlias = null;
@@ -362,6 +464,7 @@ import {
     return foundAlias;
   }
 
+  // --- §7.2: mapPagesOnSites ---
   async function mapPagesOnSites() {
     const urlsToScan = await getUrlsFromProcessArgv();
     if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
@@ -390,6 +493,7 @@ import {
     return exe5nStart;
   }
 
+  // --- §7.3: provideProcessHelp ---
   async function provideProcessHelp() {
     const exe5nStart = new Date();
 
@@ -421,6 +525,7 @@ import {
     return exe5nStart;
   }
 
+  // --- §7.4: scanUserAccessLevels ---
   async function scanUserAccessLevels() {
     const urlsToScan = await getUrlsFromProcessArgv();
     if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
@@ -448,6 +553,7 @@ import {
     return exe5nStart;
   }
 
+  // --- §7.5: scanWpSiteAccess ---
   async function scanWpSiteAccess() {
     const urlsToScan = await getUrlsFromProcessArgv();
     if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
@@ -475,10 +581,11 @@ import {
     return exe5nStart;
   }
 
-  // ·> =============================
-  // ·  §07: Headless Browser Control
-  // ·< -----------------------------
+  // ·> ========================================================================
+  // ·  §8: Headless Browser Control
+  // ·< ----------------------------
 
+  // --- §8.1: launchBrowser ---
   async function launchBrowser() {
     printProgressMsg('Opening headless browser.');
     const browser = await puppeteer.launch({headless: "new"});
@@ -490,6 +597,7 @@ import {
     return browser;
   }
 
+  // --- §8.2: logInToWsuwp ---
   async function logInToWsuwp(urlsToScan) {
     const session = {};
 
@@ -527,10 +635,11 @@ import {
     return session;
   }
 
-  // ·> =========================
-  // ·  §08: User Data Extraction
-  // ·< -------------------------
+  // ·> ========================================================================
+  // ·  §9: User Data Extraction
+  // ·< ------------------------
 
+  // --- §9.1: extractWpUserData ---
   async function extractWpUserData(baseUrl, session, userAccessMap) {
     const webDomain = baseUrl.match(/https:\/\/(.+)\//)[1];
     // Obtain the user table for the current page.
@@ -565,6 +674,7 @@ import {
     });
   }
 
+  // --- §9.2: getWpUserDataFileName ---
   function getWpUserDataFileName() {
     const now = new Date();
     const todaysMonth = (now.getMonth() + 1).toString().padStart(2, '0');
@@ -573,6 +683,7 @@ import {
       now.getFullYear() + todaysMonth + todaysDay + '.csv';
   }
 
+  // --- §9.3: getDomainsFromWpUserData ---
   function getDomainsFromWpUserData(userAccessMap) {
     const domainList = new Set();
     for (const user in userAccessMap) {
@@ -585,6 +696,7 @@ import {
     return [...domainList];
   }
 
+  // --- §9.4: mapWPUsers ---
   async function mapWPUsers(urlsToScan, session) {
     const userAccessMap = {};
     const navSlug = 'wp-admin/users.php';
@@ -627,6 +739,7 @@ import {
     return userAccessMap;
   }
 
+  // --- §9.5: writeUserMapToFile ---
   async function writeUserMapToFile(userAccessMap) {
     const domainList = getDomainsFromWpUserData(userAccessMap).sort();
 
@@ -652,26 +765,11 @@ import {
     await writeResultsToCSV(getWpUserDataFileName(), 'WP user data', output);
   }
 
-  // ·> ========================
-  // ·  §09: WSU Employee Lookup
+  // ·> ========================================================================
+  // ·  §10: WSU Employee Lookup
   // ·< ------------------------
 
-  async function queryWpUsersAsWsuEmployees(session, userAccessMap) {
-    // To-do: Finish writing function
-    const users = Object.keys(userAccessMap);
-    for (let i = 0; i < users.length; i++) {
-      if (i != 0) {
-        printProgressMsg('Pausing briefly before searching for next employee.');
-        await waitForRandomTime(2750, 1750);
-      }
-      const searchResult =
-        await lookUpWsuEmployee(session, userAccessMap[users[i]].wpEmail);
-      userAccessMap[users[i]].personName = searchResult.name;
-      userAccessMap[users[i]].title = searchResult.title;
-      userAccessMap[users[i]].wsuUnit = searchResult.wsuUnit;
-    }
-  }
-
+  // --- §10.1: lookUpWsuEmployee ---
   async function lookUpWsuEmployee(session, wsuEmail) {
     if (wsuEmail == '' || wsuEmail == '-') {
       printProgressMsg(`Bypassing search for a WP user with a blank email.`);
@@ -738,10 +836,28 @@ import {
     return result;
   }
 
-  // ·> ===========================
-  // ·  §10: WP Site Access Mapping
+  // --- §10.2: queryWpUsersAsWsuEmployees ---
+  async function queryWpUsersAsWsuEmployees(session, userAccessMap) {
+    // To-do: Finish writing function
+    const users = Object.keys(userAccessMap);
+    for (let i = 0; i < users.length; i++) {
+      if (i != 0) {
+        printProgressMsg('Pausing briefly before searching for next employee.');
+        await waitForRandomTime(2750, 1750);
+      }
+      const searchResult =
+        await lookUpWsuEmployee(session, userAccessMap[users[i]].wpEmail);
+      userAccessMap[users[i]].personName = searchResult.name;
+      userAccessMap[users[i]].title = searchResult.title;
+      userAccessMap[users[i]].wsuUnit = searchResult.wsuUnit;
+    }
+  }
+
+  // ·> ========================================================================
+  // ·  §11: WP Site Access Mapping
   // ·< ---------------------------
 
+  // --- §11.1: addWpThemeUsageToSiteAccessMap ---
   async function addWpThemeUsageToSiteAccessMap(session, wpSiteAccessMap) {
     for (let i = 0; i < wpSiteAccessMap.length; i++) {
       printProgressMsg(
@@ -762,6 +878,7 @@ import {
     }
   }
 
+  // --- §11.2: getWpSiteAccessFileName ---
   function getWpSiteAccessFileName() {
     const now = new Date();
     const todaysMonth = (now.getMonth() + 1).toString().padStart(2, '0');
@@ -770,6 +887,7 @@ import {
       now.getFullYear() + todaysMonth + todaysDay + '.csv';
   }
 
+  // --- §11.3: mapWPSiteAccess ---
   async function mapWPSiteAccess(urlsToScan, session) {
     const url = urlsToScan[0];
     printProgressMsg(
@@ -822,6 +940,7 @@ import {
     return wpSiteAccessMap;
   }
 
+  // --- §11.4: writeWPSiteAccessMapToCSVFile ---
   async function writeWPSiteAccessMapToCSVFile(wpSiteAccessMap) {
     // TO-DO: Finish writing function
     // ·> Column structure for CSV:
@@ -839,10 +958,88 @@ import {
       output);
   }
 
-  // ·> ============================
-  // ·  §11: WSUWP Site Page Mapping
+  // ·> ========================================================================
+  // ·  §12: WSUWP Site Page Mapping
   // ·< ----------------------------
 
+  // --- §12.1: addPgPostTableDataToPageMap ---
+  function addPgPostTableDataToPageMap(
+    pgPostTable, pageMap, domain, cur3tListPage
+  ) {
+    let listingPos4n = 1;
+    pgPostTable.forEach(function (page) {
+      if (!Object.hasOwn(pageMap, `${domain}-${page.postId}`)) {
+        pageMap[`${domain}-${page.postId}`] = {
+          installation: domain,
+          position: listingPos4n + (cur3tListPage - 1) * 20,
+          postId: page.postId,
+          title: page.title,
+          editUrl: page.editUrl,
+          viewUrl: page.viewUrl,
+          published: page.published,
+          lastUpdatedBy: page.lastUpdatedBy,
+          lastUpdatedOn: page.lastUpdatedOn,
+          a11yIndicators: page.a11yIndicators,
+        };
+        listingPos4n++;
+      }
+    });
+  }
+
+  // --- §12.2: extractPgPostDataOnCur3tListPage ---
+  async function extractPgPostDataOnCur3tListPage(session) {
+    const pgPostTable = await session.page.evaluate(() => {
+      const pgPostTable = [];
+      const pgPostRows =
+        document.querySelectorAll('.wp-list-table tbody tr');
+      pgPostRows.forEach((pgPost) => {
+        // ·> TO-DO: Make this code more robust by implementing error handling
+        // ·<  with processes such as regular expressions.
+        pgPostTable.push({
+          postId: pgPost.id.match(/post-([0-9]+)/)[1],
+          title: pgPost.querySelector('td.title a.row-title').innerText,
+          editUrl: pgPost.querySelector('td.title a.row-title').href,
+          viewUrl: pgPost.querySelector('td.title span.view a').href,
+          published: pgPost.querySelector('td.date').innerText
+            .replace('\n', ' '),
+          lastUpdatedBy: pgPost.querySelector('td.wsu_last_updated')
+            .innerText.match(/(.*)\n.*/)[1],
+          lastUpdatedOn: pgPost.querySelector('td.wsu_last_updated')
+            .innerText.match(/.*\n(.*)/)[1].replace(' at ', ' '),
+          a11yIndicators: pgPost.querySelector('td.accessibility').innerText,
+        });
+      });
+
+      return pgPostTable;
+    });
+
+    return pgPostTable;
+  }
+
+  // --- §12.3: getInst7nNameFromUrl ---
+  function getInst7nNameFromUrl(siteUrl) {
+    const inst7nMatches = siteUrl.match(/https?:\/\/(.+)\.wsu.edu\/(.*?)\/?$/);
+    return inst7nMatches[2] != "" ?
+      (inst7nMatches[1] + '_' + inst7nMatches[2]).replace('/', '_') :
+      inst7nMatches[1];
+  }
+
+  // --- §12.4: getWpPageMapFileName ---
+  function getWpPageMapFileName() {
+    const now = {};
+    now.date = new Date();
+    now.month = (now.date.getMonth() + 1).toString().padStart(2, '0');
+    now.day = now.date.getDate().toString().padStart(2, '0');
+    now.hours = now.date.getHours().toString().padStart(2, '0');
+    now.min3s = now.date.getMinutes().toString().padStart(2, '0');
+    now.sec3s = now.date.getSeconds().toString().padStart(2, '0');
+
+    return iife.scriptModule.match(/(.+)\.mjs/)[1] + '.wpPageData.' +
+      now.date.getFullYear() + now.month + now.day + now.hours + now.min3s +
+      now.sec3s + '.csv';
+  }
+
+  // --- §12.5: mapPagesOnSite ---
   async function mapPagesOnSite(pageMap, siteUrl, session) {
     const navSlug = 'wp-admin/edit.php';
     const queryString = '?post_type=page&paged=';
@@ -913,79 +1110,7 @@ import {
     printResultsMsg(`Found and mapped ${pagesCount} page posts on ${siteUrl}. Page map has ${Object.keys(pageMap).length} entries.`);
   }
 
-  function getInst7nNameFromUrl(siteUrl) {
-    const inst7nMatches = siteUrl.match(/https?:\/\/(.+)\.wsu.edu\/(.*?)\/?$/);
-    return inst7nMatches[2] != "" ?
-      (inst7nMatches[1] + '_' + inst7nMatches[2]).replace('/', '_') :
-      inst7nMatches[1];
-  }
-
-  function getWpPageMapFileName() {
-    const now = {};
-    now.date = new Date();
-    now.month = (now.date.getMonth() + 1).toString().padStart(2, '0');
-    now.day = now.date.getDate().toString().padStart(2, '0');
-    now.hours = now.date.getHours().toString().padStart(2, '0');
-    now.min3s = now.date.getMinutes().toString().padStart(2, '0');
-    now.sec3s = now.date.getSeconds().toString().padStart(2, '0');
-
-    return iife.scriptModule.match(/(.+)\.mjs/)[1] + '.wpPageData.' +
-      now.date.getFullYear() + now.month + now.day + now.hours + now.min3s +
-      now.sec3s + '.csv';
-  }
-
-  async function extractPgPostDataOnCur3tListPage(session) {
-    const pgPostTable = await session.page.evaluate(() => {
-      const pgPostTable = [];
-      const pgPostRows =
-        document.querySelectorAll('.wp-list-table tbody tr');
-      pgPostRows.forEach((pgPost) => {
-        // ·> TO-DO: Make this code more robust by implementing error handling
-        // ·<  with processes such as regular expressions.
-        pgPostTable.push({
-          postId: pgPost.id.match(/post-([0-9]+)/)[1],
-          title: pgPost.querySelector('td.title a.row-title').innerText,
-          editUrl: pgPost.querySelector('td.title a.row-title').href,
-          viewUrl: pgPost.querySelector('td.title span.view a').href,
-          published: pgPost.querySelector('td.date').innerText
-            .replace('\n', ' '),
-          lastUpdatedBy: pgPost.querySelector('td.wsu_last_updated')
-            .innerText.match(/(.*)\n.*/)[1],
-          lastUpdatedOn: pgPost.querySelector('td.wsu_last_updated')
-            .innerText.match(/.*\n(.*)/)[1].replace(' at ', ' '),
-          a11yIndicators: pgPost.querySelector('td.accessibility').innerText,
-        });
-      });
-
-      return pgPostTable;
-    });
-
-    return pgPostTable;
-  }
-
-  function addPgPostTableDataToPageMap(
-    pgPostTable, pageMap, domain, cur3tListPage
-  ) {
-    let listingPos4n = 1;
-    pgPostTable.forEach(function (page) {
-      if (!Object.hasOwn(pageMap, `${domain}-${page.postId}`)) {
-        pageMap[`${domain}-${page.postId}`] = {
-          installation: domain,
-          position: listingPos4n + (cur3tListPage - 1) * 20,
-          postId: page.postId,
-          title: page.title,
-          editUrl: page.editUrl,
-          viewUrl: page.viewUrl,
-          published: page.published,
-          lastUpdatedBy: page.lastUpdatedBy,
-          lastUpdatedOn: page.lastUpdatedOn,
-          a11yIndicators: page.a11yIndicators,
-        };
-        listingPos4n++;
-      }
-    });
-  }
-
+  // --- §12.6: writePageMapToFile ---
   async function writePageMapToFile(pageMap) {
     // Start the output for the CSV file with the header row.
     let output = `Installation,Listing Position,Post ID,Title,Edit at URL,View at URL,Published,Last Updated By, Last Updated On, A11y Indicators`;
@@ -1009,9 +1134,9 @@ import {
     await writeResultsToCSV(getWpPageMapFileName(), 'WP page data', output);
   }
 
-   // ·> ==========================
-  // ·  §12: Execution Entry Point
-  // ·< --------------------------
+  // ·> ========================================================================
+  // ·  §13: IIFE Execution Entry Point
+  // ·< -------------------------------
 
   async function iifeMain() {
     listenForSIGINT();
@@ -1034,11 +1159,11 @@ import {
     white: '255;255;255',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.3.1-0.1.2',
+  version: '0.3.1-0.2.0',
 });
 
-// ·> =========================================
-// ·  §13: To-dos and Plans for Adding Features
+// ·> ==========================================================================
+// ·  §14: To-dos and Plans for Adding Features
 // ·  -----------------------------------------
 // ·  • v0.4.0: Map the page posts being maintained on a WSUWP website and check
 // ·     on who has been editing pages.
