@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.3.1-0.2.0
+ * @version 0.4.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -85,15 +85,15 @@
 // ·    §11.2: getWpSiteAccessFileName.....................................881
 // ·    §11.3: mapWPSiteAccess.............................................890
 // ·    §11.4: writeWPSiteAccessMapToCSVFile...............................943
-// ·  §12: WSUWP Site Page Mapping.........................................962
-// ·    §12.1: addPgPostTableDataToPageMap.................................965
-// ·    §12.2: extractPgPostDataOnCur3tListPage............................989
-// ·    §12.3: getInst7nNameFromUrl.......................................1019
-// ·    §12.4: getWpPageMapFileName.......................................1027
-// ·    §12.5: mapPagesOnSite.............................................1042
-// ·    §12.6: writePageMapToFile.........................................1113
-// ·  §13: IIFE Execution Entry Point.....................................1138
-// ·< §14: To-dos and Plans for Adding Features...........................1166
+// ·  §12: WSUWP Site Page Mapping.........................................961
+// ·    §12.1: addPgPostTableDataToPageMap.................................964
+// ·    §12.2: extractPgPostDataOnCur3tListPage............................988
+// ·    §12.3: getInst7nNameFromUrl.......................................1018
+// ·    §12.4: getWpPageMapFileName.......................................1026
+// ·    §12.5: mapPagesOnSite.............................................1041
+// ·    §12.6: writePageMapToFile.........................................1109
+// ·  §13: IIFE Execution Entry Point.....................................1134
+// ·< §14: To-dos and Plans for Adding Features...........................1162
 
 // ·> ==========================================================================
 // ·  §01: Import Process Dependencies
@@ -942,7 +942,6 @@ import {
 
   // --- §11.4: writeWPSiteAccessMapToCSVFile ---
   async function writeWPSiteAccessMapToCSVFile(wpSiteAccessMap) {
-    // TO-DO: Finish writing function
     // ·> Column structure for CSV:
     // ·<  Link to site, Link to admin dashboard, Site title, WP network, Installed Themes, Active Theme
     // Start the output for the CSV file with the header row.
@@ -1099,10 +1098,7 @@ import {
       }
 
       // Extract page data.
-      // TO-DO: Finish writing this portion of the function.
       const pgPostTable = await extractPgPostDataOnCur3tListPage(session);
-
-      // TO-DO: Add extracted page posts data to map.
       addPgPostTableDataToPageMap(pgPostTable, pageMap, domain, cur3tListPage);
 
       cur3tListPage++;
@@ -1159,23 +1155,22 @@ import {
     white: '255;255;255',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.3.1-0.2.0',
+  version: '0.4.0',
 });
 
 // ·> ==========================================================================
 // ·  §14: To-dos and Plans for Adding Features
 // ·  -----------------------------------------
-// ·  • v0.4.0: Map the page posts being maintained on a WSUWP website and check
-// ·     on who has been editing pages.
+// ·  • v0.5.0: Map links (navigation vs. body content) across a website
+// ·  • v0.6.0: Extract CSS style sheet code from WP websites
+// ·    - Use the PostCSS package to analyze style sheets
 // ·    - Accommodate Different reporting options: *.csv files, printing tables
 // ·       to the terminal for the last 10 edits, etc.
-// ·  • v0.5.0: Extract CSS style sheet code from WP websites
-// ·    - Use the PostCSS package to analyze style sheets
-// ·  • v0.6.0: Take an a11y inventory
-// ·  • v0.7.0: Look for broken links, orphaned pages, etc.
-// ·  • v0.8.0: Content complexity analysis (word count, headings, tag counts,
+// ·  • v0.7.0: Take an a11y inventory
+// ·  • v0.8.0: Look for broken links, orphaned pages, etc.
+// ·  • v0.9.0: Content complexity analysis (word count, headings, tag counts,
 // ·     etc.)
-// ·  • v0.9.0: Website tree mapping
+// ·  • v0.10.0: Website tree mapping
 // ·  • Other features to be added:
 // ·    - Report the time it takes for commands to run
 // ·    - Handling HTTP errors during navigation
