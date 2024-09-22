@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.4.1
+ * @version 0.4.1-0.1.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -38,62 +38,67 @@
 // ·  TABLE OF CONTENTS:
 // ·   Sections of Script File Organized by Purpose
 // ·  ---------------------------------------------
-// ·  §01: Import Process Dependencies......................................99
-// ·  §02: IIFE to Encapsulate Process.....................................115
-// ·  §03: Process Messaging...............................................151
-// ·    §3.1: printErrorMsg................................................154
-// ·    §3.2: printErrorMsg................................................159
-// ·    §3.3: printProcessHelp.............................................169
-// ·    §3.4: printProgressMsg.............................................177
-// ·    §3.5: printResultsMsg..............................................182
-// ·    §3.6: printWelcomeMsg..............................................187
-// ·  §04: Process Timing..................................................195
-// ·    §4.1: waitForTime..................................................198
-// ·    §4.2: waitForRandomTime............................................203
-// ·  §05: Process Set Up and Inputs.......................................219
-// ·    §5.1: executeCommandFromArgv.......................................222
-// ·    §5.2: getAvailableCommands.........................................255
-// ·    §5.3: getCommandAliases............................................277
-// ·    §5.4: getUrlsFromFile..............................................286
-// ·    §5.5: getUrlsFromProcessArgv.......................................311
-// ·    §5.6: inputData....................................................359
-// ·    §5.7: inputPassword................................................382
-// ·    §5.8: listenForSIGINT..............................................419
-// ·  §06: Process Output..................................................428
-// ·    §6.1: getCsvOutputFromData.........................................431
-// ·    §6.2: writeResultsToCSV............................................441
-// ·  §07: Process Command Execution.......................................452
-// ·    §7.1: getCommandFromAlias..........................................455
-// ·    §7.2: mapPagesOnSites..............................................469
-// ·    §7.3: provideProcessHelp...........................................498
-// ·    §7.4: scanUserAccessLevels.........................................530
-// ·    §7.5: scanWpSiteAccess.............................................558
-// ·  §08: Headless Browser Control........................................587
-// ·    §8.1: launchBrowser................................................590
-// ·    §8.2: logInToWsuwp.................................................602
-// ·  §09: User Data Extraction............................................641
-// ·    §9.1: extractWpUserData............................................644
-// ·    §9.2: getWpUserDataFileName........................................679
-// ·    §9.3: getDomainsFromWpUserData.....................................688
-// ·    §9.4: mapWPUsers...................................................701
-// ·    §9.5: writeUserMapToFile...........................................744
-// ·  §10: WSU Employee Lookup.............................................771
-// ·    §10.1: lookUpWsuEmployee...........................................774
-// ·    §10.2: queryWpUsersAsWsuEmployees..................................841
-// ·  §11: WP Site Access Mapping..........................................859
-// ·    §11.1: addWpThemeUsageToSiteAccessMap..............................862
-// ·    §11.2: getWpSiteAccessFileName.....................................883
-// ·    §11.3: mapWPSiteAccess.............................................892
-// ·    §11.4: writeWPSiteAccessMapToCSVFile...............................945
-// ·  §12: WSUWP Site Page Mapping.........................................963
-// ·    §12.1: addPgPostTableDataToPageMap.................................966
-// ·    §12.2: extractPgPostDataOnCur3tListPage............................990
-// ·    §12.3: getInst7nNameFromUrl.......................................1020
-// ·    §12.4: getWpPageMapFileName.......................................1028
-// ·    §12.5: mapPagesOnSite.............................................1043
-// ·    §12.6: writePageMapToFile.........................................1111
-// ·  §13: IIFE Execution Entry Point.....................................1136
-// ·< §14: To-dos and Plans for Adding Features...........................1164
+// ·  §01: Import Process Dependencies.....................................104
+// ·  §02: IIFE to Encapsulate Process.....................................120
+// ·  §03: Process Messaging...............................................156
+// ·    §3.1: printErrorMsg................................................159
+// ·    §3.2: printErrorMsg................................................164
+// ·    §3.3: printProcessHelp.............................................174
+// ·    §3.4: printProgressMsg.............................................182
+// ·    §3.5: printResultsMsg..............................................187
+// ·    §3.6: printWelcomeMsg..............................................192
+// ·  §04: Process Timing..................................................200
+// ·    §4.1: waitForTime..................................................203
+// ·    §4.2: waitForRandomTime............................................208
+// ·  §05: Process Set Up and Inputs.......................................224
+// ·    §5.1: executeCommandFromArgv.......................................227
+// ·    §5.2: getAvailableCommands.........................................260
+// ·    §5.3: getCommandAliases............................................286
+// ·    §5.4: getUrlsFromFile..............................................295
+// ·    §5.5: getUrlsFromProcessArgv.......................................320
+// ·    §5.6: inputData....................................................368
+// ·    §5.7: inputPassword................................................391
+// ·    §5.8: listenForSIGINT..............................................428
+// ·  §06: Process Output..................................................437
+// ·    §6.1: getCsvOutputFromData.........................................440
+// ·    §6.2: writeResultsToCSV............................................453
+// ·  §07: Process Command Execution.......................................464
+// ·    §7.1: getCommandFromAlias..........................................467
+// ·    §7.2: mapPagesOnSites..............................................481
+// ·    §7.3: mapPluginsOnSites............................................469
+// ·    §7.4: provideProcessHelp...........................................543
+// ·    §7.5: scanUserAccessLevels.........................................575
+// ·    §7.6: scanWpSiteAccess.............................................603
+// ·  §08: Headless Browser Control........................................632
+// ·    §8.1: launchBrowser................................................635
+// ·    §8.2: logInToWsuwp.................................................647
+// ·  §09: User Data Extraction............................................686
+// ·    §9.1: extractWpUserData............................................689
+// ·    §9.2: getWpUserDataFileName........................................724
+// ·    §9.3: getDomainsFromWpUserData.....................................733
+// ·    §9.4: mapWPUsers...................................................746
+// ·    §9.5: writeUserMapToFile...........................................789
+// ·  §10: WSU Employee Lookup.............................................816
+// ·    §10.1: lookUpWsuEmployee...........................................819
+// ·    §10.2: queryWpUsersAsWsuEmployees..................................886
+// ·  §11: WP Site Access Mapping..........................................904
+// ·    §11.1: addWpThemeUsageToSiteAccessMap..............................907
+// ·    §11.2: getWpSiteAccessFileName.....................................928
+// ·    §11.3: mapWPSiteAccess.............................................937
+// ·    §11.4: writeWPSiteAccessMapToCSVFile...............................990
+// ·  §12: WSUWP Site Page Mapping........................................1008
+// ·    §12.1: addPgPostTableDataToPageMap................................1011
+// ·    §12.2: extractPgPostDataOnCur3tListPage...........................1035
+// ·    §12.3: getInst7nNameFromUrl.......................................1065
+// ·    §12.4: getWpPageMapFileName.......................................1073
+// ·    §12.5: mapPagesOnSite.............................................1088
+// ·    §12.6: writePageMapToFile.........................................1160
+// ·  §13: WSUWP Site Plugin Mapping......................................1185
+// ·    §13.1: getWpPluginMapFileName.....................................1188
+// ·    §13.2: mapPluginsOnSite...........................................1203
+// ·    §13.3: writePluginMapToFile.......................................1312
+// ·  §14: IIFE Execution Entry Point.....................................1333
+// ·< §15: To-dos and Plans for Adding Features...........................1361
 
 // ·> ==========================================================================
 // ·  §01: Import Process Dependencies
@@ -262,6 +267,10 @@ import {
       "mapPagesOnSites": {
         cb: mapPagesOnSites,
         help: "\x1B[1m\x1B[3mSyntax:\x1B[0m mapPagesOnSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n\x1B[1m\x1B[3mAliases:\x1B[0m map pages, mpos, mp\n\x1B[1m\x1B[3mDescription:\x1B[0m Scan through a series of one or more WDS websites hosted on WSU WordPress to map out the pages that are being maintained on each site. Include information who last updated each page and an overview of the accessibility issues present on each page.",
+      },
+      "mapPluginsOnSites": {
+        cb: mapPluginsOnSites,
+        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m mapPluginsOnSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n\x1B[1m\x1B[3mAliases:\x1B[0m map plugins, mpios, mpi\n\x1B[1m\x1B[3mDescription:\x1B[0m Scan through a series of one or more WDS websites hosted on WSU WordPress to map out the plugins that are currently active on each site.",
       },
       "scanUserAccessLevels": {
         cb: scanUserAccessLevels,
@@ -433,6 +442,9 @@ import {
     const delimiter = forFirstColumn ?
       '' :
       ',';
+    if (typeof data != 'string') {
+      return delimiter;
+    }
     return data.search(',') === -1 ?
       `${delimiter}${data}` :
       `${delimiter}"${data}"`;
@@ -483,11 +495,13 @@ import {
     // Begin counting execution time after logging in.
     const exe5nStart = new Date();
 
+    // ·> Map the pages on the sites represented by the URLs specified at
+    // ·<  command line.
     const pageMap = {};
     for (let i = 0; i < urlsToScan.length; i++) {
       await mapPagesOnSite(pageMap, urlsToScan[i], session);
     }
-    writePageMapToFile(pageMap);
+    await writePageMapToFile(pageMap);
 
     // Now that the command is complete, close the browser session.
     await session.browser.close();
@@ -495,7 +509,38 @@ import {
     return exe5nStart;
   }
 
-  // --- §7.3: provideProcessHelp ---
+  // --- §7.3: mapPluginsInSites ---
+  async function mapPluginsOnSites() {
+    const urlsToScan = await getUrlsFromProcessArgv();
+    if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
+      printErrorMsg('URLs supplied to process were invalid.');
+      printGoodbyeMsg();
+      process.exit();
+    }
+
+    // ·> Log in to WordPress based on the first URL provided to the module. It
+    // ·   will be assumed that the user will stay logged in during visits to
+    // ·<  subsequent website domains.
+    const session = await logInToWsuwp(urlsToScan);
+
+    // Begin counting execution time after logging in.
+    const exe5nStart = new Date();
+
+    // ·> Map the plugins active on the sites represented by the URLs specified
+    // ·<  at command line.
+    const pluginMap = {};
+    for (let i = 0; i < urlsToScan.length; i++) {
+      await mapPluginsOnSite(pluginMap, urlsToScan[i], session);
+    }
+    await writePluginMapToFile(pluginMap);
+
+    // Now that the command is complete, close the browser session.
+    await session.browser.close();
+
+    return exe5nStart;
+  }
+
+  // --- §7.4: provideProcessHelp ---
   async function provideProcessHelp() {
     const exe5nStart = new Date();
 
@@ -527,7 +572,7 @@ import {
     return exe5nStart;
   }
 
-  // --- §7.4: scanUserAccessLevels ---
+  // --- §7.5: scanUserAccessLevels ---
   async function scanUserAccessLevels() {
     const urlsToScan = await getUrlsFromProcessArgv();
     if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
@@ -555,7 +600,7 @@ import {
     return exe5nStart;
   }
 
-  // --- §7.5: scanWpSiteAccess ---
+  // --- §7.6: scanWpSiteAccess ---
   async function scanWpSiteAccess() {
     const urlsToScan = await getUrlsFromProcessArgv();
     if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
@@ -1062,7 +1107,8 @@ import {
         `Extracting pages on list table page ${cur3tListPage.toString()}.`
       );
 
-      // Determine the total number of pages that will be mapped.
+      // ·> Determine the total number of pages that will be mapped and use it
+      // ·<  to infer the index of the last page of the listing.
       if (pagesCount == 0) {
         await session.page.waitForSelector(
           '#wpbody .displaying-num, body#error-page'
@@ -1079,6 +1125,9 @@ import {
         });
         maxListPage = Math.ceil(pagesCount / 20);
       }
+
+      // ·> Handle cases where the page count has been set to signal that the
+      // ·<  listing could not be accessed because of permissions.
       if (pagesCount == -1) {
         printProgressMsg(
           `Error page encountered on ${siteUrl}; moving on to next site.`
@@ -1133,7 +1182,155 @@ import {
   }
 
   // ·> ========================================================================
-  // ·  §13: IIFE Execution Entry Point
+  // ·  §13: WSUWP Site Plugin Mapping
+  // ·< ------------------------------
+
+  // --- §13.1: getWpPluginMapFileName ---
+  function getWpPluginMapFileName() {
+    const now = {};
+    now.date = new Date();
+    now.month = (now.date.getMonth() + 1).toString().padStart(2, '0');
+    now.day = now.date.getDate().toString().padStart(2, '0');
+    now.hours = now.date.getHours().toString().padStart(2, '0');
+    now.min3s = now.date.getMinutes().toString().padStart(2, '0');
+    now.sec3s = now.date.getSeconds().toString().padStart(2, '0');
+
+    return iife.scriptModule.match(/(.+)\.mjs/)[1] + '.wpPluginData.' +
+      now.date.getFullYear() + now.month + now.day + now.hours + now.min3s +
+      now.sec3s + '.csv';
+  }
+
+  // --- §13.2: mapPluginsOnSite ---
+  async function mapPluginsOnSite(pluginMap, siteUrl, session) {
+    const navSlug = 'wp-admin/plugins.php';
+    const queryString = '?plugin_status=active';
+    let cur3tListPage = 1;
+
+    printProgressMsg(
+      `Navigating to the “Plugins (Active)” admin screen of ${siteUrl} to map the plugins that are currently active on the site.`
+    );
+
+    // Access the listing  listing.
+    let pluginsCount = 0;
+    const domain = getInst7nNameFromUrl(siteUrl);
+    await session.page.goto(`${siteUrl + navSlug + queryString}`);
+    await session.page.waitForSelector(
+      '#wpbody .displaying-num, body#error-page'
+    );
+
+    // ·> Ensure the plugin listing can be accessed and determine the number of
+    // ·<  plugins that are active on the site.
+    pluginsCount = await session.page.evaluate(() => {
+      if (document.querySelector('body#error-page') !== null) {
+        return -1;
+      }
+      const ucIndicator = document.querySelector(
+        '#wpbody .displaying-num'
+      );
+      const pluginCountMatcher = /([0-9]+) items/;
+      return parseInt(ucIndicator.innerText.match(pluginCountMatcher)[1]);
+    });
+
+    // ·> Handle cases where the plugin count has been set to signal that the
+    // ·<  listing could not be accessed because of permissions.
+    if (pluginsCount == -1) {
+      printProgressMsg(
+        `Error page encountered on ${siteUrl}; moving on to next site.`
+      );
+      pluginMap[`${domain}-0`] = {
+        installation: domain,
+        position: '-',
+        name: '-',
+        desc6n: '-',
+        settingsUrl: '-',
+        siteUrl: '-',
+      };
+
+      return;
+    }
+
+    // Extract plugin data.
+    // ·> To-do: Finish writing function based on extractPgPostDataOnCur3tList
+    // ·<  Page and addPgPostTableDataToPageMap.
+    const pluginTable = await session.page.evaluate(() => {
+      const pluginTable = [];
+      const $activePluginRows =
+        [...document.querySelectorAll(
+          '#the-list tr.active'
+        )];
+      let list3Pos4n = 1;
+      $activePluginRows.forEach(function (row) {
+        const pluginTitle = row.querySelector('td.plugin-title');
+        if (pluginTitle === null) {
+          return;
+        }
+        const pluginLink =
+          [...row.querySelectorAll('.plugin-version-author-uri a')]
+          .filter((link) => {
+            return link.innerText == "Visit plugin site" ||
+              link.innerText == "Support";
+          });
+
+        const settingsLink =
+          [...row.querySelectorAll('.row-actions.visible a')]
+          .filter((link) => {
+            return link.innerText == "Settings";
+          });
+
+        pluginTable.push({
+          position: list3Pos4n,
+          name: row.querySelector('td.plugin-title strong:first-child')
+            .innerText,
+          desc6n: row.querySelector('td.desc .plugin-description').innerText,
+          settingsUrl: settingsLink.length == 0 ?
+            '-' :
+            settingsLink[0].href,
+          siteUrl: pluginLink.length == 0 ?
+            '-' :
+            pluginLink[0].href,
+        });
+        list3Pos4n++;
+      });
+
+      return pluginTable;
+    });
+
+    console.log(`Plugin table has ${pluginTable.length} rows.`);
+
+    for (let i = 0; i < pluginTable.length; i++) {
+      pluginMap[`${domain}-${i}`] = {
+        installation: domain,
+        position: pluginTable[i].position,
+        name: pluginTable[i].name,
+        desc6n: pluginTable[i].desc6n,
+        settingsUrl: pluginTable[i].settingsUrl,
+        siteUrl: pluginTable[i].siteUrl,
+      };
+    }
+  }
+
+  // --- §13.3: writePluginMapToFile ---
+  async function writePluginMapToFile(pluginMap) {
+    // Start the output for the CSV file with the header row.
+    let output = `Installation,Listing Position,Name,Description,Settings URL,Site URL`;
+    // Add the access level per domain for each user as a row.
+    const plugins = Object.keys(pluginMap);
+    console.log(plugins.length);
+    for (let i = 0; i < plugins.length; i++) {
+      output += '\n' + getCsvOutputFromData(pluginMap[plugins[i]].installation,
+        true);
+      output += ',' + pluginMap[plugins[i]].position;
+      output += getCsvOutputFromData(pluginMap[plugins[i]].name);
+      output += getCsvOutputFromData(pluginMap[plugins[i]].desc6n);
+      output += getCsvOutputFromData(pluginMap[plugins[i]].settingsUrl);
+      output += getCsvOutputFromData(pluginMap[plugins[i]].siteUrl);
+    }
+
+    await writeResultsToCSV(getWpPluginMapFileName(), 'WP page data', output);
+  }
+
+  // ·> ========================================================================
+  // ·  §14: IIFE Execution Entry Point
   // ·< -------------------------------
 
   async function iifeMain() {
@@ -1157,22 +1354,24 @@ import {
     white: '255;255;255',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.4.1',
+  version: '0.4.1-0.1.0',
 });
 
 // ·> ==========================================================================
-// ·  §14: To-dos and Plans for Adding Features
+// ·  §15: To-dos and Plans for Adding Features
 // ·  -----------------------------------------
-// ·  • v0.5.0: Map links (navigation vs. body content) across a website
-// ·  • v0.6.0: Extract CSS style sheet code from WP websites
+// ·  • Provide automatic culling of unique domains from lists of URLs passed to
+// ·     the module.
+// ·  • Map links (navigation vs. body content) across a website
+// ·  • Extract CSS style sheet code from WP websites
 // ·    - Use the PostCSS package to analyze style sheets
 // ·    - Accommodate Different reporting options: *.csv files, printing tables
 // ·       to the terminal for the last 10 edits, etc.
-// ·  • v0.7.0: Take an a11y inventory
-// ·  • v0.8.0: Look for broken links, orphaned pages, etc.
-// ·  • v0.9.0: Content complexity analysis (word count, headings, tag counts,
+// ·  • Take an a11y inventory
+// ·  • Look for broken links, orphaned pages, etc.
+// ·  • Content complexity analysis (word count, headings, tag counts,
 // ·     etc.)
-// ·  • v0.10.0: Website tree mapping
+// ·  • Website tree mapping
 // ·  • Other features to be added:
 // ·    - Report the time it takes for commands to run
 // ·    - Handling HTTP errors during navigation
