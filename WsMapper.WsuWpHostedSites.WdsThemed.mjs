@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.4.1-0.1.0
+ * @version 0.4.1-0.1.1
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -65,7 +65,7 @@
 // ·  §07: Process Command Execution.......................................464
 // ·    §7.1: getCommandFromAlias..........................................467
 // ·    §7.2: mapPagesOnSites..............................................481
-// ·    §7.3: mapPluginsOnSites............................................469
+// ·    §7.3: mapPluginsOnSites............................................512
 // ·    §7.4: provideProcessHelp...........................................543
 // ·    §7.5: scanUserAccessLevels.........................................575
 // ·    §7.6: scanWpSiteAccess.............................................603
@@ -92,13 +92,13 @@
 // ·    §12.3: getInst7nNameFromUrl.......................................1065
 // ·    §12.4: getWpPageMapFileName.......................................1073
 // ·    §12.5: mapPagesOnSite.............................................1088
-// ·    §12.6: writePageMapToFile.........................................1160
-// ·  §13: WSUWP Site Plugin Mapping......................................1185
-// ·    §13.1: getWpPluginMapFileName.....................................1188
-// ·    §13.2: mapPluginsOnSite...........................................1203
-// ·    §13.3: writePluginMapToFile.......................................1312
-// ·  §14: IIFE Execution Entry Point.....................................1333
-// ·< §15: To-dos and Plans for Adding Features...........................1361
+// ·    §12.6: writePageMapToFile.........................................1162
+// ·  §13: WSUWP Site Plugin Mapping......................................1187
+// ·    §13.1: getWpPluginMapFileName.....................................1190
+// ·    §13.2: mapPluginsOnSite...........................................1205
+// ·    §13.3: writePluginMapToFile.......................................1314
+// ·  §14: IIFE Execution Entry Point.....................................1335
+// ·< §15: To-dos and Plans for Adding Features...........................1363
 
 // ·> ==========================================================================
 // ·  §01: Import Process Dependencies
@@ -1111,10 +1111,12 @@ import {
       // ·<  to infer the index of the last page of the listing.
       if (pagesCount == 0) {
         await session.page.waitForSelector(
-          '#wpbody .displaying-num, body#error-page'
+          '#wpbody .displaying-num, body#error-page, body.error404'
         );
         pagesCount = await session.page.evaluate(() => {
-          if (document.querySelector('body#error-page') !== null) {
+          if (
+            document.querySelector('body#error-page, body.error404') !== null
+          ) {
             return -1;
           }
           const ucIndicator = document.querySelector(
@@ -1215,13 +1217,13 @@ import {
     const domain = getInst7nNameFromUrl(siteUrl);
     await session.page.goto(`${siteUrl + navSlug + queryString}`);
     await session.page.waitForSelector(
-      '#wpbody .displaying-num, body#error-page'
+      '#wpbody .displaying-num, body#error-page, body.error404'
     );
 
     // ·> Ensure the plugin listing can be accessed and determine the number of
     // ·<  plugins that are active on the site.
     pluginsCount = await session.page.evaluate(() => {
-      if (document.querySelector('body#error-page') !== null) {
+      if (document.querySelector('body#error-page, body.error404') !== null) {
         return -1;
       }
       const ucIndicator = document.querySelector(
@@ -1354,7 +1356,7 @@ import {
     white: '255;255;255',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.4.1-0.1.0',
+  version: '0.4.1-0.1.1',
 });
 
 // ·> ==========================================================================
