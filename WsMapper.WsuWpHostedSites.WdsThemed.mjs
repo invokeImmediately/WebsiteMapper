@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.4.1-0.2.0
+ * @version 0.4.1-0.3.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -38,75 +38,78 @@
 // ·  TABLE OF CONTENTS:
 // ·   Sections of Script File Organized by Purpose
 // ·  ---------------------------------------------
-// ·  §01: Import Process Dependencies.....................................112
-// ·  §02: IIFE to Encapsulate Process.....................................128
-// ·  §03: Process Messaging...............................................164
-// ·    §3.1: printErrorMsg................................................167
-// ·    §3.2: printGoodbyeMsg..............................................172
-// ·    §3.3: printProcessHelp.............................................182
-// ·    §3.4: printProgressMsg.............................................190
-// ·    §3.5: printResultsMsg..............................................195
-// ·    §3.6: printWelcomeMsg..............................................200
-// ·  §04: Process Timing..................................................208
-// ·    §4.1: waitForTime..................................................211
-// ·    §4.2: waitForRandomTime............................................216
-// ·  §05: Process Set Up and Inputs.......................................232
-// ·    §5.1: executeCommandFromArgv.......................................235
-// ·    §5.2: getAvailableCommands.........................................268
-// ·    §5.3: getCommandAliases............................................298
-// ·    §5.4: getUrlsFromFile..............................................310
-// ·    §5.5: getUrlsFromProcessArgv.......................................335
-// ·    §5.6: inputData....................................................383
-// ·    §5.7: inputPassword................................................406
-// ·    §5.8: listenForSIGINT..............................................443
-// ·  §06: Quality Control of Process Input................................452
-// ·    §6.1: getUrlsToProceed.............................................455
-// ·  §07: Process Output..................................................467
-// ·    §7.1: getCsvOutputFromData.........................................470
-// ·    §7.2: writeResultsToCSV............................................483
-// ·  §08: Process Command Execution.......................................494
-// ·    §8.1: getCommandFromAlias..........................................497
-// ·    §8.2: mapLinksOnSites..............................................511
-// ·    §8.3: mapPagesOnSites..............................................540
-// ·    §8.4: mapPluginsOnSites............................................566
-// ·    §8.5: provideProcessHelp...........................................592
-// ·    §8.6: scanUserAccessLevels.........................................624
-// ·    §8.7: scanWpSiteAccess.............................................647
-// ·  §09: Headless Browser Control........................................671
-// ·    §9.1: launchBrowser................................................674
-// ·    §9.2: getAuthenticatedWsuWpSession.................................686
-// ·    §9.3: getUnauthenticatedWsuWpSession...............................724
-// ·  §10: User Data Extraction............................................741
-// ·    §10.1: extractWpUserData...........................................744
-// ·    §10.2: getWpUserDataFileName.......................................779
-// ·    §10.3: getDomainsFromWpUserData....................................788
-// ·    §10.4: mapWPUsers..................................................801
-// ·    §10.5: writeUserMapToFile..........................................844
-// ·  §11: WSU Employee Lookup.............................................871
-// ·    §11.1: lookUpWsuEmployee...........................................874
-// ·    §11.2: queryWpUsersAsWsuEmployees..................................941
-// ·  §12: WP Site Access Mapping..........................................959
-// ·    §12.1: addWpThemeUsageToSiteAccessMap..............................962
-// ·    §12.2: getWpSiteAccessFileName.....................................983
-// ·    §12.3: mapWPSiteAccess.............................................992
-// ·    §12.4: writeWPSiteAccessMapToCSVFile..............................1045
-// ·  §13: WSUWP Site Page Mapping........................................1063
-// ·    §13.1: addPgPostTableDataToPageMap................................1066
-// ·    §13.2: extractPgPostDataOnCur3tListPage...........................1090
-// ·    §13.3: getInst7nNameFromUrl.......................................1120
-// ·    §13.4: getWpPageMapFileName.......................................1128
-// ·    §13.5: mapPagesOnSite.............................................1143
-// ·    §13.6: writePageMapToFile.........................................1217
-// ·  §14: WSUWP Site Plugin Mapping......................................1242
-// ·    §14.1: getWpPluginMapFileName.....................................1245
-// ·    §14.2: mapPluginsOnSite...........................................1260
-// ·    §14.3: writePluginMapToFile.......................................1369
-// ·  §15: WSUWP Site Link Mapping........................................1390
-// ·    §15.1: mapLinksOnSite.............................................1393
-// ·    §15.2: mapLinksOnPage.............................................1421
-// ·    §15.3: addPageLinksToSiteMap......................................1532
-// ·    §15.4: addPageLinksToPagesToCheck.................................1582
-// ·< §16: IIFE Execution Entry Point.....................................1645
+// ·  §01: Import Process Dependencies.....................................115
+// ·  §02: IIFE to Encapsulate Process.....................................131
+// ·  §03: Process Messaging...............................................167
+// ·    §3.1: printErrorMsg................................................170
+// ·    §3.2: printGoodbyeMsg..............................................175
+// ·    §3.3: printProcessHelp.............................................185
+// ·    §3.4: printProgressMsg.............................................193
+// ·    §3.5: printResultsMsg..............................................198
+// ·    §3.6: printWelcomeMsg..............................................203
+// ·  §04: Process Timing..................................................211
+// ·    §4.1: waitForTime..................................................214
+// ·    §4.2: waitForRandomTime............................................219
+// ·  §05: Process Set Up and Inputs.......................................235
+// ·    §5.1: executeCommandFromArgv.......................................238
+// ·    §5.2: getAvailableCommands.........................................271
+// ·    §5.3: getCommandAliases............................................305
+// ·    §5.4: getUrlsFromFile..............................................318
+// ·    §5.5: getUrlsFromProcessArgv.......................................343
+// ·    §5.6: inputData....................................................391
+// ·    §5.7: inputPassword................................................414
+// ·    §5.8: listenForSIGINT..............................................451
+// ·  §06: Quality Control of Process Input................................460
+// ·    §6.1: getUrlsToProceed.............................................463
+// ·  §07: Process Output..................................................475
+// ·    §7.1: getCsvOutputFromData.........................................478
+// ·    §7.2: writeResultsToCSV............................................491
+// ·  §08: Process Command Execution.......................................502
+// ·    §8.1: getCommandFromAlias..........................................505
+// ·    §8.2: mapLinksOnSites..............................................519
+// ·    §8.3: mapPagesOnSites..............................................548
+// ·    §8.4: mapPluginsOnSites............................................574
+// ·    §8.5: provideProcessHelp...........................................600
+// ·    §8.6: scanUserAccessLevels.........................................632
+// ·    §8.7: scanWpSiteAccess.............................................655
+// ·    §8.8: testLogOnAtSites.............................................678
+// ·  §09: Headless Browser Control........................................697
+// ·    §9.1: launchBrowser................................................700
+// ·    §9.2: getAuthenticatedWsuWpSession.................................712
+// ·    §9.3: auth6teOnAwsHostedSession....................................750
+// ·    §9.4: auth6teOnPullmanHostedSession................................819
+// ·    §9.5: getUnauthenticatedWsuWpSession...............................845
+// ·  §10: User Data Extraction............................................862
+// ·    §10.1: extractWpUserData...........................................865
+// ·    §10.2: getWpUserDataFileName.......................................901
+// ·    §10.3: getDomainsFromWpUserData....................................910
+// ·    §10.4: mapWPUsers..................................................923
+// ·    §10.5: writeUserMapToFile..........................................976
+// ·  §11: WSU Employee Lookup............................................1003
+// ·    §11.1: lookUpWsuEmployee..........................................1006
+// ·    §11.2: queryWpUsersAsWsuEmployees.................................1073
+// ·  §12: WP Site Access Mapping.........................................1091
+// ·    §12.1: addWpThemeUsageToSiteAccessMap.............................1094
+// ·    §12.2: getWpSiteAccessFileName....................................1115
+// ·    §12.3: mapWPSiteAccess............................................1124
+// ·    §12.4: writeWPSiteAccessMapToCSVFile..............................1177
+// ·  §13: WSUWP Site Page Mapping........................................1195
+// ·    §13.1: addPgPostTableDataToPageMap................................1198
+// ·    §13.2: extractPgPostDataOnCur3tListPage...........................1222
+// ·    §13.3: getInst7nNameFromUrl.......................................1252
+// ·    §13.4: getWpPageMapFileName.......................................1260
+// ·    §13.5: mapPagesOnSite.............................................1275
+// ·    §13.6: writePageMapToFile.........................................1349
+// ·  §14: WSUWP Site Plugin Mapping......................................1374
+// ·    §14.1: getWpPluginMapFileName.....................................1377
+// ·    §14.2: mapPluginsOnSite...........................................1392
+// ·    §14.3: writePluginMapToFile.......................................1501
+// ·  §15: WSUWP Site Link Mapping........................................1522
+// ·    §15.1: mapLinksOnSite.............................................1525
+// ·    §15.2: mapLinksOnPage.............................................1553
+// ·    §15.3: addPageLinksToSiteMap......................................1664
+// ·    §15.4: addPageLinksToPagesToCheck.................................1714
+// ·< §16: IIFE Execution Entry Point.....................................1777
 
 // ·> ==========================================================================
 // ·  §01: Import Process Dependencies
@@ -292,6 +295,10 @@ import {
         cb: scanWpSiteAccess,
         help: "\x1B[1m\x1B[3mSyntax:\x1B[0m scanWpSiteAccess|alias 'url'\n\x1B[1m\x1B[3mAliases:\x1B[0m wordpress site access, wp site access, site access, wpsa, sa\n\x1B[1m\x1B[3mDescription:\x1B[0m Log into a WSU WordPress site and scan the networks menu to map the sites that the user can access. If possible to determine based on the user's permissions, include the theme that is in use on each site.",
       },
+      "testLogOnAtSites": {
+        cb: testLogOnAtSites,
+        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m testLogOnAtSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n\x1B[1m\x1B[3mAliases:\x1B[0m test log on, tlo\n\x1B[1m\x1B[3mDescription:\x1B[0m Attempt to log on at the specified WSUWP websites.",
+      },
     };
   }
 
@@ -304,6 +311,7 @@ import {
       "mapPluginsOnSites": /^(?:(?:map )?plugins(?: on sites?)?|mpi(?:os)?)$/i,
       "scanUserAccessLevels": /^(?:user access(?: levels?)?|ual?)$/i,
       "scanWpSiteAccess": /^(?:(?:wordpress |wp )?site access|(?:wp)?sa)$/i,
+      "testLogOnAtSites": /^(?:test log on|tlo)$/i,
     };
   }
 
@@ -667,6 +675,24 @@ import {
     return exe5nStart;
   }
 
+  // --- §8.8: testLogOnAtSites ---
+  async function testLogOnAtSites() {
+    const urlsToScan = await getUrlsToProceed();
+
+    // ·> Log in to WordPress based on the first URL provided to the module. It
+    // ·   will be assumed that the user will stay logged in during visits to
+    // ·<  subsequent website domains.
+    const session = await getAuthenticatedWsuWpSession(urlsToScan);
+
+    // Begin counting execution time after logging in.
+    const exe5nStart = new Date();
+
+    // Now that the command is complete, close the browser session.
+    await session.browser.close();
+
+    return exe5nStart;
+  }
+
   // ·> ========================================================================
   // ·  §9: Headless Browser Control
   // ·< ----------------------------
@@ -697,6 +723,101 @@ import {
 
     await session.page.setViewport({width: 1680, height: 1050});
 
+    // TO-DO: Perform check on how session is hosted
+    try {
+      await session.page.waitForSelector(
+          'body.login.wp-core-ui',
+          { timeout: 5000 }
+        );
+
+      const isAwsHosted = await session.page.evaluate(() => {
+        return hasOktaLogin = document.querySelector(
+          '#login .openid-connect-login-button') !== null;
+      });
+
+      if (isAwsHosted) {
+        await auth6teOnAwsHostedSession(session);
+      } else {
+        await auth6teOnPullmanHostedSession(session);
+      }
+    } catch (error) {
+      session.loginSuccessful = false;
+    }
+
+    return session;
+  }
+
+  // --- §9.3: auth6teOnAwsHostedSession ---
+  async function auth6teOnAwsHostedSession(session) {
+    // Activate login button to start process.
+    await session.page.click('#login .openid-connect-login-button a.button');
+
+    // Enter user name on page.
+    await session.page.waitForSelector(
+        'input#identifier.MuiInputBase-input',
+        { timeout: 5000 }
+      );
+    session.userName = await inputData('WSUWP username: ');
+    await session.page.type('input#identifier.MuiInputBase-input',
+      session.userName);
+    await session.page.click('button[type="submit"].MuiButtonBase-root');
+
+    // Enter password.
+    await session.page.waitForSelector(
+        'input[type="password"]#credentials\\.passcode.MuiInputBase-input',
+        { timeout: 5000 }
+      );
+    const password = await inputPassword('WSUWP password: ');
+    await session.page.type(
+        'input[type="password"]#credentials\\.passcode.MuiInputBase-input',
+        password
+      );
+    await session.page.click('button[type="submit"].MuiButtonBase-root');
+
+    // Choose the OKTA verify app method
+    printProgressMsg(
+        `MFA process initiated via an Okta Verify push notification.`
+      );
+    await session.page.waitForSelector(
+        'button[aria-label="Select to get a push notification to the Okta Verify app."].MuiBox-root',
+        { timeout: 5000 }
+      );
+    await session.page.click(
+      'button[aria-label="Select to get a push notification to the Okta Verify app."].MuiBox-root');
+    await session.page.waitForSelector(
+        'button[type="submit"].MuiButtonBase-root',
+        { timeout: 5000 }
+      );
+    await session.page.click(
+      'button[type="submit"].MuiButtonBase-root');
+
+    // Verify that log on has succeeded & handle a potential invalid-state error
+    await session.page.waitForSelector(
+        'body.login.js #login #login_error, body.wp-admin #wpcontent',
+        { timeout: 30000 }
+      );
+    const hasStateError = await session.page.evaluate(() => {
+      return hasStateError = document.querySelector(
+        'body.login.js #login #login_error') !== null;
+    });
+    printProgressMsg(`MFA process completed.`);
+    if (hasStateError) {
+      printProgressMsg(
+          `Logged in but with an invalid state error. Attempting to reauthenticate.`
+        );
+      await session.page.click('#login .openid-connect-login-button a.button');
+      await session.page.waitForSelector(
+          'body.wp-admin #wpcontent', { timeout: 30000 }
+        );
+      printProgressMsg(`Logged in and arrived at WP admin dashboard.`);
+    } else {
+      printProgressMsg(`Logged in and arrived at WP admin dashboard.`);
+    }
+    session.loginSuccessful = true;
+  }
+
+  // --- §9.4: auth6teOnPullmanHostedSession ---
+  async function auth6teOnPullmanHostedSession(session) {
     session.userName = await inputData('WSUWP username: ');
     await session.page.type('#loginform #user_login', session.userName);
 
@@ -705,23 +826,23 @@ import {
 
     printProgressMsg('Credentials entered; attempting to log in.');
     await session.page.click('#loginform #wp-submit');
+
+    // TO-DO: Introduce try/catch error handling here.
     const progressIndicator =
       await session.page.waitForSelector(
-        'body.wp-admin, body.wp-core-ui.login #login_error'
-      );
-    const loginSuccessful = await progressIndicator?.evaluate(
+          'body.wp-admin, body.wp-core-ui.login #login_error'
+        );
+    session.loginSuccessful = await progressIndicator?.evaluate(
       el => el.classList.contains('wp-admin')
     );
-    if(!loginSuccessful) {
-      throw new Error("Couldn't log in.");
+    if(!session.loginSuccessful) {
+      throw new Error("Couldn't log on.");
     } else {
-      printProgressMsg('Log in was successful.');
+      printProgressMsg('Login was successful.');
     }
-
-    return session;
   }
 
-  // --- §9.3: getUnauthenticatedWsuWpSession ---
+  // --- §9.5: getUnauthenticatedWsuWpSession ---
   async function getUnauthenticatedWsuWpSession(urlsToScan) {
     const session = {};
 
@@ -750,6 +871,7 @@ import {
       const userRows = document.querySelectorAll('.wp-list-table tbody tr');
       userRows.forEach((row) => {
         const emailValue = row.querySelector('td.email a').innerText;
+        // TO-DO: Check for Super Admin privileges
         userTable.push({
           userName: row.querySelector('td.username a').innerText,
           email: emailValue == '' ?
@@ -822,7 +944,17 @@ import {
           `Extracting users on list table page ${cur3tListPage.toString()}.`
         );
         if (userCount == 0) {
-          await session.page.waitForSelector('#wpbody .displaying-num');
+          try {
+            await session.page.waitForSelector(
+                '#wpbody .displaying-num', { timeout: 5000 }
+              );
+          } catch (error) {
+            const docContents = await session.page.evaluate(() => {
+              return document.querySelector('body').innerText
+            });
+            printProgressMsg(docContents);
+            throw error;
+          }
           userCount = await session.page.evaluate(() => {
             const ucIndicator = document.querySelector(
               '#wpbody .displaying-num'
