@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.4.1-0.1.1
+ * @version 0.4.1-0.3.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -38,67 +38,78 @@
 // ·  TABLE OF CONTENTS:
 // ·   Sections of Script File Organized by Purpose
 // ·  ---------------------------------------------
-// ·  §01: Import Process Dependencies.....................................104
-// ·  §02: IIFE to Encapsulate Process.....................................120
-// ·  §03: Process Messaging...............................................156
-// ·    §3.1: printErrorMsg................................................159
-// ·    §3.2: printErrorMsg................................................164
-// ·    §3.3: printProcessHelp.............................................174
-// ·    §3.4: printProgressMsg.............................................182
-// ·    §3.5: printResultsMsg..............................................187
-// ·    §3.6: printWelcomeMsg..............................................192
-// ·  §04: Process Timing..................................................200
-// ·    §4.1: waitForTime..................................................203
-// ·    §4.2: waitForRandomTime............................................208
-// ·  §05: Process Set Up and Inputs.......................................224
-// ·    §5.1: executeCommandFromArgv.......................................227
-// ·    §5.2: getAvailableCommands.........................................260
-// ·    §5.3: getCommandAliases............................................286
-// ·    §5.4: getUrlsFromFile..............................................295
-// ·    §5.5: getUrlsFromProcessArgv.......................................320
-// ·    §5.6: inputData....................................................368
-// ·    §5.7: inputPassword................................................391
-// ·    §5.8: listenForSIGINT..............................................428
-// ·  §06: Process Output..................................................437
-// ·    §6.1: getCsvOutputFromData.........................................440
-// ·    §6.2: writeResultsToCSV............................................453
-// ·  §07: Process Command Execution.......................................464
-// ·    §7.1: getCommandFromAlias..........................................467
-// ·    §7.2: mapPagesOnSites..............................................481
-// ·    §7.3: mapPluginsOnSites............................................512
-// ·    §7.4: provideProcessHelp...........................................543
-// ·    §7.5: scanUserAccessLevels.........................................575
-// ·    §7.6: scanWpSiteAccess.............................................603
-// ·  §08: Headless Browser Control........................................632
-// ·    §8.1: launchBrowser................................................635
-// ·    §8.2: logInToWsuwp.................................................647
-// ·  §09: User Data Extraction............................................686
-// ·    §9.1: extractWpUserData............................................689
-// ·    §9.2: getWpUserDataFileName........................................724
-// ·    §9.3: getDomainsFromWpUserData.....................................733
-// ·    §9.4: mapWPUsers...................................................746
-// ·    §9.5: writeUserMapToFile...........................................789
-// ·  §10: WSU Employee Lookup.............................................816
-// ·    §10.1: lookUpWsuEmployee...........................................819
-// ·    §10.2: queryWpUsersAsWsuEmployees..................................886
-// ·  §11: WP Site Access Mapping..........................................904
-// ·    §11.1: addWpThemeUsageToSiteAccessMap..............................907
-// ·    §11.2: getWpSiteAccessFileName.....................................928
-// ·    §11.3: mapWPSiteAccess.............................................937
-// ·    §11.4: writeWPSiteAccessMapToCSVFile...............................990
-// ·  §12: WSUWP Site Page Mapping........................................1008
-// ·    §12.1: addPgPostTableDataToPageMap................................1011
-// ·    §12.2: extractPgPostDataOnCur3tListPage...........................1035
-// ·    §12.3: getInst7nNameFromUrl.......................................1065
-// ·    §12.4: getWpPageMapFileName.......................................1073
-// ·    §12.5: mapPagesOnSite.............................................1088
-// ·    §12.6: writePageMapToFile.........................................1162
-// ·  §13: WSUWP Site Plugin Mapping......................................1187
-// ·    §13.1: getWpPluginMapFileName.....................................1190
-// ·    §13.2: mapPluginsOnSite...........................................1205
-// ·    §13.3: writePluginMapToFile.......................................1314
-// ·  §14: IIFE Execution Entry Point.....................................1335
-// ·< §15: To-dos and Plans for Adding Features...........................1363
+// ·  §01: Import Process Dependencies.....................................115
+// ·  §02: IIFE to Encapsulate Process.....................................131
+// ·  §03: Process Messaging...............................................167
+// ·    §3.1: printErrorMsg................................................170
+// ·    §3.2: printGoodbyeMsg..............................................175
+// ·    §3.3: printProcessHelp.............................................185
+// ·    §3.4: printProgressMsg.............................................193
+// ·    §3.5: printResultsMsg..............................................198
+// ·    §3.6: printWelcomeMsg..............................................203
+// ·  §04: Process Timing..................................................211
+// ·    §4.1: waitForTime..................................................214
+// ·    §4.2: waitForRandomTime............................................219
+// ·  §05: Process Set Up and Inputs.......................................235
+// ·    §5.1: executeCommandFromArgv.......................................238
+// ·    §5.2: getAvailableCommands.........................................271
+// ·    §5.3: getCommandAliases............................................305
+// ·    §5.4: getUrlsFromFile..............................................318
+// ·    §5.5: getUrlsFromProcessArgv.......................................343
+// ·    §5.6: inputData....................................................391
+// ·    §5.7: inputPassword................................................414
+// ·    §5.8: listenForSIGINT..............................................451
+// ·  §06: Quality Control of Process Input................................460
+// ·    §6.1: getUrlsToProceed.............................................463
+// ·  §07: Process Output..................................................475
+// ·    §7.1: getCsvOutputFromData.........................................478
+// ·    §7.2: writeResultsToCSV............................................491
+// ·  §08: Process Command Execution.......................................502
+// ·    §8.1: getCommandFromAlias..........................................505
+// ·    §8.2: mapLinksOnSites..............................................519
+// ·    §8.3: mapPagesOnSites..............................................548
+// ·    §8.4: mapPluginsOnSites............................................574
+// ·    §8.5: provideProcessHelp...........................................600
+// ·    §8.6: scanUserAccessLevels.........................................632
+// ·    §8.7: scanWpSiteAccess.............................................655
+// ·    §8.8: testLogOnAtSites.............................................678
+// ·  §09: Headless Browser Control........................................697
+// ·    §9.1: launchBrowser................................................700
+// ·    §9.2: getAuthenticatedWsuWpSession.................................712
+// ·    §9.3: auth6teOnAwsHostedSession....................................750
+// ·    §9.4: auth6teOnPullmanHostedSession................................819
+// ·    §9.5: getUnauthenticatedWsuWpSession...............................845
+// ·  §10: User Data Extraction............................................862
+// ·    §10.1: extractWpUserData...........................................865
+// ·    §10.2: getWpUserDataFileName.......................................901
+// ·    §10.3: getDomainsFromWpUserData....................................910
+// ·    §10.4: mapWPUsers..................................................923
+// ·    §10.5: writeUserMapToFile..........................................976
+// ·  §11: WSU Employee Lookup............................................1003
+// ·    §11.1: lookUpWsuEmployee..........................................1006
+// ·    §11.2: queryWpUsersAsWsuEmployees.................................1073
+// ·  §12: WP Site Access Mapping.........................................1091
+// ·    §12.1: addWpThemeUsageToSiteAccessMap.............................1094
+// ·    §12.2: getWpSiteAccessFileName....................................1115
+// ·    §12.3: mapWPSiteAccess............................................1124
+// ·    §12.4: writeWPSiteAccessMapToCSVFile..............................1177
+// ·  §13: WSUWP Site Page Mapping........................................1195
+// ·    §13.1: addPgPostTableDataToPageMap................................1198
+// ·    §13.2: extractPgPostDataOnCur3tListPage...........................1222
+// ·    §13.3: getInst7nNameFromUrl.......................................1252
+// ·    §13.4: getWpPageMapFileName.......................................1260
+// ·    §13.5: mapPagesOnSite.............................................1275
+// ·    §13.6: writePageMapToFile.........................................1349
+// ·  §14: WSUWP Site Plugin Mapping......................................1374
+// ·    §14.1: getWpPluginMapFileName.....................................1377
+// ·    §14.2: mapPluginsOnSite...........................................1392
+// ·    §14.3: writePluginMapToFile.......................................1501
+// ·  §15: WSUWP Site Link Mapping........................................1522
+// ·    §15.1: mapLinksOnSite.............................................1525
+// ·    §15.2: mapLinksOnPage.............................................1553
+// ·    §15.3: addPageLinksToSiteMap......................................1664
+// ·    §15.4: addPageLinksToPagesToCheck.................................1714
+// ·< §16: IIFE Execution Entry Point.....................................1777
 
 // ·> ==========================================================================
 // ·  §01: Import Process Dependencies
@@ -161,7 +172,7 @@ import {
     console.log(`\x1B[38;2;${iife.ansiColors.red}m${msg}\x1B[0m`);
   }
 
-  // --- §3.2: printErrorMsg ---
+  // --- §3.2: printGoodbyeMsg ---
   function printGoodbyeMsg(exe5nTime) {
     printProgressMsg(
       `\nProcess completed in ${(exe5nTime / 1000).toFixed(2)}s.`
@@ -264,6 +275,10 @@ import {
         cb: provideProcessHelp,
         help: "\x1B[1m\x1B[3mSyntax:\x1B[0m help (\"command|alias\")?\n\x1B[1m\x1B[3mAliases:\x1B[0m h\n\x1B[1m\x1B[3mDescription:\x1B[0m Get information about the commands that are available from this WebsiteMapper module for scanning WDS websites hosted on WSU WordPress."
       },
+      "mapLinksOnSites": {
+        cb: mapLinksOnSites,
+        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m mapLinksOnSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n\x1B[1m\x1B[3mAliases:\x1B[0m map links, mlos, ml\n\x1B[1m\x1B[3mDescription:\x1B[0m Using the specified home page URLs as a starting point, create a mapping of all the links that appear on each site. Specifically, progressively use the mapping as it is being built to find and analyze each of the live pages on a site that should contribute to the final mapping.",
+      },
       "mapPagesOnSites": {
         cb: mapPagesOnSites,
         help: "\x1B[1m\x1B[3mSyntax:\x1B[0m mapPagesOnSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n\x1B[1m\x1B[3mAliases:\x1B[0m map pages, mpos, mp\n\x1B[1m\x1B[3mDescription:\x1B[0m Scan through a series of one or more WDS websites hosted on WSU WordPress to map out the pages that are being maintained on each site. Include information who last updated each page and an overview of the accessibility issues present on each page.",
@@ -280,6 +295,10 @@ import {
         cb: scanWpSiteAccess,
         help: "\x1B[1m\x1B[3mSyntax:\x1B[0m scanWpSiteAccess|alias 'url'\n\x1B[1m\x1B[3mAliases:\x1B[0m wordpress site access, wp site access, site access, wpsa, sa\n\x1B[1m\x1B[3mDescription:\x1B[0m Log into a WSU WordPress site and scan the networks menu to map the sites that the user can access. If possible to determine based on the user's permissions, include the theme that is in use on each site.",
       },
+      "testLogOnAtSites": {
+        cb: testLogOnAtSites,
+        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m testLogOnAtSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n\x1B[1m\x1B[3mAliases:\x1B[0m test log on, tlo\n\x1B[1m\x1B[3mDescription:\x1B[0m Attempt to log on at the specified WSUWP websites.",
+      },
     };
   }
 
@@ -287,8 +306,12 @@ import {
   function getCommandAliases() {
     return {
       "help": /^h$/i,
+      "mapLinksOnSites": /^(?:(?:map )?links(?: on sites?)?|ml(?:os)?)$/i,
+      "mapPagesOnSites": /^(?:(?:map )?pages(?: on sites?)?|mp(?:os)?)$/i,
+      "mapPluginsOnSites": /^(?:(?:map )?plugins(?: on sites?)?|mpi(?:os)?)$/i,
       "scanUserAccessLevels": /^(?:user access(?: levels?)?|ual?)$/i,
       "scanWpSiteAccess": /^(?:(?:wordpress |wp )?site access|(?:wp)?sa)$/i,
+      "testLogOnAtSites": /^(?:test log on|tlo)$/i,
     };
   }
 
@@ -434,10 +457,25 @@ import {
   }
 
   // ·> ========================================================================
-  // ·  §6: Process Output
+  // ·  §6: Quality Control of Process Input
+  // ·< ------------------------------------
+
+  // --- §6.1: getUrlsToProceed ---
+  async function getUrlsToProceed() {
+    const urlsToScan = await getUrlsFromProcessArgv();
+    if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
+      printErrorMsg('URLs supplied to process were invalid.');
+      printGoodbyeMsg();
+      process.exit();
+    }
+    return urlsToScan;
+  }
+
+  // ·> ========================================================================
+  // ·  §7: Process Output
   // ·< ------------------
 
-  // --- §6.1: getCsvOutputFromData ---
+  // --- §7.1: getCsvOutputFromData ---
   function getCsvOutputFromData(data, forFirstColumn = false) {
     const delimiter = forFirstColumn ?
       '' :
@@ -450,7 +488,7 @@ import {
       `${delimiter}"${data}"`;
   }
 
-  // --- §6.2: writeResultsToCSV ---
+  // --- §7.2: writeResultsToCSV ---
   async function writeResultsToCSV(fileName, filePurpose, results) {
     printProgressMsg(`Writing ${filePurpose} to “${fileName}”.`);
     try {
@@ -461,10 +499,10 @@ import {
   }
 
   // ·> ========================================================================
-  // ·  §7: Process Command Execution
+  // ·  §8: Process Command Execution
   // ·< -----------------------------
 
-  // --- §7.1: getCommandFromAlias ---
+  // --- §8.1: getCommandFromAlias ---
   function getCommandFromAlias(pro6veAlias) {
     const aliases = getCommandAliases();
     let foundAlias = null;
@@ -478,19 +516,43 @@ import {
     return foundAlias;
   }
 
-  // --- §7.2: mapPagesOnSites ---
-  async function mapPagesOnSites() {
-    const urlsToScan = await getUrlsFromProcessArgv();
-    if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
-      printErrorMsg('URLs supplied to process were invalid.');
-      printGoodbyeMsg();
-      process.exit();
+  // --- §8.2: mapLinksOnSites ---
+  async function mapLinksOnSites() {
+    const urlsToScan = await getUrlsToProceed();
+
+    // ·> Start browsing a WSU WordPress hosted site based on the first URL
+    // ·   provided to the module. Do not authenticate because being logged in
+    // ·   will not be needed for building a link map.
+    const session = await getUnauthenticatedWsuWpSession(urlsToScan);
+
+    // Begin counting execution time after logging in.
+    const exe5nStart = new Date();
+
+    // ·> Map the pages on the sites represented by the URLs specified at
+    // ·<  command line.
+    const linkMap = {};
+    for (let i = 0; i < urlsToScan.length; i++) {
+      await mapLinksOnSite(linkMap, urlsToScan[i], session);
     }
+
+    // TO-DO: Finish writing function.
+    // await writeLinkMapToFile(linkMap);
+
+    // Now that the command is complete, close the browser session.
+    await session.browser.close();
+
+    return exe5nStart;
+  }
+
+
+  // --- §8.3: mapPagesOnSites ---
+  async function mapPagesOnSites() {
+    const urlsToScan = await getUrlsToProceed();
 
     // ·> Log in to WordPress based on the first URL provided to the module. It
     // ·   will be assumed that the user will stay logged in during visits to
     // ·<  subsequent website domains.
-    const session = await logInToWsuwp(urlsToScan);
+    const session = await getAuthenticatedWsuWpSession(urlsToScan);
 
     // Begin counting execution time after logging in.
     const exe5nStart = new Date();
@@ -509,19 +571,14 @@ import {
     return exe5nStart;
   }
 
-  // --- §7.3: mapPluginsInSites ---
+  // --- §8.4: mapPluginsInSites ---
   async function mapPluginsOnSites() {
-    const urlsToScan = await getUrlsFromProcessArgv();
-    if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
-      printErrorMsg('URLs supplied to process were invalid.');
-      printGoodbyeMsg();
-      process.exit();
-    }
+    const urlsToScan = await getUrlsToProceed();
 
     // ·> Log in to WordPress based on the first URL provided to the module. It
     // ·   will be assumed that the user will stay logged in during visits to
     // ·<  subsequent website domains.
-    const session = await logInToWsuwp(urlsToScan);
+    const session = await getAuthenticatedWsuWpSession(urlsToScan);
 
     // Begin counting execution time after logging in.
     const exe5nStart = new Date();
@@ -540,7 +597,7 @@ import {
     return exe5nStart;
   }
 
-  // --- §7.4: provideProcessHelp ---
+  // --- §8.5: provideProcessHelp ---
   async function provideProcessHelp() {
     const exe5nStart = new Date();
 
@@ -572,19 +629,14 @@ import {
     return exe5nStart;
   }
 
-  // --- §7.5: scanUserAccessLevels ---
+  // --- §8.6: scanUserAccessLevels ---
   async function scanUserAccessLevels() {
-    const urlsToScan = await getUrlsFromProcessArgv();
-    if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
-      printErrorMsg('URLs supplied to process were invalid.');
-      printGoodbyeMsg();
-      process.exit();
-    }
+    const urlsToScan = await getUrlsToProceed();
 
     // ·> Log in to WordPress based on the first URL provided to the module. It
     // ·   will be assumed that the user will stay logged in during visits to
     // ·<  subsequent website domains.
-    const session = await logInToWsuwp(urlsToScan);
+    const session = await getAuthenticatedWsuWpSession(urlsToScan);
 
     // Begin counting execution time after logging in.
     const exe5nStart = new Date();
@@ -600,19 +652,14 @@ import {
     return exe5nStart;
   }
 
-  // --- §7.6: scanWpSiteAccess ---
+  // --- §8.7: scanWpSiteAccess ---
   async function scanWpSiteAccess() {
-    const urlsToScan = await getUrlsFromProcessArgv();
-    if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
-      printErrorMsg('URLs supplied to process were invalid.');
-      printGoodbyeMsg();
-      process.exit();
-    }
+    const urlsToScan = await getUrlsToProceed();
 
     // ·> Log in to WordPress based on the first URL provided to the module. It
     // ·   will be assumed that the user will stay logged in during visits to
     // ·<  subsequent website domains.
-    const session = await logInToWsuwp(urlsToScan);
+    const session = await getAuthenticatedWsuWpSession(urlsToScan);
 
     // Begin counting execution time after logging in.
     const exe5nStart = new Date();
@@ -628,11 +675,29 @@ import {
     return exe5nStart;
   }
 
+  // --- §8.8: testLogOnAtSites ---
+  async function testLogOnAtSites() {
+    const urlsToScan = await getUrlsToProceed();
+
+    // ·> Log in to WordPress based on the first URL provided to the module. It
+    // ·   will be assumed that the user will stay logged in during visits to
+    // ·<  subsequent website domains.
+    const session = await getAuthenticatedWsuWpSession(urlsToScan);
+
+    // Begin counting execution time after logging in.
+    const exe5nStart = new Date();
+
+    // Now that the command is complete, close the browser session.
+    await session.browser.close();
+
+    return exe5nStart;
+  }
+
   // ·> ========================================================================
-  // ·  §8: Headless Browser Control
+  // ·  §9: Headless Browser Control
   // ·< ----------------------------
 
-  // --- §8.1: launchBrowser ---
+  // --- §9.1: launchBrowser ---
   async function launchBrowser() {
     printProgressMsg('Opening headless browser.');
     const browser = await puppeteer.launch({headless: "new"});
@@ -644,8 +709,8 @@ import {
     return browser;
   }
 
-  // --- §8.2: logInToWsuwp ---
-  async function logInToWsuwp(urlsToScan) {
+  // --- §9.2: getAuthenticatedWsuWpSession ---
+  async function getAuthenticatedWsuWpSession(urlsToScan) {
     const session = {};
 
     session.browser = await launchBrowser();
@@ -658,6 +723,101 @@ import {
 
     await session.page.setViewport({width: 1680, height: 1050});
 
+    // TO-DO: Perform check on how session is hosted
+    try {
+      await session.page.waitForSelector(
+          'body.login.wp-core-ui',
+          { timeout: 5000 }
+        );
+
+      const isAwsHosted = await session.page.evaluate(() => {
+        return hasOktaLogin = document.querySelector(
+          '#login .openid-connect-login-button') !== null;
+      });
+
+      if (isAwsHosted) {
+        await auth6teOnAwsHostedSession(session);
+      } else {
+        await auth6teOnPullmanHostedSession(session);
+      }
+    } catch (error) {
+      session.loginSuccessful = false;
+    }
+
+    return session;
+  }
+
+  // --- §9.3: auth6teOnAwsHostedSession ---
+  async function auth6teOnAwsHostedSession(session) {
+    // Activate login button to start process.
+    await session.page.click('#login .openid-connect-login-button a.button');
+
+    // Enter user name on page.
+    await session.page.waitForSelector(
+        'input#identifier.MuiInputBase-input',
+        { timeout: 5000 }
+      );
+    session.userName = await inputData('WSUWP username: ');
+    await session.page.type('input#identifier.MuiInputBase-input',
+      session.userName);
+    await session.page.click('button[type="submit"].MuiButtonBase-root');
+
+    // Enter password.
+    await session.page.waitForSelector(
+        'input[type="password"]#credentials\\.passcode.MuiInputBase-input',
+        { timeout: 5000 }
+      );
+    const password = await inputPassword('WSUWP password: ');
+    await session.page.type(
+        'input[type="password"]#credentials\\.passcode.MuiInputBase-input',
+        password
+      );
+    await session.page.click('button[type="submit"].MuiButtonBase-root');
+
+    // Choose the OKTA verify app method
+    printProgressMsg(
+        `MFA process initiated via an Okta Verify push notification.`
+      );
+    await session.page.waitForSelector(
+        'button[aria-label="Select to get a push notification to the Okta Verify app."].MuiBox-root',
+        { timeout: 5000 }
+      );
+    await session.page.click(
+      'button[aria-label="Select to get a push notification to the Okta Verify app."].MuiBox-root');
+    await session.page.waitForSelector(
+        'button[type="submit"].MuiButtonBase-root',
+        { timeout: 5000 }
+      );
+    await session.page.click(
+      'button[type="submit"].MuiButtonBase-root');
+
+    // Verify that log on has succeeded & handle a potential invalid-state error
+    await session.page.waitForSelector(
+        'body.login.js #login #login_error, body.wp-admin #wpcontent',
+        { timeout: 30000 }
+      );
+    const hasStateError = await session.page.evaluate(() => {
+      return hasStateError = document.querySelector(
+        'body.login.js #login #login_error') !== null;
+    });
+    printProgressMsg(`MFA process completed.`);
+    if (hasStateError) {
+      printProgressMsg(
+          `Logged in but with an invalid state error. Attempting to reauthenticate.`
+        );
+      await session.page.click('#login .openid-connect-login-button a.button');
+      await session.page.waitForSelector(
+          'body.wp-admin #wpcontent', { timeout: 30000 }
+        );
+      printProgressMsg(`Logged in and arrived at WP admin dashboard.`);
+    } else {
+      printProgressMsg(`Logged in and arrived at WP admin dashboard.`);
+    }
+    session.loginSuccessful = true;
+  }
+
+  // --- §9.4: auth6teOnPullmanHostedSession ---
+  async function auth6teOnPullmanHostedSession(session) {
     session.userName = await inputData('WSUWP username: ');
     await session.page.type('#loginform #user_login', session.userName);
 
@@ -666,27 +826,43 @@ import {
 
     printProgressMsg('Credentials entered; attempting to log in.');
     await session.page.click('#loginform #wp-submit');
+
+    // TO-DO: Introduce try/catch error handling here.
     const progressIndicator =
       await session.page.waitForSelector(
-        'body.wp-admin, body.wp-core-ui.login #login_error'
-      );
-    const loginSuccessful = await progressIndicator?.evaluate(
+          'body.wp-admin, body.wp-core-ui.login #login_error'
+        );
+    session.loginSuccessful = await progressIndicator?.evaluate(
       el => el.classList.contains('wp-admin')
     );
-    if(!loginSuccessful) {
-      throw new Error("Couldn't log in.");
+    if(!session.loginSuccessful) {
+      throw new Error("Couldn't log on.");
     } else {
-      printProgressMsg('Log in was successful.');
+      printProgressMsg('Login was successful.');
     }
+  }
+
+  // --- §9.5: getUnauthenticatedWsuWpSession ---
+  async function getUnauthenticatedWsuWpSession(urlsToScan) {
+    const session = {};
+
+    session.browser = await launchBrowser();
+
+    printProgressMsg('Loading new page.');
+    session.page = await session.browser.newPage();
+
+    printProgressMsg(`Navigating to ${urlsToScan[0]}.`);
+    await session.page.goto(`${urlsToScan[0]}`);
+    await session.page.setViewport({width: 1680, height: 1050});
 
     return session;
   }
 
   // ·> ========================================================================
-  // ·  §9: User Data Extraction
+  // ·  §10: User Data Extraction
   // ·< ------------------------
 
-  // --- §9.1: extractWpUserData ---
+  // --- §10.1: extractWpUserData ---
   async function extractWpUserData(baseUrl, session, userAccessMap) {
     const webDomain = baseUrl.match(/https:\/\/(.+)\//)[1];
     // Obtain the user table for the current page.
@@ -695,6 +871,7 @@ import {
       const userRows = document.querySelectorAll('.wp-list-table tbody tr');
       userRows.forEach((row) => {
         const emailValue = row.querySelector('td.email a').innerText;
+        // TO-DO: Check for Super Admin privileges
         userTable.push({
           userName: row.querySelector('td.username a').innerText,
           email: emailValue == '' ?
@@ -721,7 +898,7 @@ import {
     });
   }
 
-  // --- §9.2: getWpUserDataFileName ---
+  // --- §10.2: getWpUserDataFileName ---
   function getWpUserDataFileName() {
     const now = new Date();
     const todaysMonth = (now.getMonth() + 1).toString().padStart(2, '0');
@@ -730,7 +907,7 @@ import {
       now.getFullYear() + todaysMonth + todaysDay + '.csv';
   }
 
-  // --- §9.3: getDomainsFromWpUserData ---
+  // --- §10.3: getDomainsFromWpUserData ---
   function getDomainsFromWpUserData(userAccessMap) {
     const domainList = new Set();
     for (const user in userAccessMap) {
@@ -743,7 +920,7 @@ import {
     return [...domainList];
   }
 
-  // --- §9.4: mapWPUsers ---
+  // --- §10.4: mapWPUsers ---
   async function mapWPUsers(urlsToScan, session) {
     const userAccessMap = {};
     const navSlug = 'wp-admin/users.php';
@@ -767,7 +944,17 @@ import {
           `Extracting users on list table page ${cur3tListPage.toString()}.`
         );
         if (userCount == 0) {
-          await session.page.waitForSelector('#wpbody .displaying-num');
+          try {
+            await session.page.waitForSelector(
+                '#wpbody .displaying-num', { timeout: 5000 }
+              );
+          } catch (error) {
+            const docContents = await session.page.evaluate(() => {
+              return document.querySelector('body').innerText
+            });
+            printProgressMsg(docContents);
+            throw error;
+          }
           userCount = await session.page.evaluate(() => {
             const ucIndicator = document.querySelector(
               '#wpbody .displaying-num'
@@ -786,7 +973,7 @@ import {
     return userAccessMap;
   }
 
-  // --- §9.5: writeUserMapToFile ---
+  // --- §10.5: writeUserMapToFile ---
   async function writeUserMapToFile(userAccessMap) {
     const domainList = getDomainsFromWpUserData(userAccessMap).sort();
 
@@ -813,10 +1000,10 @@ import {
   }
 
   // ·> ========================================================================
-  // ·  §10: WSU Employee Lookup
+  // ·  §11: WSU Employee Lookup
   // ·< ------------------------
 
-  // --- §10.1: lookUpWsuEmployee ---
+  // --- §11.1: lookUpWsuEmployee ---
   async function lookUpWsuEmployee(session, wsuEmail) {
     if (wsuEmail == '' || wsuEmail == '-') {
       printProgressMsg(`Bypassing search for a WP user with a blank email.`);
@@ -883,7 +1070,7 @@ import {
     return result;
   }
 
-  // --- §10.2: queryWpUsersAsWsuEmployees ---
+  // --- §11.2: queryWpUsersAsWsuEmployees ---
   async function queryWpUsersAsWsuEmployees(session, userAccessMap) {
     // To-do: Finish writing function
     const users = Object.keys(userAccessMap);
@@ -901,10 +1088,10 @@ import {
   }
 
   // ·> ========================================================================
-  // ·  §11: WP Site Access Mapping
+  // ·  §12: WP Site Access Mapping
   // ·< ---------------------------
 
-  // --- §11.1: addWpThemeUsageToSiteAccessMap ---
+  // --- §12.1: addWpThemeUsageToSiteAccessMap ---
   async function addWpThemeUsageToSiteAccessMap(session, wpSiteAccessMap) {
     for (let i = 0; i < wpSiteAccessMap.length; i++) {
       printProgressMsg(
@@ -925,7 +1112,7 @@ import {
     }
   }
 
-  // --- §11.2: getWpSiteAccessFileName ---
+  // --- §12.2: getWpSiteAccessFileName ---
   function getWpSiteAccessFileName() {
     const now = new Date();
     const todaysMonth = (now.getMonth() + 1).toString().padStart(2, '0');
@@ -934,7 +1121,7 @@ import {
       now.getFullYear() + todaysMonth + todaysDay + '.csv';
   }
 
-  // --- §11.3: mapWPSiteAccess ---
+  // --- §12.3: mapWPSiteAccess ---
   async function mapWPSiteAccess(urlsToScan, session) {
     const url = urlsToScan[0];
     printProgressMsg(
@@ -987,7 +1174,7 @@ import {
     return wpSiteAccessMap;
   }
 
-  // --- §11.4: writeWPSiteAccessMapToCSVFile ---
+  // --- §12.4: writeWPSiteAccessMapToCSVFile ---
   async function writeWPSiteAccessMapToCSVFile(wpSiteAccessMap) {
     // ·> Column structure for CSV:
     // ·<  Link to site, Link to admin dashboard, Site title, WP network, Installed Themes, Active Theme
@@ -1005,10 +1192,10 @@ import {
   }
 
   // ·> ========================================================================
-  // ·  §12: WSUWP Site Page Mapping
+  // ·  §13: WSUWP Site Page Mapping
   // ·< ----------------------------
 
-  // --- §12.1: addPgPostTableDataToPageMap ---
+  // --- §13.1: addPgPostTableDataToPageMap ---
   function addPgPostTableDataToPageMap(
     pgPostTable, pageMap, domain, cur3tListPage
   ) {
@@ -1032,7 +1219,7 @@ import {
     });
   }
 
-  // --- §12.2: extractPgPostDataOnCur3tListPage ---
+  // --- §13.2: extractPgPostDataOnCur3tListPage ---
   async function extractPgPostDataOnCur3tListPage(session) {
     const pgPostTable = await session.page.evaluate(() => {
       const pgPostTable = [];
@@ -1062,7 +1249,7 @@ import {
     return pgPostTable;
   }
 
-  // --- §12.3: getInst7nNameFromUrl ---
+  // --- §13.3: getInst7nNameFromUrl ---
   function getInst7nNameFromUrl(siteUrl) {
     const inst7nMatches = siteUrl.match(/https?:\/\/(.+)\.wsu.edu\/(.*?)\/?$/);
     return inst7nMatches[2] != "" ?
@@ -1070,7 +1257,7 @@ import {
       inst7nMatches[1];
   }
 
-  // --- §12.4: getWpPageMapFileName ---
+  // --- §13.4: getWpPageMapFileName ---
   function getWpPageMapFileName() {
     const now = {};
     now.date = new Date();
@@ -1085,7 +1272,7 @@ import {
       now.sec3s + '.csv';
   }
 
-  // --- §12.5: mapPagesOnSite ---
+  // --- §13.5: mapPagesOnSite ---
   async function mapPagesOnSite(pageMap, siteUrl, session) {
     const navSlug = 'wp-admin/edit.php';
     const queryString = '?post_type=page&paged=';
@@ -1159,7 +1346,7 @@ import {
     printResultsMsg(`Found and mapped ${pagesCount} page posts on ${siteUrl}. Page map has ${Object.keys(pageMap).length} entries.`);
   }
 
-  // --- §12.6: writePageMapToFile ---
+  // --- §13.6: writePageMapToFile ---
   async function writePageMapToFile(pageMap) {
     // Start the output for the CSV file with the header row.
     let output = `Installation,Listing Position,Post ID,Title,Edit at URL,View at URL,Published,Last Updated By, Last Updated On, A11y Indicators`;
@@ -1184,10 +1371,10 @@ import {
   }
 
   // ·> ========================================================================
-  // ·  §13: WSUWP Site Plugin Mapping
+  // ·  §14: WSUWP Site Plugin Mapping
   // ·< ------------------------------
 
-  // --- §13.1: getWpPluginMapFileName ---
+  // --- §14.1: getWpPluginMapFileName ---
   function getWpPluginMapFileName() {
     const now = {};
     now.date = new Date();
@@ -1202,7 +1389,7 @@ import {
       now.sec3s + '.csv';
   }
 
-  // --- §13.2: mapPluginsOnSite ---
+  // --- §14.2: mapPluginsOnSite ---
   async function mapPluginsOnSite(pluginMap, siteUrl, session) {
     const navSlug = 'wp-admin/plugins.php';
     const queryString = '?plugin_status=active';
@@ -1311,7 +1498,7 @@ import {
     }
   }
 
-  // --- §13.3: writePluginMapToFile ---
+  // --- §14.3: writePluginMapToFile ---
   async function writePluginMapToFile(pluginMap) {
     // Start the output for the CSV file with the header row.
     let output = `Installation,Listing Position,Name,Description,Settings URL,Site URL`;
@@ -1332,7 +1519,262 @@ import {
   }
 
   // ·> ========================================================================
-  // ·  §14: IIFE Execution Entry Point
+  // ·  §15: WSUWP Site Link Mapping
+  // ·< ----------------------------
+
+  // --- §15.1: mapLinksOnSite ---
+  async function mapLinksOnSite(linkMap, siteUrl, session) {
+    printProgressMsg(
+      `Using ${siteUrl} as a starting point to map out the links found on the pages that can be reached by visiting links found on the site represented by the location.`
+    );
+
+    const siteLinks = new Map();
+    const pagesToCheck = new Map();
+    let pageLinks = await mapLinksOnPage(session, siteUrl);
+
+    pagesToCheck.set(siteUrl, true);
+    addPageLinksToSiteMap(siteUrl, pageLinks, siteLinks);
+    addPageLinksToPagesToCheck(siteUrl, pageLinks, pagesToCheck);
+
+    let i = 0;
+    for (const [page, wasChecked] of pagesToCheck) {
+      if (wasChecked) {
+        continue;
+      }
+      pageLinks = await mapLinksOnPage(session, page);
+      pagesToCheck.set(page, true);
+      addPageLinksToSiteMap(page, pageLinks, siteLinks);
+      addPageLinksToPagesToCheck(siteUrl, pageLinks, pagesToCheck);
+      i++;
+    }
+    console.log(siteLinks);
+  }
+
+  // --- §15.2: mapLinksOnPage ---
+  async function mapLinksOnPage(session, pageUrl) {
+    printProgressMsg(
+      `Navigating to ${pageUrl} to map the links present the page.`
+    );
+
+    try {
+      await session.page.goto(pageUrl);
+      await session.page.waitForSelector('main#wsu-content.wsu-wrapper-main', {
+          timeout: 2000
+        });
+    } catch (error) {
+      printErrorMsg(error.message);
+      return;
+    }
+
+    printProgressMsg(
+      `Collecting info on links present on ${pageUrl} to map the links present the page.`
+    );
+
+    const linksMap = await session.page.evaluate(() => {
+      const pageAddress = document.location.href;
+      const pageLinks = [...document.querySelectorAll('a')];
+      const uniqueLinks = new Map();
+
+      pageLinks.forEach((link) => {
+        let linkContext = '';
+        let elem3Id;
+        let cssClasses;
+        let cur3tParent = link.parentElement;
+
+        while(cur3tParent !== null) {
+          if (
+            cur3tParent.tagName !== undefined &&
+            cur3tParent.tagName.match(
+              /nav|main|header|footer|h1|h2|h3|h4|h5|h6/i
+            ) !== null || (
+              cur3tParent.tagName == 'DIV' &&
+              (
+                cur3tParent.classList.contains(
+                  'wsu-navigation-vertical__menu-wrapper'
+                ) ||
+                cur3tParent.classList.contains(
+                  'breadcrumbs'
+                )
+              )
+            ) || (
+              cur3tParent.tagName == 'UL' &&
+              (
+                cur3tParent.id == 'menu-site-footer-navigation' ||
+                cur3tParent.id == 'menu-site-footer-navigation-more-resources' ||
+                cur3tParent.id == 'wsu-site-menu'
+              )
+            )
+          ) {
+            cssClasses = cur3tParent.classList.length > 0 ?
+              `.${[...cur3tParent.classList].join('.')}` :
+              '';
+            elem3Id = cur3tParent.id == '' ?
+              '' :
+              `#${cur3tParent.id}`;
+            linkContext = linkContext == '' ?
+              `${cur3tParent.tagName}${elem3Id}${cssClasses}` :
+              `${cur3tParent.tagName}${elem3Id}${cssClasses} > ${linkContext}`;
+          }
+          cur3tParent = cur3tParent.parentElement;
+        }
+
+        if (uniqueLinks.has(link.href)) {
+          uniqueLinks.get(link.href).contexts.add(linkContext);
+          uniqueLinks.get(link.href).texts.add(link.textContent.trim());
+          uniqueLinks.get(link.href).instances++;
+          return;
+        }
+
+        uniqueLinks.set(link.href, {
+          contexts: new Set(),
+          texts: new Set(),
+          instances: 1,
+        });
+
+        uniqueLinks.get(link.href).contexts.add(linkContext);
+        uniqueLinks.get(link.href).texts.add(link.textContent.trim());
+      });
+
+      // ·> Convert unique link Map into a simple object that will be success-
+      // ·   fully returned to the Node process.
+      const uniqueLinkData = [];
+      for (const [link, properties] of uniqueLinks) {
+        console.log(link);
+        uniqueLinkData.push({
+          href: link,
+          contexts: [...properties.contexts],
+          texts: [...properties.texts],
+          instances: properties.instances,
+        });
+      }
+
+      return uniqueLinkData; // TO-DO: Fix this step so that the data is completely returned; unfortunately, Map objects will not work. Also, may it be advisable to try JSON stringify and parse to pass the data? (UPDATE: I think this is now fixed, should verify.)
+    });
+
+    // TO-DO: Remove.
+    // console.log(`Found ${linksMap.length} unique hyperlinks in the document. Return value is of type ${typeof linksMap}. Details for the 31st unique link:`);
+    // console.log(`${linksMap[30].href} contexts – ${linksMap[30].contexts}`);
+    // console.log('Details for the first 10 links:');
+    // for (let i = 0; i < 10; i++) {
+    //   console.log(`${i}: ${linksMap[i].href}`);
+    // }
+    return linksMap;
+  }
+
+  // --- §15.3: addPageLinksToSiteMap ---
+  function addPageLinksToSiteMap(pageLoc4n, pageLinks, siteLinks) {
+    if (!pageLinks) {
+      return;
+    }
+    pageLinks.forEach(function (link) {
+      if (siteLinks.has(link.href)) {
+        siteLinks.get(link.href).locations.add(pageLoc4n);
+        let i;
+        for (i = 0; i < link.contexts.length; i++) {
+          siteLinks.get(link.href).contexts.add(link.contexts[i]);
+        }
+        for (i = 0; i < link.texts.length; i++) {
+          siteLinks.get(link.href).texts.add(link.texts[i]);
+        }
+        siteLinks.get(link.href).instances += link.instances;
+      } else {
+        siteLinks.set(link.href, {
+          locations: new Set(),
+          contexts: new Set(link.contexts),
+          texts: new Set(link.texts),
+          instances: link.instances
+        });
+        siteLinks.get(link.href).locations.add(pageLoc4n);
+      }
+    });
+
+    // TO-DO: Remove?
+    /*for (const [link, properties] of pageLinks) {
+      if (siteLinks.has(link)) {
+        siteLinks.get(link).locations.add(pageLoc4n);
+        for (const context of properties.contexts) {
+          siteLinks.get(link).context.add(context);
+        }
+        for (const texts of properties.texts) {
+          siteLinks.get(link).context.add(context);
+        }
+        siteLinks.get(link).instances += properties.instances;
+      } else {
+        siteLinks.set(link, {
+          locations: new Set(),
+          contexts: new Set(properties.contexts),
+          texts: new Set(properties.contexts),
+          instances: properties.instances
+        });
+        siteLinks.get(link).locations.add(pageLoc4n);
+      }
+    }*/
+  }
+
+  // --- §15.4: addPageLinksToPagesToCheck ---
+  function addPageLinksToPagesToCheck(pageUrl, pageLinks, pagesToCheck) {
+    if (!pageLinks) {
+      return;
+    }
+    // To-do: What to do if the link is relative?
+    const webDomain = pageUrl.match(/https?:\/\/(.+?)\//)[1];
+    let linkDomain, hrefComp5s, hrefToStore;
+    pageLinks.forEach(function (link) {
+      linkDomain = link.href.match(/https?:\/\/(.+?)\/.*/);
+      hrefComp5s =
+        link.href.match(
+          /^(https?:\/\/)([^:\/]+)(:(?:\d+))?(\/.*?)?(\?[^#]*)?(#.*)?$/
+        );
+
+      // Don't bother with cross-origin links.
+      if (linkDomain === null) {
+        return;
+      } else {
+        linkDomain = linkDomain[1];
+      }
+
+      // Don't proceed if the form of the href does not match expectations.
+      if (hrefComp5s === null) {
+        return;
+      } else {
+        hrefToStore = hrefComp5s[1] + hrefComp5s[2];
+        hrefToStore += hrefComp5s[3] !== undefined ?
+          hrefComp5s[3] :
+          '';
+        hrefToStore += hrefComp5s[4] !== undefined ?
+          hrefComp5s[4] :
+          '';
+      }
+
+      // Don't try to check links to files.
+      const isLinkToFile =
+        hrefToStore.match(
+            /^(https?:\/\/)([^:\/]+)(:(?:\d+))?(\/.*?)?(\.(?:3g2|3gp|avi|doc|docx|flac|flv|gif|ics|jpeg|jpg|key|m4a|m4v|mid|midi|mov|mp3|mp4|mpg|odt|ogg|ogv|pdf|png|pps|ppsx|ppt|pptx|wav|webm|webp|xls|xlsx)\/?)$/
+          ) !== null;
+      if (isLinkToFile) {
+        return;
+      }
+
+      // ·> Don't check unhelpful links associated with the Events Calendar
+      // ·< plugin user interface.
+      const isEventsCal4rUILink =
+        hrefToStore.match(
+            /\/calendar\/(?:month\/[-0-9]+\/|[-0-9]+\/)$|\/calendar\/category\//
+          ) !== null;
+      if (isEventsCal4rUILink) {
+        return;
+      }
+
+      // Since all of the checks on the link have passed, record it as a page
+      // that will be checked later in the process.
+      if (webDomain == linkDomain && !pagesToCheck.has(hrefToStore)) {
+        pagesToCheck.set(hrefToStore, false);
+      }
+    });
+  }
+
+  // ·> ========================================================================
+  // ·  §16: IIFE Execution Entry Point
   // ·< -------------------------------
 
   async function iifeMain() {
@@ -1356,25 +1798,5 @@ import {
     white: '255;255;255',
   },
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
-  version: '0.4.1-0.1.1',
+  version: '0.4.1-0.2.0',
 });
-
-// ·> ==========================================================================
-// ·  §15: To-dos and Plans for Adding Features
-// ·  -----------------------------------------
-// ·  • Provide automatic culling of unique domains from lists of URLs passed to
-// ·     the module.
-// ·  • Map links (navigation vs. body content) across a website
-// ·  • Extract CSS style sheet code from WP websites
-// ·    - Use the PostCSS package to analyze style sheets
-// ·    - Accommodate Different reporting options: *.csv files, printing tables
-// ·       to the terminal for the last 10 edits, etc.
-// ·  • Take an a11y inventory
-// ·  • Look for broken links, orphaned pages, etc.
-// ·  • Content complexity analysis (word count, headings, tag counts,
-// ·     etc.)
-// ·  • Website tree mapping
-// ·  • Other features to be added:
-// ·    - Report the time it takes for commands to run
-// ·    - Handling HTTP errors during navigation
-// ·<   - Command line arguments for URL list (as file)
