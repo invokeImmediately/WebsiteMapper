@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.4.1-0.3.0
+ * @version 0.4.1-0.4.0
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -16,7 +16,7 @@
  *
  * @link https://github.com/invokeImmediately/WebsiteMapper
  *
- * @license MIT - Copyright (c) 2024 Daniel C.Rieck.
+ * @license MIT - Copyright (c) 2025 Daniel C.Rieck.
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to
  *   deal in the Software without restriction, including without limitation the
@@ -38,78 +38,82 @@
 // ·  TABLE OF CONTENTS:
 // ·   Sections of Script File Organized by Purpose
 // ·  ---------------------------------------------
-// ·  §01: Import Process Dependencies.....................................115
-// ·  §02: IIFE to Encapsulate Process.....................................131
-// ·  §03: Process Messaging...............................................167
-// ·    §3.1: printErrorMsg................................................170
-// ·    §3.2: printGoodbyeMsg..............................................175
-// ·    §3.3: printProcessHelp.............................................185
-// ·    §3.4: printProgressMsg.............................................193
-// ·    §3.5: printResultsMsg..............................................198
-// ·    §3.6: printWelcomeMsg..............................................203
-// ·  §04: Process Timing..................................................211
-// ·    §4.1: waitForTime..................................................214
-// ·    §4.2: waitForRandomTime............................................219
-// ·  §05: Process Set Up and Inputs.......................................235
-// ·    §5.1: executeCommandFromArgv.......................................238
-// ·    §5.2: getAvailableCommands.........................................271
-// ·    §5.3: getCommandAliases............................................305
-// ·    §5.4: getUrlsFromFile..............................................318
-// ·    §5.5: getUrlsFromProcessArgv.......................................343
-// ·    §5.6: inputData....................................................391
-// ·    §5.7: inputPassword................................................414
-// ·    §5.8: listenForSIGINT..............................................451
-// ·  §06: Quality Control of Process Input................................460
-// ·    §6.1: getUrlsToProceed.............................................463
-// ·  §07: Process Output..................................................475
-// ·    §7.1: getCsvOutputFromData.........................................478
-// ·    §7.2: writeResultsToCSV............................................491
-// ·  §08: Process Command Execution.......................................502
-// ·    §8.1: getCommandFromAlias..........................................505
-// ·    §8.2: mapLinksOnSites..............................................519
-// ·    §8.3: mapPagesOnSites..............................................548
-// ·    §8.4: mapPluginsOnSites............................................574
-// ·    §8.5: provideProcessHelp...........................................600
-// ·    §8.6: scanUserAccessLevels.........................................632
-// ·    §8.7: scanWpSiteAccess.............................................655
-// ·    §8.8: testLogOnAtSites.............................................678
-// ·  §09: Headless Browser Control........................................697
-// ·    §9.1: launchBrowser................................................700
-// ·    §9.2: getAuthenticatedWsuWpSession.................................712
-// ·    §9.3: auth6teOnAwsHostedSession....................................750
-// ·    §9.4: auth6teOnPullmanHostedSession................................819
-// ·    §9.5: getUnauthenticatedWsuWpSession...............................845
-// ·  §10: User Data Extraction............................................862
-// ·    §10.1: extractWpUserData...........................................865
-// ·    §10.2: getWpUserDataFileName.......................................901
-// ·    §10.3: getDomainsFromWpUserData....................................910
-// ·    §10.4: mapWPUsers..................................................923
-// ·    §10.5: writeUserMapToFile..........................................976
-// ·  §11: WSU Employee Lookup............................................1003
-// ·    §11.1: lookUpWsuEmployee..........................................1006
-// ·    §11.2: queryWpUsersAsWsuEmployees.................................1073
-// ·  §12: WP Site Access Mapping.........................................1091
-// ·    §12.1: addWpThemeUsageToSiteAccessMap.............................1094
-// ·    §12.2: getWpSiteAccessFileName....................................1115
-// ·    §12.3: mapWPSiteAccess............................................1124
-// ·    §12.4: writeWPSiteAccessMapToCSVFile..............................1177
-// ·  §13: WSUWP Site Page Mapping........................................1195
-// ·    §13.1: addPgPostTableDataToPageMap................................1198
-// ·    §13.2: extractPgPostDataOnCur3tListPage...........................1222
-// ·    §13.3: getInst7nNameFromUrl.......................................1252
-// ·    §13.4: getWpPageMapFileName.......................................1260
-// ·    §13.5: mapPagesOnSite.............................................1275
-// ·    §13.6: writePageMapToFile.........................................1349
-// ·  §14: WSUWP Site Plugin Mapping......................................1374
-// ·    §14.1: getWpPluginMapFileName.....................................1377
-// ·    §14.2: mapPluginsOnSite...........................................1392
-// ·    §14.3: writePluginMapToFile.......................................1501
-// ·  §15: WSUWP Site Link Mapping........................................1522
-// ·    §15.1: mapLinksOnSite.............................................1525
-// ·    §15.2: mapLinksOnPage.............................................1553
-// ·    §15.3: addPageLinksToSiteMap......................................1664
-// ·    §15.4: addPageLinksToPagesToCheck.................................1714
-// ·< §16: IIFE Execution Entry Point.....................................1777
+// ·  §01: Import Process Dependencies.....................................119
+// ·  §02: IIFE to Encapsulate Process.....................................135
+// ·  §03: Process Messaging...............................................171
+// ·    §3.1: printCommandTime.............................................174
+// ·    §3.2: printErrorMsg................................................184
+// ·    §3.3: printGoodbyeMsg..............................................189
+// ·    §3.4: printProcessHelp.............................................197
+// ·    §3.5: printProgressMsg.............................................205
+// ·    §3.6: printResultsMsg..............................................210
+// ·    §3.7: printWelcomeMsg..............................................215
+// ·  §04: Process Timing..................................................223
+// ·    §4.1: waitForTime..................................................226
+// ·    §4.2: waitForRandomTime............................................231
+// ·  §05: Process Set Up and Inputs.......................................247
+// ·    §5.1: exec3CommandFromArgv.........................................250
+// ·    §5.2: exec3CommandFromTerm4........................................283
+// ·    §5.3: getAvailableCommands.........................................308
+// ·    §5.4: getCommandAliases............................................346
+// ·    §5.5: getUrlsFromInput.............................................360
+// ·    §5.6: getUrlsFromFile..............................................385
+// ·    §5.7: getUrlsFromProcessArgv.......................................432
+// ·    §5.8: inputData....................................................480
+// ·    §5.9: inputPassword................................................503
+// ·    §5.10: listenForSIGINT.............................................540
+// ·  §06: Quality Control of Process Input................................549
+// ·    §6.1: getUrlsToProceed.............................................552
+// ·  §07: Process Output..................................................569
+// ·    §7.1: getCsvOutputFromData.........................................572
+// ·    §7.2: writeResultsToCSV............................................585
+// ·  §08: Process Command Execution.......................................596
+// ·    §8.1: getCommandFromAlias..........................................599
+// ·    §8.2: mapLinksOnSites..............................................613
+// ·    §8.3: mapPagesOnSites..............................................642
+// ·    §8.4: mapPluginsOnSites............................................668
+// ·    §8.5: provideProcessHelp...........................................694
+// ·    §8.6: quitProcess..................................................726
+// ·    §8.7: scanUserAccessLevels.........................................732
+// ·    §8.8: scanWpSiteAccess.............................................755
+// ·    §8.9: testLogOnAtSites.............................................778
+// ·  §09: Headless Browser Control........................................797
+// ·    §9.1: launchBrowser................................................800
+// ·    §9.2: getAuthenticatedWsuWpSession.................................812
+// ·    §9.3: auth6teOnAwsHostedSession....................................851
+// ·    §9.4: auth6teOnPullmanHostedSession................................920
+// ·    §9.5: getUnauthenticatedWsuWpSession...............................946
+// ·  §10: User Data Extraction............................................963
+// ·    §10.1: extractWpUserData...........................................966
+// ·    §10.2: getWpUserDataFileName......................................1002
+// ·    §10.3: getDomainsFromWpUserData...................................1011
+// ·    §10.4: mapWPUsers.................................................1024
+// ·    §10.5: writeUserMapToFile.........................................1077
+// ·  §11: WSU Employee Lookup............................................1104
+// ·    §11.1: lookUpWsuEmployee..........................................1107
+// ·    §11.2: queryWpUsersAsWsuEmployees.................................1174
+// ·  §12: WP Site Access Mapping.........................................1192
+// ·    §12.1: addWpThemeUsageToSiteAccessMap.............................1195
+// ·    §12.2: getWpSiteAccessFileName....................................1216
+// ·    §12.3: mapWPSiteAccess............................................1225
+// ·    §12.4: writeWPSiteAccessMapToCSVFile..............................1278
+// ·  §13: WSUWP Site Page Mapping........................................1296
+// ·    §13.1: addPgPostTableDataToPageMap................................1299
+// ·    §13.2: extractPgPostDataOnCur3tListPage...........................1323
+// ·    §13.3: getInst7nNameFromUrl.......................................1353
+// ·    §13.4: getWpPageMapFileName.......................................1361
+// ·    §13.5: mapPagesOnSite.............................................1376
+// ·    §13.6: writePageMapToFile.........................................1450
+// ·  §14: WSUWP Site Plugin Mapping......................................1475
+// ·    §14.1: getWpPluginMapFileName.....................................1478
+// ·    §14.2: mapPluginsOnSite...........................................1493
+// ·    §14.3: writePluginMapToFile.......................................1602
+// ·  §15: WSUWP Site Link Mapping........................................1623
+// ·    §15.1: mapLinksOnSite.............................................1626
+// ·    §15.2: mapLinksOnPage.............................................1654
+// ·    §15.3: addPageLinksToSiteMap......................................1765
+// ·    §15.4: addPageLinksToPagesToCheck.................................1815
+// ·< §16: IIFE Execution Entry Point.....................................1878
 
 // ·> ==========================================================================
 // ·  §01: Import Process Dependencies
@@ -167,22 +171,30 @@ import {
   // ·  §3: Process Messaging
   // ·< ---------------------
 
-  // --- §3.1: printErrorMsg ---
+  // --- §3.1: printCommandTime ---
+  function printCommandTime(exe5nTime) {
+    if (Number.isNaN(exe5nTime)) {
+      exe5nTime = 0;
+    }
+    printProgressMsg(
+      `\nCommand completed in ${(exe5nTime / 1000).toFixed(2)}s.`
+    );
+  }
+
+  // --- §3.2: printErrorMsg ---
   function printErrorMsg(msg) {
     console.log(`\x1B[38;2;${iife.ansiColors.red}m${msg}\x1B[0m`);
   }
 
-  // --- §3.2: printGoodbyeMsg ---
+  // --- §3.3: printGoodbyeMsg ---
   function printGoodbyeMsg(exe5nTime) {
-    printProgressMsg(
-      `\nProcess completed in ${(exe5nTime / 1000).toFixed(2)}s.`
-    );
+    printCommandTime(exe5nTime);
     console.log(
       `\n\x1B[48;5;237m \x1B[38;2;${iife.ansiColors.white}m${iife.scriptModule}\x1B[38;2;${iife.ansiColors.brightGray}m v${iife.version} \x1B[38;5;222mNow Exiting \x1B[0m\n`
     );
   }
 
-  // --- §3.3: printProcessHelp ---
+  // --- §3.4: printProcessHelp ---
   function printProcessHelp() {
     const availableCommands = getAvailableCommands();
     console.log(
@@ -190,17 +202,17 @@ import {
     );
   }
 
-  // --- §3.4: printProgressMsg ---
+  // --- §3.5: printProgressMsg ---
   function printProgressMsg(msg) {
     console.log(`\x1B[38;2;${iife.ansiColors.blue}m${msg}\x1B[0m`);
   }
 
-  // --- §3.5: printResultsMsg ---
+  // --- §3.6: printResultsMsg ---
   function printResultsMsg(msg) {
     console.log(`\x1B[38;2;${iife.ansiColors.yellow}m${msg}\x1B[0m`);
   }
 
-  // --- §3.6: printWelcomeMsg ---
+  // --- §3.7: printWelcomeMsg ---
   function printWelcomeMsg() {
     console.log(
       `\n\x1B[48;5;237m \x1B[38;2;${iife.ansiColors.white}m${iife.scriptModule}\x1B[38;2;${iife.ansiColors.brightGray}m v${iife.version} \x1B[38;5;222mNow Running \x1B[0m\n`
@@ -235,8 +247,8 @@ import {
   // ·  §5: Process Set Up and Inputs
   // ·< -----------------------------
 
-  // --- §5.1: executeCommandFromArgv ---
-  async function executeCommandFromArgv() {
+  // --- §5.1: exec3CommandFromArgv ---
+  async function exec3CommandFromArgv() {
     const availableCommands = getAvailableCommands();
 
     // Specification of a command is required for the script to function.
@@ -250,7 +262,7 @@ import {
     try {
       const commandFound =
         typeof availableCommands[requestedCommand] != 'undefined';
-      const aliasFound = commandFound ?
+      const aliasFound = !commandFound ?
         getCommandFromAlias(requestedCommand) :
         undefined;
       if (!commandFound && !aliasFound) {
@@ -260,7 +272,7 @@ import {
       } else if (aliasFound) {
         requestedCommand = aliasFound;
       }
-      exe5nStart = await availableCommands[requestedCommand].cb();
+      exe5nStart = await availableCommands[requestedCommand].cb(true);
     } catch (error) {
       printErrorMsg(error.message);
     }
@@ -268,11 +280,36 @@ import {
     return exe5nStart;
   }
 
-  // --- §5.2: getAvailableCommands ---
+  // --- §5.2: exec3CommandFromTerm4 ---
+  async function exec3CommandFromTerm4() {
+    let requestedCommand = await inputData('\nNext Command: ');
+    const availableCommands = getAvailableCommands();
+    let exe5nStart = undefined;
+    try {
+      const commandFound =
+        typeof availableCommands[requestedCommand] != 'undefined';
+      const aliasFound = !commandFound ?
+        getCommandFromAlias(requestedCommand) :
+        undefined;
+      if (!commandFound && !aliasFound) {
+        throw new ReferenceError(
+          `I do not recognize the command “${requestedCommand}.” Available commands are:\n${Object.keys(availableCommands).join(', ')}`
+        );
+      } else if (aliasFound) {
+        requestedCommand = aliasFound;
+      }
+      exe5nStart = await availableCommands[requestedCommand].cb(false);
+    } catch (error) {
+      printErrorMsg(error.message);
+    }
+    return exe5nStart;
+  }
+
+  // --- §5.3: getAvailableCommands ---
   function getAvailableCommands() {
     return {
       "help": {
-        cb: provideProcessHelp,
+        cb: printProcessHelp,
         help: "\x1B[1m\x1B[3mSyntax:\x1B[0m help (\"command|alias\")?\n\x1B[1m\x1B[3mAliases:\x1B[0m h\n\x1B[1m\x1B[3mDescription:\x1B[0m Get information about the commands that are available from this WebsiteMapper module for scanning WDS websites hosted on WSU WordPress."
       },
       "mapLinksOnSites": {
@@ -286,6 +323,10 @@ import {
       "mapPluginsOnSites": {
         cb: mapPluginsOnSites,
         help: "\x1B[1m\x1B[3mSyntax:\x1B[0m mapPluginsOnSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n\x1B[1m\x1B[3mAliases:\x1B[0m map plugins, mpios, mpi\n\x1B[1m\x1B[3mDescription:\x1B[0m Scan through a series of one or more WDS websites hosted on WSU WordPress to map out the plugins that are currently active on each site.",
+      },
+      "quitProcess": {
+        cb: quitProcess,
+        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m quitProcess|alias\n\x1B[1m\x1B[3mAliases:\x1B[0m quit, q, exit, terminate\n\x1B[1m\x1B[3mDescription:\x1B[0m Terminate the WsMapper module and return execution to the terminal’s command line.",
       },
       "scanUserAccessLevels": {
         cb: scanUserAccessLevels,
@@ -302,20 +343,21 @@ import {
     };
   }
 
-  // --- §5.3: getCommandAliases ---
+  // --- §5.4: getCommandAliases ---
   function getCommandAliases() {
     return {
       "help": /^h$/i,
       "mapLinksOnSites": /^(?:(?:map )?links(?: on sites?)?|ml(?:os)?)$/i,
       "mapPagesOnSites": /^(?:(?:map )?pages(?: on sites?)?|mp(?:os)?)$/i,
       "mapPluginsOnSites": /^(?:(?:map )?plugins(?: on sites?)?|mpi(?:os)?)$/i,
+      "quitProcess": /^(?:q(?:uit)?|exit|terminate)$/i,
       "scanUserAccessLevels": /^(?:user access(?: levels?)?|ual?)$/i,
       "scanWpSiteAccess": /^(?:(?:wordpress |wp )?site access|(?:wp)?sa)$/i,
       "testLogOnAtSites": /^(?:test log on|tlo)$/i,
     };
   }
 
-  // --- §5.4: getUrlsFromFile ---
+  // --- §5.6: getUrlsFromFile ---
   async function getUrlsFromFile(fileName) {
     try {
       const sourcefile = await open(fileName);
@@ -340,7 +382,54 @@ import {
     }
   }
 
-  // --- §5.5: getUrlsFromProcessArgv ---
+  // --- §5.5: getUrlsFromInput ---
+  async function getUrlsFromInput() {
+    // TO-DO: Finish writing function
+    const urlsJSON = await inputData(
+        'Enter URL as string, URLs as JSON string, or a file path to URLs:\n'
+      );
+    let urlsInput;
+
+    // ·> The URLs argument could be JSON representing a list of URLs, a file
+    // ·<  containing a list of URLs, or a URL.
+    try {
+      urlsInput = JSON.parse(urlsJSON);
+    } catch (error) {
+      // Check if the argument is a single URL.
+      if (
+        typeof urlsJSON == 'string' && urlsJSON.match(/https:\/\/.+/) !== null
+      ) {
+        return [
+          urlsJSON.charAt(urlsJSON.length - 1) == '/' ?
+            urlsJSON :
+            urlsJSON + '/'
+        ];
+      }
+
+      // Check the argument to see if it is a file containing a list of URLs.
+      const urlsFromFile = await getUrlsFromFile(urlsJSON);
+      if (urlsFromFile !== null) {
+        return urlsFromFile;
+      }
+    }
+
+    // ·> Ensure that only valid URLs are passed
+    const urls = urlsInput.filter((url) => {
+      return typeof url == 'string' && url.match(/https:\/\/.+/) !== null;
+    });
+    if (urls.length == 0) {
+      return undefined;
+    }
+
+    // ·> The script only accepts URLs that have a terminating slash.
+    return urls.map((url) => {
+      return url = url.charAt(url.length - 1) == '/' ?
+        url :
+        url + '/';
+    });
+  }
+
+  // --- §5.7: getUrlsFromProcessArgv ---
   async function getUrlsFromProcessArgv() {
     // Command requires that at least one URL was supplied at invocation.
     if (process.argv.length < 4) {
@@ -370,7 +459,7 @@ import {
       if (urlsFromFile !== null) {
         return urlsFromFile;
       }
-   }
+    }
 
     // ·> Ensure that only valid URLs are passed
     const urls = urlsInput.filter((url) => {
@@ -388,7 +477,7 @@ import {
     });
   }
 
-  // --- §5.6: inputData ---
+  // --- §5.8: inputData ---
   async function inputData(query) {
     const rl = readline.createInterface({
       input: process.stdin,
@@ -411,7 +500,7 @@ import {
     return data;
   }
 
-  // --- §5.7: inputPassword ---
+  // --- §5.9: inputPassword ---
   async function inputPassword(query) {
     const rl = readline.createInterface({
       input: process.stdin,
@@ -448,7 +537,7 @@ import {
     return password;
   }
 
-  // --- §5.8: listenForSIGINT ---
+  // --- §5.10: listenForSIGINT ---
   function listenForSIGINT() {
     process.on("SIGINT", function () {
       printGoodbyeMsg();
@@ -461,8 +550,13 @@ import {
   // ·< ------------------------------------
 
   // --- §6.1: getUrlsToProceed ---
-  async function getUrlsToProceed() {
-    const urlsToScan = await getUrlsFromProcessArgv();
+  async function getUrlsToProceed(invokedFromC6L3) {
+    let urlsToScan = undefined;
+    if (invokedFromC6L3) {
+      urlsToScan = await getUrlsFromProcessArgv();
+    } else {
+      urlsToScan = await getUrlsFromInput();
+    }
     if (typeof urlsToScan == 'undefined' || urlsToScan.length == 0) {
       printErrorMsg('URLs supplied to process were invalid.');
       printGoodbyeMsg();
@@ -517,8 +611,8 @@ import {
   }
 
   // --- §8.2: mapLinksOnSites ---
-  async function mapLinksOnSites() {
-    const urlsToScan = await getUrlsToProceed();
+  async function mapLinksOnSites(invokedFromC6L3) {
+    const urlsToScan = await getUrlsToProceed(invokedFromC6L3);
 
     // ·> Start browsing a WSU WordPress hosted site based on the first URL
     // ·   provided to the module. Do not authenticate because being logged in
@@ -546,8 +640,8 @@ import {
 
 
   // --- §8.3: mapPagesOnSites ---
-  async function mapPagesOnSites() {
-    const urlsToScan = await getUrlsToProceed();
+  async function mapPagesOnSites(invokedFromC6L3) {
+    const urlsToScan = await getUrlsToProceed(invokedFromC6L3);
 
     // ·> Log in to WordPress based on the first URL provided to the module. It
     // ·   will be assumed that the user will stay logged in during visits to
@@ -572,8 +666,8 @@ import {
   }
 
   // --- §8.4: mapPluginsInSites ---
-  async function mapPluginsOnSites() {
-    const urlsToScan = await getUrlsToProceed();
+  async function mapPluginsOnSites(invokedFromC6L3) {
+    const urlsToScan = await getUrlsToProceed(invokedFromC6L3);
 
     // ·> Log in to WordPress based on the first URL provided to the module. It
     // ·   will be assumed that the user will stay logged in during visits to
@@ -598,7 +692,7 @@ import {
   }
 
   // --- §8.5: provideProcessHelp ---
-  async function provideProcessHelp() {
+  async function provideProcessHelp(invokedFromC6L3) {
     const exe5nStart = new Date();
 
     // ·> Determine whether help was requested with a specific command. If not,
@@ -629,9 +723,15 @@ import {
     return exe5nStart;
   }
 
-  // --- §8.6: scanUserAccessLevels ---
-  async function scanUserAccessLevels() {
-    const urlsToScan = await getUrlsToProceed();
+  // --- §8.6: quitProcess ---
+  async function quitProcess(invokedFromC6L3) {
+    iife.proc3ReadyToExit = true;
+    return new Date();
+  }
+
+  // --- §8.7: scanUserAccessLevels ---
+  async function scanUserAccessLevels(invokedFromC6L3) {
+    const urlsToScan = await getUrlsToProceed(invokedFromC6L3);
 
     // ·> Log in to WordPress based on the first URL provided to the module. It
     // ·   will be assumed that the user will stay logged in during visits to
@@ -652,9 +752,9 @@ import {
     return exe5nStart;
   }
 
-  // --- §8.7: scanWpSiteAccess ---
-  async function scanWpSiteAccess() {
-    const urlsToScan = await getUrlsToProceed();
+  // --- §8.8: scanWpSiteAccess ---
+  async function scanWpSiteAccess(invokedFromC6L3) {
+    const urlsToScan = await getUrlsToProceed(invokedFromC6L3);
 
     // ·> Log in to WordPress based on the first URL provided to the module. It
     // ·   will be assumed that the user will stay logged in during visits to
@@ -675,9 +775,9 @@ import {
     return exe5nStart;
   }
 
-  // --- §8.8: testLogOnAtSites ---
-  async function testLogOnAtSites() {
-    const urlsToScan = await getUrlsToProceed();
+  // --- §8.9: testLogOnAtSites ---
+  async function testLogOnAtSites(invokedFromC6L3) {
+    const urlsToScan = await getUrlsToProceed(invokedFromC6L3);
 
     // ·> Log in to WordPress based on the first URL provided to the module. It
     // ·   will be assumed that the user will stay logged in during visits to
@@ -741,6 +841,7 @@ import {
         await auth6teOnPullmanHostedSession(session);
       }
     } catch (error) {
+      printErrorMsg(error.message);
       session.loginSuccessful = false;
     }
 
@@ -1780,8 +1881,18 @@ import {
   async function iifeMain() {
     listenForSIGINT();
     printWelcomeMsg();
-    const exe5nStart = await executeCommandFromArgv();
-    const exe5nEnd = new Date();
+
+    // Execute a command specified at the command line when invoking the module.
+    let exe5nStart = await exec3CommandFromArgv();
+    let exe5nEnd = new Date();
+
+    // Begin a command execution loop.
+    while (!iife.proc3ReadyToExit) {
+      printCommandTime(exe5nEnd - exe5nStart);
+      exe5nStart = await exec3CommandFromTerm4();
+      exe5nEnd = new Date();
+    }
+
     printGoodbyeMsg(exe5nEnd - exe5nStart);
     process.exit();
   }
@@ -1797,6 +1908,7 @@ import {
     yellow: '243;231;0',
     white: '255;255;255',
   },
+  proc3ReadyToExit: false,
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
   version: '0.4.1-0.2.0',
 });
