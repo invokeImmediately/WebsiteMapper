@@ -8,7 +8,7 @@
  * Command-line module for mapping WordPress management activity on websites
  *  hosted on WSU WordPress and running the Web Design System theme.
  *
- * @version 0.4.1-0.4.0
+ * @version 0.4.1-0.4.1
  *
  * @author: Daniel Rieck
  *  [daniel.rieck@wsu.edu]
@@ -54,66 +54,66 @@
 // ·  §05: Process Set Up and Inputs.......................................247
 // ·    §5.1: exec3CommandFromArgv.........................................250
 // ·    §5.2: exec3CommandFromTerm4........................................283
-// ·    §5.3: getAvailableCommands.........................................308
-// ·    §5.4: getCommandAliases............................................346
-// ·    §5.5: getUrlsFromInput.............................................360
-// ·    §5.6: getUrlsFromFile..............................................385
-// ·    §5.7: getUrlsFromProcessArgv.......................................432
-// ·    §5.8: inputData....................................................480
-// ·    §5.9: inputPassword................................................503
-// ·    §5.10: listenForSIGINT.............................................540
-// ·  §06: Quality Control of Process Input................................549
-// ·    §6.1: getUrlsToProceed.............................................552
-// ·  §07: Process Output..................................................569
-// ·    §7.1: getCsvOutputFromData.........................................572
-// ·    §7.2: writeResultsToCSV............................................585
-// ·  §08: Process Command Execution.......................................596
-// ·    §8.1: getCommandFromAlias..........................................599
-// ·    §8.2: mapLinksOnSites..............................................613
-// ·    §8.3: mapPagesOnSites..............................................642
-// ·    §8.4: mapPluginsOnSites............................................668
-// ·    §8.5: provideProcessHelp...........................................694
-// ·    §8.6: quitProcess..................................................726
-// ·    §8.7: scanUserAccessLevels.........................................732
-// ·    §8.8: scanWpSiteAccess.............................................755
-// ·    §8.9: testLogOnAtSites.............................................778
-// ·  §09: Headless Browser Control........................................797
-// ·    §9.1: launchBrowser................................................800
-// ·    §9.2: getAuthenticatedWsuWpSession.................................812
-// ·    §9.3: auth6teOnAwsHostedSession....................................851
-// ·    §9.4: auth6teOnPullmanHostedSession................................920
-// ·    §9.5: getUnauthenticatedWsuWpSession...............................946
-// ·  §10: User Data Extraction............................................963
-// ·    §10.1: extractWpUserData...........................................966
-// ·    §10.2: getWpUserDataFileName......................................1002
-// ·    §10.3: getDomainsFromWpUserData...................................1011
-// ·    §10.4: mapWPUsers.................................................1024
-// ·    §10.5: writeUserMapToFile.........................................1077
-// ·  §11: WSU Employee Lookup............................................1104
-// ·    §11.1: lookUpWsuEmployee..........................................1107
-// ·    §11.2: queryWpUsersAsWsuEmployees.................................1174
-// ·  §12: WP Site Access Mapping.........................................1192
-// ·    §12.1: addWpThemeUsageToSiteAccessMap.............................1195
-// ·    §12.2: getWpSiteAccessFileName....................................1216
-// ·    §12.3: mapWPSiteAccess............................................1225
-// ·    §12.4: writeWPSiteAccessMapToCSVFile..............................1278
-// ·  §13: WSUWP Site Page Mapping........................................1296
-// ·    §13.1: addPgPostTableDataToPageMap................................1299
-// ·    §13.2: extractPgPostDataOnCur3tListPage...........................1323
-// ·    §13.3: getInst7nNameFromUrl.......................................1353
-// ·    §13.4: getWpPageMapFileName.......................................1361
-// ·    §13.5: mapPagesOnSite.............................................1376
-// ·    §13.6: writePageMapToFile.........................................1450
-// ·  §14: WSUWP Site Plugin Mapping......................................1475
-// ·    §14.1: getWpPluginMapFileName.....................................1478
-// ·    §14.2: mapPluginsOnSite...........................................1493
-// ·    §14.3: writePluginMapToFile.......................................1602
-// ·  §15: WSUWP Site Link Mapping........................................1623
-// ·    §15.1: mapLinksOnSite.............................................1626
-// ·    §15.2: mapLinksOnPage.............................................1654
-// ·    §15.3: addPageLinksToSiteMap......................................1765
-// ·    §15.4: addPageLinksToPagesToCheck.................................1815
-// ·< §16: IIFE Execution Entry Point.....................................1878
+// ·    §5.3: getAvailableCommands.........................................310
+// ·    §5.4: getCommandAliases............................................348
+// ·    §5.5: getUrlsFromInput.............................................362
+// ·    §5.6: getUrlsFromFile..............................................387
+// ·    §5.7: getUrlsFromProcessArgv.......................................434
+// ·    §5.8: inputData....................................................482
+// ·    §5.9: inputPassword................................................505
+// ·    §5.10: listenForSIGINT.............................................542
+// ·  §06: Quality Control of Process Input................................551
+// ·    §6.1: getUrlsToProceed.............................................554
+// ·  §07: Process Output..................................................571
+// ·    §7.1: getCsvOutputFromData.........................................574
+// ·    §7.2: writeResultsToCSV............................................587
+// ·  §08: Process Command Execution.......................................598
+// ·    §8.1: getCommandFromAlias..........................................601
+// ·    §8.2: mapLinksOnSites..............................................615
+// ·    §8.3: mapPagesOnSites..............................................644
+// ·    §8.4: mapPluginsOnSites............................................670
+// ·    §8.5: provideProcessHelp...........................................696
+// ·    §8.6: quitProcess..................................................728
+// ·    §8.7: scanUserAccessLevels.........................................734
+// ·    §8.8: scanWpSiteAccess.............................................757
+// ·    §8.9: testLogOnAtSites.............................................780
+// ·  §09: Headless Browser Control........................................799
+// ·    §9.1: launchBrowser................................................802
+// ·    §9.2: getAuthenticatedWsuWpSession.................................814
+// ·    §9.3: auth6teOnAwsHostedSession....................................853
+// ·    §9.4: auth6teOnPullmanHostedSession................................922
+// ·    §9.5: getUnauthenticatedWsuWpSession...............................948
+// ·  §10: User Data Extraction............................................965
+// ·    §10.1: extractWpUserData...........................................968
+// ·    §10.2: getWpUserDataFileName......................................1004
+// ·    §10.3: getDomainsFromWpUserData...................................1013
+// ·    §10.4: mapWPUsers.................................................1026
+// ·    §10.5: writeUserMapToFile.........................................1079
+// ·  §11: WSU Employee Lookup............................................1106
+// ·    §11.1: lookUpWsuEmployee..........................................1109
+// ·    §11.2: queryWpUsersAsWsuEmployees.................................1176
+// ·  §12: WP Site Access Mapping.........................................1194
+// ·    §12.1: addWpThemeUsageToSiteAccessMap.............................1197
+// ·    §12.2: getWpSiteAccessFileName....................................1218
+// ·    §12.3: mapWPSiteAccess............................................1227
+// ·    §12.4: writeWPSiteAccessMapToCSVFile..............................1280
+// ·  §13: WSUWP Site Page Mapping........................................1298
+// ·    §13.1: addPgPostTableDataToPageMap................................1301
+// ·    §13.2: extractPgPostDataOnCur3tListPage...........................1325
+// ·    §13.3: getInst7nNameFromUrl.......................................1355
+// ·    §13.4: getWpPageMapFileName.......................................1363
+// ·    §13.5: mapPagesOnSite.............................................1378
+// ·    §13.6: writePageMapToFile.........................................1452
+// ·  §14: WSUWP Site Plugin Mapping......................................1477
+// ·    §14.1: getWpPluginMapFileName.....................................1480
+// ·    §14.2: mapPluginsOnSite...........................................1495
+// ·    §14.3: writePluginMapToFile.......................................1604
+// ·  §15: WSUWP Site Link Mapping........................................1625
+// ·    §15.1: mapLinksOnSite.............................................1628
+// ·    §15.2: mapLinksOnPage.............................................1656
+// ·    §15.3: addPageLinksToSiteMap......................................1767
+// ·    §15.4: addPageLinksToPagesToCheck.................................1817
+// ·< §16: IIFE Execution Entry Point.....................................1880
 
 // ·> ==========================================================================
 // ·  §01: Import Process Dependencies
@@ -183,14 +183,14 @@ import {
 
   // --- §3.2: printErrorMsg ---
   function printErrorMsg(msg) {
-    console.log(`\x1B[38;2;${iife.ansiColors.red}m${msg}\x1B[0m`);
+    console.log(`${iife.ansiColors.red}${msg}${iife.ansiSGR.reset}`);
   }
 
   // --- §3.3: printGoodbyeMsg ---
   function printGoodbyeMsg(exe5nTime) {
     printCommandTime(exe5nTime);
     console.log(
-      `\n\x1B[48;5;237m \x1B[38;2;${iife.ansiColors.white}m${iife.scriptModule}\x1B[38;2;${iife.ansiColors.brightGray}m v${iife.version} \x1B[38;5;222mNow Exiting \x1B[0m\n`
+      `\n${iife.ansiColors.darkGrayBg} ${iife.ansiColors.white}${iife.scriptModule}${iife.ansiColors.brightGray} v${iife.version} ${iife.ansiColors.veryLightOrange}Now Exiting ${iife.ansiSGR.reset}\n`
     );
   }
 
@@ -198,24 +198,24 @@ import {
   function printProcessHelp() {
     const availableCommands = getAvailableCommands();
     console.log(
-      `This \x1B[38;2;${iife.ansiColors.white}mWebsiteMapper module\x1B[0m is designed to automatically scan WDS websites hosted on WSU WordPress to map important characteristics including network-based site access, user access levels, employee information, etc. Scanned information is generally stored in CSV files written to the \x1B[38;2;${iife.ansiColors.white}mResults\x1B[0m sub-folder located in the module's working directory.\n\n\x1B[38;2;${iife.ansiColors.white}mAvailable commands:\x1B[0m ${Object.keys(availableCommands).join(', ')}`
+      `This ${iife.ansiColors.white}WebsiteMapper module${iife.ansiSGR.reset} is designed to automatically scan WDS websites hosted on WSU WordPress to map important characteristics including network-based site access, user access levels, employee information, etc. Scanned information is generally stored in CSV files written to the ${iife.ansiColors.white}Results${iife.ansiSGR.reset} sub-folder located in the module's working directory.\n\n${iife.ansiColors.white}Available commands:${iife.ansiSGR.reset} ${Object.keys(availableCommands).join(', ')}`
     );
   }
 
   // --- §3.5: printProgressMsg ---
   function printProgressMsg(msg) {
-    console.log(`\x1B[38;2;${iife.ansiColors.blue}m${msg}\x1B[0m`);
+    console.log(`${iife.ansiColors.blue}${msg}${iife.ansiSGR.reset}`);
   }
 
   // --- §3.6: printResultsMsg ---
   function printResultsMsg(msg) {
-    console.log(`\x1B[38;2;${iife.ansiColors.yellow}m${msg}\x1B[0m`);
+    console.log(`${iife.ansiColors.yellow}${msg}${iife.ansiSGR.reset}`);
   }
 
   // --- §3.7: printWelcomeMsg ---
   function printWelcomeMsg() {
     console.log(
-      `\n\x1B[48;5;237m \x1B[38;2;${iife.ansiColors.white}m${iife.scriptModule}\x1B[38;2;${iife.ansiColors.brightGray}m v${iife.version} \x1B[38;5;222mNow Running \x1B[0m\n`
+      `\n${iife.ansiColors.darkGrayBg} ${iife.ansiColors.white}${iife.scriptModule}${iife.ansiColors.brightGray} v${iife.version} ${iife.ansiColors.veryLightOrange}Now Running ${iife.ansiSGR.reset}\n`
     );
   }
 
@@ -282,7 +282,9 @@ import {
 
   // --- §5.2: exec3CommandFromTerm4 ---
   async function exec3CommandFromTerm4() {
-    let requestedCommand = await inputData('\nNext Command: ');
+    let requestedCommand = await inputData(
+        `\n${iife.ansiColors.green}Next Command:${iife.ansiSGR.reset} `
+      );
     const availableCommands = getAvailableCommands();
     let exe5nStart = undefined;
     try {
@@ -310,35 +312,35 @@ import {
     return {
       "help": {
         cb: printProcessHelp,
-        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m help (\"command|alias\")?\n\x1B[1m\x1B[3mAliases:\x1B[0m h\n\x1B[1m\x1B[3mDescription:\x1B[0m Get information about the commands that are available from this WebsiteMapper module for scanning WDS websites hosted on WSU WordPress."
+        help: `${iife.ansiSGR.bold}${iife.ansiSGR.bold}Syntax:${iife.ansiSGR.reset} help (\"command|alias\")?\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Aliases:${iife.ansiSGR.reset} h\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Description:${iife.ansiSGR.reset} Get information about the commands that are available from this WebsiteMapper module for scanning WDS websites hosted on WSU WordPress.`
       },
       "mapLinksOnSites": {
         cb: mapLinksOnSites,
-        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m mapLinksOnSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n\x1B[1m\x1B[3mAliases:\x1B[0m map links, mlos, ml\n\x1B[1m\x1B[3mDescription:\x1B[0m Using the specified home page URLs as a starting point, create a mapping of all the links that appear on each site. Specifically, progressively use the mapping as it is being built to find and analyze each of the live pages on a site that should contribute to the final mapping.",
+        help: `${iife.ansiSGR.bold}${iife.ansiSGR.bold}Syntax:${iife.ansiSGR.reset} mapLinksOnSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Aliases:${iife.ansiSGR.reset} map links, mlos, ml\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Description:${iife.ansiSGR.reset} Using the specified home page URLs as a starting point, create a mapping of all the links that appear on each site. Specifically, progressively use the mapping as it is being built to find and analyze each of the live pages on a site that should contribute to the final mapping.`,
       },
       "mapPagesOnSites": {
         cb: mapPagesOnSites,
-        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m mapPagesOnSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n\x1B[1m\x1B[3mAliases:\x1B[0m map pages, mpos, mp\n\x1B[1m\x1B[3mDescription:\x1B[0m Scan through a series of one or more WDS websites hosted on WSU WordPress to map out the pages that are being maintained on each site. Include information who last updated each page and an overview of the accessibility issues present on each page.",
+        help: `${iife.ansiSGR.bold}${iife.ansiSGR.bold}Syntax:${iife.ansiSGR.reset} mapPagesOnSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Aliases:${iife.ansiSGR.reset} map pages, mpos, mp\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Description:${iife.ansiSGR.reset} Scan through a series of one or more WDS websites hosted on WSU WordPress to map out the pages that are being maintained on each site. Include information who last updated each page and an overview of the accessibility issues present on each page.`,
       },
       "mapPluginsOnSites": {
         cb: mapPluginsOnSites,
-        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m mapPluginsOnSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n\x1B[1m\x1B[3mAliases:\x1B[0m map plugins, mpios, mpi\n\x1B[1m\x1B[3mDescription:\x1B[0m Scan through a series of one or more WDS websites hosted on WSU WordPress to map out the plugins that are currently active on each site.",
+        help: `${iife.ansiSGR.bold}${iife.ansiSGR.bold}Syntax:${iife.ansiSGR.reset} mapPluginsOnSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Aliases:${iife.ansiSGR.reset} map plugins, mpios, mpi\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Description:${iife.ansiSGR.reset} Scan through a series of one or more WDS websites hosted on WSU WordPress to map out the plugins that are currently active on each site.`,
       },
       "quitProcess": {
         cb: quitProcess,
-        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m quitProcess|alias\n\x1B[1m\x1B[3mAliases:\x1B[0m quit, q, exit, terminate\n\x1B[1m\x1B[3mDescription:\x1B[0m Terminate the WsMapper module and return execution to the terminal’s command line.",
+        help: `${iife.ansiSGR.bold}${iife.ansiSGR.bold}Syntax:${iife.ansiSGR.reset} quitProcess|alias\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Aliases:${iife.ansiSGR.reset} quit, q, exit, terminate\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Description:${iife.ansiSGR.reset} Terminate the WsMapper module and return execution to the terminal’s command line.`,
       },
       "scanUserAccessLevels": {
         cb: scanUserAccessLevels,
-        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m scanUserAccessLevels|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n\x1B[1m\x1B[3mAliases:\x1B[0m user access levels, user access, ua, ual\n\x1B[1m\x1B[3mDescription:\x1B[0m Scan a series of WDS websites hosted on WSU WordPress to build a list of WP users and their access levels. Requires WP authentication using an account with admin access to each site in the list.",
+        help: `${iife.ansiSGR.bold}${iife.ansiSGR.bold}Syntax:${iife.ansiSGR.reset} scanUserAccessLevels|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Aliases:${iife.ansiSGR.reset} user access levels, user access, ua, ual\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Description:${iife.ansiSGR.reset} Scan a series of WDS websites hosted on WSU WordPress to build a list of WP users and their access levels. Requires WP authentication using an account with admin access to each site in the list.`,
       },
       "scanWpSiteAccess": {
         cb: scanWpSiteAccess,
-        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m scanWpSiteAccess|alias 'url'\n\x1B[1m\x1B[3mAliases:\x1B[0m wordpress site access, wp site access, site access, wpsa, sa\n\x1B[1m\x1B[3mDescription:\x1B[0m Log into a WSU WordPress site and scan the networks menu to map the sites that the user can access. If possible to determine based on the user's permissions, include the theme that is in use on each site.",
+        help: `${iife.ansiSGR.bold}${iife.ansiSGR.bold}Syntax:${iife.ansiSGR.reset} scanWpSiteAccess|alias 'url'\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Aliases:${iife.ansiSGR.reset} wordpress site access, wp site access, site access, wpsa, sa\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Description:${iife.ansiSGR.reset} Log into a WSU WordPress site and scan the networks menu to map the sites that the user can access. If possible to determine based on the user's permissions, include the theme that is in use on each site.`,
       },
       "testLogOnAtSites": {
         cb: testLogOnAtSites,
-        help: "\x1B[1m\x1B[3mSyntax:\x1B[0m testLogOnAtSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n\x1B[1m\x1B[3mAliases:\x1B[0m test log on, tlo\n\x1B[1m\x1B[3mDescription:\x1B[0m Attempt to log on at the specified WSUWP websites.",
+        help: `${iife.ansiSGR.bold}${iife.ansiSGR.bold}Syntax:${iife.ansiSGR.reset} testLogOnAtSites|alias '\"url1\"|[\"url1\"(, \"url2\", \"url3\", …)?]'\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Aliases:${iife.ansiSGR.reset} test log on, tlo\n${iife.ansiSGR.bold}${iife.ansiSGR.bold}Description:${iife.ansiSGR.reset} Attempt to log on at the specified WSUWP websites.`,
       },
     };
   }
@@ -520,7 +522,7 @@ import {
       } else {
         rl.output.write(
           "\x1B[2K\x1B[200D" + rl.query + "\x1B[90m" +
-            "*".repeat(rl.line.length) + "\x1B[0m"
+            "*".repeat(rl.line.length) + `${iife.ansiSGR.reset}`
         );
      }
     }
@@ -1900,13 +1902,20 @@ import {
   await iifeMain();
 })({
   ansiColors: {
-    blue: '91;195;245',
-    brightGray: '192;192;192',
-    green: '170;220;36',
-    orange: '225;103;39',
-    red: '230;20;62',
-    yellow: '243;231;0',
-    white: '255;255;255',
+    blue: '\x1B[38;2;91;195;245m',
+    brightGray: '\x1B[38;2;192;192;192m',
+    darkGrayBg: '\x1B[48;5;237m',
+    green: '\x1B[38;2;170;220;36m',
+    orange: '\x1B[38;2;225;103;39m',
+    red: '\x1B[38;2;230;20;62m',
+    veryLightOrange: '\x1B[38;5;222m',
+    yellow: '\x1B[38;2;243;231;0m',
+    white: '\x1B[38;2;255;255;255m',
+  },
+  ansiSGR: {
+    bold: '\x1B[1m',
+    italic: '\x1B[3m',
+    reset: '\x1B[0m',
   },
   proc3ReadyToExit: false,
   scriptModule: 'WsMapper.Scanners.WSUWDS.mjs',
